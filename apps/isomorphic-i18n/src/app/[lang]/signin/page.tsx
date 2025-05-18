@@ -1,0 +1,76 @@
+import SignInForm from '@/app/[lang]/signin/sign-in-form';
+import AuthWrapperOne from '@/app/shared/auth-layout/auth-wrapper-one';
+import Image from 'next/image';
+import UnderlineShape from '@components/shape/underline';
+import { metaObject } from '@/config/site.config';
+import signUpBG from '@public/sign-up.webp';
+import signUpBGAr from '@public/sign-up-ar.webp';
+
+export const metadata = {
+  ...metaObject('Sign In'),
+};
+
+const translations = {
+  en: {
+    welcome: "Welcome back! Please ",
+    signinTitle: "Sign in to",
+    continue: "continue.",
+    description:
+      "By signing up, you will gain access to exclusive content, special offers, and be the first to hear about exciting news and updates.",
+    bannerTitle: "The simplest way to manage your workspace.",
+    bannerDescription:
+      "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint velit officia consequat duis.",
+  },
+  ar: {
+    welcome: "أهلاً بك من جديد! من فضلك ",
+    signinTitle: "قم بتسجيل الدخول إليها",
+    continue: "للمتابعة.",
+    description:
+      "من خلال التسجيل، ستحصل على محتوى حصري وعروض خاصة وستكون أول من يعرف الأخبار والتحديثات المثيرة.",
+    bannerTitle: "أسهل طريقة لإدارة مساحتك.",
+    bannerDescription:
+      "أميت مينيوم موليت نون ديزورنت ألامكو إيست سيت ألايكا دولور دو أميت سينت فيليت أوفيسيا كونسكات دويس.",
+  },
+};
+
+export default function SignIn({
+  params: { lang },
+}: {
+  params: {
+    lang: string;
+  };
+}) {
+  const t = translations[lang as 'en' | 'ar'] || translations.en;
+  return (
+    <AuthWrapperOne
+      title={
+        <>
+          {t.welcome}
+          <span className="relative inline-block">
+            {t.signinTitle}
+            <UnderlineShape className="absolute -bottom-2 start-0 h-2.5 w-24 text-blue md:w-28 xl:-bottom-1.5 xl:w-36" />
+          </span>{' '}
+          {t.continue}
+        </>
+      }
+      // description={t.description}
+      bannerTitle={t.bannerTitle}
+      // bannerDescription={t.bannerDescription}
+      isSocialLoginActive={false}
+      pageImage={
+        <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[620px] 2xl:w-[710px]">
+          <Image
+            src={lang === "ar"? signUpBGAr : signUpBG}
+            alt="Sign Up Thumbnail"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw"
+            className="object-cover"
+          />
+        </div>
+      }
+    >
+      <SignInForm lang={lang} />
+    </AuthWrapperOne>
+  );
+}

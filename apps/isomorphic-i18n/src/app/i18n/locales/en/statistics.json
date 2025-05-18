@@ -1,0 +1,24 @@
+{
+    "ProductsDetails":"Products Details",
+    "TotalProducts":"Total Products",
+    "totalOrders":"Total Orders",
+    "TotalCategories":"Total Categories",
+    "totalCustomers":"Total Customers",
+    "totalDeliveries":"Total Deliveries",
+    "totalProfit":"Total Profit",
+    "cancelledOrdersPercentage":"cancelled Orders %",
+"topProducts":"Best Selling products",
+"topRating":"Top Rating products",
+"BestCustomers":"Best Customers",
+"topcategory":"Top Selling Categories",
+"orders":"Orders",
+    "cancelledOrdersCount":"Cancelled Orders",
+"topsell":"Top Selling",
+"toprate":"Top Ratind",
+
+
+    "totalProductsVariations":"Total Variations"
+
+
+
+}

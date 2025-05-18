@@ -1,0 +1,20 @@
+{
+    "ProductsDetails":"تفاصيل المنتجات",
+    "TotalProducts":"جميع المنتجات",
+    "TotalCategories":"جميع الاقسام",
+    "totalOrders":"جميع الطلبات",
+    "totalCustomers":"جميع العملاء",
+    "cancelledOrdersCount":"الطلبات الملغية",
+    "totalProfit":"اجمالي الارباح",
+    "cancelledOrdersPercentage":"نسبه الطلبات الملغيه",
+    "totalDeliveries":"موظفي تسليم الطلبات",
+"topProducts":"المنتجات الاكثر مبيعا",
+"BestCustomers":"افضل العملاء",
+"topRating":"المنتجات الاعلي تقييما",
+"topcategory":"الاصناف الاعلي مبيعا",
+"orders":"طلبات",
+
+"topsell":"الاعلي مبيعا",
+"toprate":"الاعلي تقييم",
+    "totalProductsVariations":"جميع المتغيرات"
+}

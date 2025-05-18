@@ -1,0 +1,26 @@
+{
+    "basic-Title1":"Basic Shop data",
+    "basic-Desc1":"You can control your basic store data from here",
+    "color-desc":"You can change your store colors from here",
+    "color-title":"Store colors",
+    "selectColor-one":"Main color",
+    "selectColor-two":"Subcolor",
+    "shop-name":"Shop name",
+    "shop-subdomainName":"Subdomain",
+    "restaurant":"Restaurant",
+    "shop":"Shop",
+    "form-url":"https://",
+    "contact-title":"Contact Info",
+    "add":"Add",
+    "update":"Update",
+    "delete":"Delete",
+    "whatsapp":"WhatsApp number",
+    "facebook":"Facebook link",
+    "twitter":"Twitter link",
+    "insta":"Instagram link",
+    "whatsappHint": "Make sure to add an active WhatsApp number to make it easier for customers to contact you directly.",
+    "socialLinksHint": "Add links to your store's social media pages to help increase your followers.",
+    "linksValidityHint": "Ensure that the links you've added are correct and working properly.",
+    "updateHint": "Keep your contact information updated in case it changes."
+
+}

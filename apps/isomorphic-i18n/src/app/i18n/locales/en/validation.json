@@ -1,0 +1,7 @@
+{
+    "codeValidation": "Code is required",
+    "discountValue": "Discount value is required",
+    "expireDate": "Expiration date is required",
+    "usageLimit": "Usage limit is required",
+    "num": "This field accepts numbers only"
+}

@@ -1,0 +1,10 @@
+{
+    "basic-Title1":"Basic store data",
+    "basic-Desc1":"You can control your basic store data from here",
+    "color-title":"Store colors",
+    "color-desc":"You can change your store colors from here",
+    "selectColor-one":"Main color",
+    "selectColor-two":"Subcolor",
+    "shop-name":"Shop name",
+    "shop-subdomainName":"Subdomain"
+}
