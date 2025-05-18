@@ -13,6 +13,7 @@ import { dir } from "i18next";
 import { languages } from "../i18n/settings";
 import { UserProvider } from "../components/context/UserContext";
 import { GuardProvider } from "../components/context/GuardContext";
+import { QrStyleProvider } from "../components/contsxt1";
 
 const NextProgress = dynamic(() => import("@components/next-progress"), {
   ssr: false,
@@ -45,19 +46,21 @@ export default async function RootLayout({
         suppressHydrationWarning
         className={cn(elTajawal.variable ,'font-elTajawal')}
       >
-        <GuardProvider>
-          <UserProvider>
-            <AuthProvider session={session}>
-              <ThemeProvider>
-                <NextProgress />
-                {children}
-                <Toaster />
-                <GlobalDrawer lang={lang} />
-                <GlobalModal />
-              </ThemeProvider>
-            </AuthProvider>
-          </UserProvider>
-        </GuardProvider>
+        <QrStyleProvider>
+          <GuardProvider>
+            <UserProvider>
+              <AuthProvider session={session}>
+                <ThemeProvider>
+                  <NextProgress />
+                  {children}
+                  <Toaster />
+                  <GlobalDrawer lang={lang} />
+                  <GlobalModal />
+                </ThemeProvider>
+              </AuthProvider>
+            </UserProvider>
+          </GuardProvider>
+        </QrStyleProvider>
       </body>
     </html>
   );

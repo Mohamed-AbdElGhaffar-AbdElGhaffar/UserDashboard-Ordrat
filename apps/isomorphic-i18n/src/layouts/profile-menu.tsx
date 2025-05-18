@@ -9,6 +9,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/app/i18n/client";
 import Cookies from 'js-cookie';
+import { useCart } from '@/store/quick-cart/cart.context';
+
 export default function ProfileMenu({
   buttonClassName,
   avatarClassName,
@@ -20,6 +22,7 @@ export default function ProfileMenu({
   username?: boolean;
   lang?: string;
 }) {
+  const name = Cookies.get("name");
   return (
     <ProfileMenuPopover>
       <Popover.Trigger>
@@ -31,12 +34,12 @@ export default function ProfileMenu({
         >
           <Avatar
             src="https://isomorphic-furyroad.s3.amazonaws.com/public/avatars/avatar-11.webp"
-            name="John Doe"
+            name={name || "John Doe"}
             className={cn("!h-9 w-9 sm:!h-10 sm:!w-10", avatarClassName)}
           />
           {!!username && (
             <span className="username hidden text-gray-200 dark:text-gray-700 md:inline-flex">
-              Hi, Andry
+              {lang=='ar'? `اهلا, ${name || 'محمد'}`:`Hi, ${name || 'Mohamed'}`}
             </span>
           )}
         </button>
@@ -88,6 +91,7 @@ function DropdownMenu({ lang }: { lang?: string }) {
   const { t } = useTranslation(lang!);
   const name = Cookies.get("name");
   const email = Cookies.get("email");
+  const { resetCart } = useCart();
   return (
     <div className="w-64 text-left rtl:text-right">
       <div className="flex items-center border-b border-gray-300 px-6 pb-5 pt-6">
@@ -102,7 +106,7 @@ function DropdownMenu({ lang }: { lang?: string }) {
           <Text className="text-gray-600">{email}</Text>
         </div>
       </div>
-      <div className="grid px-3.5 py-3.5 font-medium text-gray-700">
+      {/* <div className="grid px-3.5 py-3.5 font-medium text-gray-700">
         {menuItems.map((item) => (
           <Link
             key={item.name}
@@ -112,17 +116,20 @@ function DropdownMenu({ lang }: { lang?: string }) {
             {t(item.name)}
           </Link>
         ))}
-      </div>
+      </div> */}
       <div className="border-t border-gray-300 px-6 pb-6 pt-5">
         <Link
           href={`/${lang}/signin`}
           className="h-auto w-full justify-start p-0 font-medium text-gray-700 outline-none focus-within:text-gray-600 hover:text-gray-900 focus-visible:ring-0"
           // variant="text"
           onClick={() => {
+            resetCart();
             Cookies.remove('shopId');
             Cookies.remove('accessToken');
             Cookies.remove('refreshToken');
             Cookies.remove('roles');
+            Cookies.remove('branches');
+            Cookies.remove('mainBranch');
             Cookies.remove('name');
             Cookies.remove('email');
             // signOut({ redirect: false });

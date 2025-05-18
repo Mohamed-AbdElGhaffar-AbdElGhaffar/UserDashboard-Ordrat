@@ -28,7 +28,7 @@ export default function Header({ lang }: { lang?: string }) {
           <Logo small={true} />
         </Link>
 
-        <SearchWidget t={t} />
+        <SearchWidget t={t} lang={lang!} />
       </div>
 
       <HeaderMenuRight lang={lang} />

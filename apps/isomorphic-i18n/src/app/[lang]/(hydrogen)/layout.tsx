@@ -9,6 +9,8 @@ import { useIsMounted } from '@hooks/use-is-mounted';
 import LithiumLayout from '@/layouts/lithium/lithium-layout';
 import BoronLayout from '@/layouts/boron/boron-layout';
 import CarbonLayout from '@/layouts/carbon/carbon-layout';
+import { POS_CART_KEY } from '@/config/constants';
+import { CartProvider } from '@/store/quick-cart/cart.context';
 
 export default function DefaultLayout({
   children,
@@ -42,5 +44,5 @@ export default function DefaultLayout({
     return <CarbonLayout lang={lang}>{children}</CarbonLayout>;
   }
 
-  return <HydrogenLayout lang={lang}>{children}</HydrogenLayout>;
+  return <CartProvider cartKey={POS_CART_KEY}><HydrogenLayout lang={lang}>{children}</HydrogenLayout></CartProvider>;
 }
