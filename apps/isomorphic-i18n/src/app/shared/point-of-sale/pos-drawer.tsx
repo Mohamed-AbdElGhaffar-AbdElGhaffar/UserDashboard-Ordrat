@@ -19,7 +19,7 @@ type PosDrawerProps = {
   branchOption: any[];
   allDatatables: any[];
   languages: number;
-  branchZones: { lat: number; lng: number; zoonRadius: number }[]; 
+  branchZones: { id:string; lat: number; lng: number; zoonRadius: number }[]; 
   freeShppingTarget: number;
   defaultUser: string;
 };

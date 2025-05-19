@@ -86,7 +86,7 @@ type POSDeliveryOrderProps = {
   onSuccess?: () => void;
   lang: string;
   languages: number;
-  branchZones: { lat: number; lng: number; zoonRadius: number }[]; 
+  branchZones: { id:string; lat: number; lng: number; zoonRadius: number }[]; 
   items: Item[];
   freeShppingTarget: number;
 };
@@ -350,6 +350,18 @@ export default function POSDeliveryOrder({
 			}, 10);
 		}
 	};	
+
+  const filteredBranchZones = branchZones
+  .filter(zone => zone.id === mainBranch)
+  .map(zone => ({
+    lat: zone.lat,
+    lng: zone.lng,
+    zoonRadius: zone.zoonRadius
+  }));
+
+  const initLat = filteredBranchZones.length > 0 ? filteredBranchZones[0].lat : 30.023173855111207;
+  const initLng = filteredBranchZones.length > 0 ? filteredBranchZones[0].lng : 31.185028997638923;
+
   return (
     <div className='py-1'>
       <div className={`m-auto ps-3 rounded-xl pe-1.5 me-1.5 pb-4 pt-4 IBM-Plex-sans ${styles.customScroll}`}>
@@ -378,9 +390,9 @@ export default function POSDeliveryOrder({
               <LocationPicker
                 apiKey='AIzaSyCPQicAmrON3EtFwOmHvSZQ9IbONbLQmtA' 
                 onLocationSelect={(lat, lng, address) => handleLocationSelect(lat, lng, address, mainFormik.validateForm)}
-                initLat={30.023173855111207}
-                initLng={31.185028997638923}
-                branchZones={branchZones}
+                initLat={initLat}
+                initLng={initLng}
+                branchZones={filteredBranchZones}
                 lang={lang!}
               />
               <RadioGroup

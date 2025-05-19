@@ -131,6 +131,7 @@ async function fetchBranchZones(shopId: string) {
 
     const data = await res.json();
     return data.map((branch: any) => ({
+      id: branch.id,
       lat: branch.centerLatitude,
       lng: branch.centerLongitude,
       zoonRadius: branch.coverageRadius,
@@ -186,7 +187,7 @@ export default async function PointOfSalePage({
   const shopData = await fetchShopData(lang, shopId as string);
   const branchZones = await fetchBranchZones(shopId as string);
   const defaultUsers = await fetchDefaultUsers(lang, shopId as string);
-  console.log("Default Users:", defaultUsers);
+  console.log("branchZones:", branchZones);
   const pageHeader = {
     title: lang =='ar'?'الكاشير':'Point of Sale (POS)',
     breadcrumb: [
