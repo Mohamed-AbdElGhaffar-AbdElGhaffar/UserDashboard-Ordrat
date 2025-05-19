@@ -187,7 +187,7 @@ export default async function PointOfSalePage({
   const shopData = await fetchShopData(lang, shopId as string);
   const branchZones = await fetchBranchZones(shopId as string);
   const defaultUsers = await fetchDefaultUsers(lang, shopId as string);
-  console.log("branchZones:", branchZones);
+  console.log("shopData:", shopData);
   const pageHeader = {
     title: lang =='ar'?'الكاشير':'Point of Sale (POS)',
     breadcrumb: [
@@ -222,6 +222,7 @@ export default async function PointOfSalePage({
           branchZones={branchZones}
           freeShppingTarget={shopData.freeShppingTarget}
           currencyAbbreviation={shopData.currencyAbbreviation}
+          shopData={shopData}
         />
         <POSDrawer 
           className="xl:hidden" 
@@ -233,6 +234,7 @@ export default async function PointOfSalePage({
           languages={shopData.languages} 
           branchZones={branchZones}
           freeShppingTarget={shopData.freeShppingTarget}
+          shopData={shopData}
         />
       </div>
     </CartProvider>

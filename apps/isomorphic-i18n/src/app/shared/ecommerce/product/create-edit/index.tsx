@@ -179,13 +179,24 @@ export default function CreateEditProduct({
       );
       setLoading(false);
       methods.reset();
-    } catch (error) {
-      console.error('API Error:', error);
-      toast.error(
-        lang === 'ar'
-        ? 'فشل في إنشاء المنتج. حاول مجدداً.'
-        : 'Failed to create product. Please try again.'
-      );
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message;
+    
+      if (errorMessage === "Sorry, You have exceed the limit of add product") {
+        toast.error(
+          lang === 'ar'
+            ? 'عذراً، لقد تجاوزت الحد المسموح به لإضافة المنتجات'
+            : 'Sorry, you have exceeded the product addition limit.'
+        );
+      } else {
+        toast.error(
+          lang === 'ar'
+            ? 'فشل في إنشاء المنتج. حاول مجدداً.'
+            : 'Failed to create product. Please try again.'
+        );
+      }
+    
+      console.error('API Error:', errorMessage || error);
       setLoading(false);
     }
   };

@@ -83,6 +83,7 @@ type PosSidebarProps = {
   branchZones: { id:string; lat: number; lng: number; zoonRadius: number }[]; 
   freeShppingTarget: number;
   defaultUser: string;
+  shopData: any;
 }; 
 
 function PostSidebar({
@@ -97,7 +98,8 @@ function PostSidebar({
   languages,
   branchZones,
   freeShppingTarget,
-  defaultUser
+  defaultUser,
+  shopData
 }: PosSidebarProps) {
   const { shipping, setShipping, posTableOrderId, setPOSTableOrderId, 
     updateMainBranch, setUpdateMainBranch, setTablesData,
@@ -644,24 +646,63 @@ function PostSidebar({
       setCloseOrder(false);
     }
   };
-  
+    
+  function findMatchingOrderItem(orderItems: any[], realProductData: any): string | null {
+    const matchingItem = orderItems.find((item) => {
+      // Check if product ID matches
+      if (item.product.id !== realProductData.id) return false;
+      if (item.cancelled == true) return false;
+
+      // Check if variations match
+      const orderVariations = item.orderItemVariations || [];
+      const realVariations = realProductData.variations || {};
+
+      return variationsMatch(orderVariations, realVariations);
+    });
+
+    // Return the item ID if found, otherwise null
+    return matchingItem ? matchingItem.id : null;
+  }
+
   const handleDeleteOrder = async () => {
-    if (localStorage.getItem('posTableOrderId')) {
-      openModal({
-        view: <ModalCancelOrder
-          lang={lang} 
-          orderId={posTableOrderId.order.id}
-          onSuccess={()=>{
-            setTablesData(true);
-            resetCart();
-          }}
-        />,
-        customSize: '480px',
-      });
-    }else{
-      resetCart();
+    const localStorageOrder = localStorage.getItem('posTableOrderId');
+    let allItemsCancelled = true;
+  
+    if (localStorageOrder && posTableOrderId?.order?.items?.length > 0) {
+      for (const item of items) {
+        const realProductData = parseProductData(item.id as string);
+        const matchingItem = posTableOrderId.order.items.find(
+          (orderItem: any) =>
+            orderItem.product.id === realProductData.id &&
+            variationsMatch(orderItem.orderItemVariations, realProductData.variations)
+        );
+  
+        if (matchingItem && matchingItem.cancelled === false) {
+          allItemsCancelled = false;
+          break;
+        }
+      }
+  
+      if (!allItemsCancelled) {
+        openModal({
+          view: (
+            <ModalCancelOrder
+              lang={lang}
+              orderId={posTableOrderId.order.id}
+              onSuccess={() => {
+                setTablesData(true);
+                resetCart();
+              }}
+            />
+          ),
+          customSize: '480px',
+        });
+        return;
+      }
     }
-  };
+  
+    resetCart();
+  };  
 
   const options = [
     {
@@ -769,7 +810,7 @@ function PostSidebar({
       )}
       {!!orderedItems?.length && (
         <div className="border-t border-gray-300 p-4 pb-0 lg:p-4">
-          <PriceCalculation lang={lang} shippingValue={shipping}/>
+          <PriceCalculation lang={lang} shippingValue={shipping} shopData={shopData}/>
           {posTableOrderId?
             <div className="flex gap-4">
               {posTableOrderId.tableStatus == 1?

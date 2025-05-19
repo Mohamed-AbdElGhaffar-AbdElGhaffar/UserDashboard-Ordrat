@@ -10,8 +10,8 @@ import { useEffect, useState } from 'react';
 import axiosClient from '@/app/components/context/api';
 // import { useCart } from '../../../../../isomorphic/src/store/quick-cart/cart.context';
 
-export default function POSPageView({ lang = 'en', filterOptions, tables, branchOption, allDatatables, languages, branchZones, freeShppingTarget, currencyAbbreviation, defaultUser }:{ lang: string; filterOptions: { id: string; name: string; value: string; icon: any; }[]; 
-  tables: { value: string; label: string }[]; branchOption: any[]; allDatatables: any[]; languages: number; branchZones: { id:string; lat: number; lng: number; zoonRadius: number }[]; freeShppingTarget: number; currencyAbbreviation: string; defaultUser: string;}) {
+export default function POSPageView({ lang = 'en', filterOptions, tables, branchOption, allDatatables, languages, branchZones, freeShppingTarget, currencyAbbreviation, defaultUser, shopData }:{ lang: string; filterOptions: { id: string; name: string; value: string; icon: any; }[]; 
+  tables: { value: string; label: string }[]; branchOption: any[]; allDatatables: any[]; languages: number; branchZones: { id:string; lat: number; lng: number; zoonRadius: number }[]; freeShppingTarget: number; currencyAbbreviation: string; defaultUser: string; shopData: any;}) {
   const { items, removeItemFromCart, clearItemFromCart, addItemToCart } = useCart();
   const [defaultData, setDefaultData] = useState<any[]>(allDatatables);
   const { posTableOrderId, setPOSTableOrderId, tablesData, setTablesData, mainBranch } = useUserContext();
@@ -72,6 +72,7 @@ export default function POSPageView({ lang = 'en', filterOptions, tables, branch
             languages={languages}
             branchZones={branchZones}
             freeShppingTarget={freeShppingTarget}
+            shopData={shopData}
           />
         </aside>
       {/* )} */}

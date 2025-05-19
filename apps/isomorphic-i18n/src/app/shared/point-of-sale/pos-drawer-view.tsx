@@ -85,6 +85,7 @@ type POSOrderTypes = {
   branchZones: { id:string; lat: number; lng: number; zoonRadius: number }[]; 
   freeShppingTarget: number;
   defaultUser: string;
+  shopData: any;
 };
  
 export default function POSDrawerView({
@@ -102,7 +103,8 @@ export default function POSDrawerView({
   languages,
   branchZones,
   freeShppingTarget,
-  defaultUser
+  defaultUser,
+  shopData
 }: POSOrderTypes) {
   const { shipping, setShipping, posTableOrderId, setPOSTableOrderId, 
     updateMainBranch, setUpdateMainBranch, setTablesData,
@@ -760,7 +762,7 @@ export default function POSDrawerView({
       )}
       {!!orderedItems?.length && (
         <div className="border-t border-gray-300 p-5 pb-7 lg:p-7">
-          <PriceCalculation lang={lang} shippingValue={shipping}/>
+          <PriceCalculation lang={lang} shippingValue={shipping} shopData={shopData}/>
           {posTableOrderId?
             <div className="flex gap-4">
               {posTableOrderId.tableStatus == 1?
@@ -849,8 +851,9 @@ export default function POSDrawerView({
 
 const TAX_PERCENTAGE = 5;
 
-export function PriceCalculation({ lang='en', shippingValue }:{ lang?:string; shippingValue?: string; }) {
+export function PriceCalculation({ lang='en', shippingValue, shopData }:{ lang?:string; shippingValue?: string; shopData?: any; }) {
   const { t, i18n } = useTranslation(lang!, "home");
+  const {posTableOrderId} = useUserContext();
   useEffect(() => {
     i18n.changeLanguage(lang);
   }, [lang, i18n]);
@@ -859,28 +862,71 @@ export function PriceCalculation({ lang='en', shippingValue }:{ lang?:string; sh
     (acc, item) => acc + (item?.salePrice ?? item.price) * item.quantity,
     0
   );
-  const tax = total * (TAX_PERCENTAGE / 100);
-  const subTotal = total + tax;
+  // const tax = total * (TAX_PERCENTAGE / 100);
+  // const subTotal = total + tax;
+  
+  const isDineIn = !!posTableOrderId;
+
+  // Service logic
+  const service =
+    shopData?.applyServiceOnDineInOnly && !isDineIn ? 0 : shopData?.service;
+
+  // VAT logic
+  const shouldApplyVat = shopData?.applyVatOnDineInOnly ? isDineIn : true;
+
+  const vat =
+    shouldApplyVat && shopData?.vat
+      ? shopData?.vatType === 1
+        ? shopData?.vat // fixed
+        : (shopData?.vat / 100) * total // percentage
+      : 0;
+
+  const subTotal = total + vat + service;
 
   return (
     <div className="mb-4 space-y-3.5">
       <p className="flex items-center justify-between">
         <span className="text-gray-500">{t('subtotal')}</span>
-        <span className="font-medium text-gray-900">{lang=='ar'?`${total.toFixed(2)} ${t('currency')}`:`${t('currency')} ${total.toFixed(2)}`}</span>
+        <span className="font-medium text-gray-900">
+          {lang === 'ar'
+            ? `${total.toFixed(2)} ${t('currency')}`
+            : `${t('currency')} ${total.toFixed(2)}`}
+        </span>
       </p>
-      {/* {shippingValue == 'table' &&(
+
+      {shouldApplyVat && (
         <p className="flex items-center justify-between">
-          <span className="text-gray-500">{t('delivery')}</span>
-          <span className="font-medium text-gray-900">{t('free')}</span>
+          <span className="text-gray-500">{t('tax')}</span>
+          <span className="font-medium text-gray-900">
+            {vat > 0
+              ? lang === 'ar'
+                ? `${vat.toFixed(2)} ${t('currency')}`
+                : `${t('currency')} ${vat.toFixed(2)}`
+              : t('free')}
+          </span>
         </p>
-      )} */}
-      <p className="flex items-center justify-between">
-        <span className="text-gray-500">{t('tax')}</span>
-        <span className="font-medium text-gray-900">{lang=='ar'?`${tax.toFixed(2)} ${t('currency')}`:`${t('currency')} ${tax.toFixed(2)}`}</span>
-      </p>
+      )}
+
+      {shopData?.applyServiceOnDineInOnly || shopData?.service > 0 ? (
+        <p className="flex items-center justify-between">
+          <span className="text-gray-500">{t('service')}</span>
+          <span className="font-medium text-gray-900">
+            {service > 0
+              ? lang === 'ar'
+                ? `${service.toFixed(2)} ${t('currency')}`
+                : `${t('currency')} ${service.toFixed(2)}`
+              : t('free')}
+          </span>
+        </p>
+      ) : null}
+
       <p className="flex items-center justify-between border-t border-gray-300 pt-3.5 text-base font-semibold">
         <span className="text-gray-900">{t('total')}:</span>
-        <span className="text-gray-900">{lang=='ar'?`${subTotal.toFixed(2)} ${t('currency')}`:`${t('currency')} ${subTotal.toFixed(2)}`}</span>
+        <span className="text-gray-900">
+          {lang === 'ar'
+            ? `${subTotal.toFixed(2)} ${t('currency')}`
+            : `${t('currency')} ${subTotal.toFixed(2)}`}
+        </span>
       </p>
     </div>
   );
