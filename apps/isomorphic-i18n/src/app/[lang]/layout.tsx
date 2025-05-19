@@ -53,7 +53,19 @@ export default async function RootLayout({
                 <ThemeProvider>
                   <NextProgress />
                   {children}
-                  <Toaster />
+                  <Toaster
+                    toastOptions={{
+                      style: {
+                        zIndex: 999999,
+                      },
+                    }}
+                    containerStyle={{
+                      zIndex: 999999,
+                      position: 'fixed',
+                      left: 0,
+                      top:20,
+                    }}
+                  />
                   <GlobalDrawer lang={lang} />
                   <GlobalModal />
                 </ThemeProvider>

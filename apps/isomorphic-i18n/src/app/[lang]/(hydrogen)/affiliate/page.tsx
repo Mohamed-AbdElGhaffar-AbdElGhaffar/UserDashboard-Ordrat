@@ -4,9 +4,21 @@ import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookie
 import AffiliateComponent from '@/app/components/affiliate/affiliateComponent/AffiliateComponent';
 import { API_BASE_URL } from '@/config/base-url';
 
-export const metadata = {
-  ...metaObject('Affiliate'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'نظام الشركاء | اربح من خلال الترويج لأوردات'
+        : 'Affiliate Program | Earn by Promoting Ordrat',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'انضم إلى نظام الشركاء وابدأ في تحقيق الأرباح من خلال دعوة المستخدمين والمتاجر إلى منصة أوردات.'
+        : 'Join the affiliate program and start earning by inviting users and shops to the Ordrat platform.'
+    ),
+  };
+}
 
 async function getValidAccessToken(accessToken: string | null, refreshToken: string | null): Promise<string | null> {
   if (!accessToken && refreshToken) {

@@ -62,11 +62,13 @@ interface ActionsCellProps {
   languages: number;
   items: Item[];
   clearItemFromCart: (id: number | string) => void;
+  defaultUser: string;
 }
 
-const ActionsPosTables: React.FC<ActionsCellProps> = ({ data, lang, languages, items, clearItemFromCart, }) => {    
+const ActionsPosTables: React.FC<ActionsCellProps> = ({ data, lang, languages, items, clearItemFromCart, defaultUser }) => {    
   const { closeModal } = useModal();  
   const shopId = GetCookiesClient('shopId');
+  const userType = GetCookiesClient('userType');
   const { setTablesData, shipping, setPOSTableOrderId } = useUserContext();
   const [loadingAddOrderItemsTable, setLoadingAddOrderItemsTable] = useState('');
   const [loadingEndOrder, setLoadingEndOrder] = useState('');
@@ -91,9 +93,13 @@ const ActionsPosTables: React.FC<ActionsCellProps> = ({ data, lang, languages, i
 
       formData.append('ShopId', shopId as string);
       formData.append('BranchId', "7b509bf6-7e75-4895-8d3f-0d7c4afa28f5");
-      formData.append('EndUserId', "9fd5a273-7273-4a2b-ab50-0bc908d3381e");
+      formData.append('EndUserId', defaultUser);
       if (decodedToken.uid) {
-        formData.append('EmployeeId', decodedToken.uid);
+        if(userType == '4'){
+          formData.append('EmployeeId', decodedToken.uid);
+        }else{
+          formData.append('SellerId', decodedToken.uid);
+        }
       }
       formData.append('Discount', '0');
       formData.append('GrossProfit', '0');

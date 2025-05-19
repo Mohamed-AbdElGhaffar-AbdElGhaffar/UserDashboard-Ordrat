@@ -47,7 +47,7 @@ export function WalletDetails({ lang, affiliateWallet }:WalletDetailsProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div className="text-center bg-gray-50 p-4 rounded">
             <div className="text-xl font-semibold">{affiliateWallet?.balance || '0.00'}{text.currency}</div>
             <div className="text-xs text-gray-500 uppercase">{text.total}</div>
@@ -62,7 +62,7 @@ export function WalletDetails({ lang, affiliateWallet }:WalletDetailsProps) {
           </div>
         </div>
 
-        <div className="h-64">
+        <div className="h-0 md:h-64">
           <canvas id="earningsChart" className="w-full h-full" />
         </div>
       </div>

@@ -21,9 +21,10 @@ type PosDrawerProps = {
   languages: number;
   branchZones: { lat: number; lng: number; zoonRadius: number }[]; 
   freeShppingTarget: number;
+  defaultUser: string;
 };
 
-export default function POSDrawer({ className, lang, tables, branchOption, allDatatables, languages, branchZones, freeShppingTarget }: PosDrawerProps) {
+export default function POSDrawer({ className, lang, tables, branchOption, allDatatables, languages, branchZones, freeShppingTarget, defaultUser }: PosDrawerProps) {
   const [openDrawer, setOpenDrawer] = useState(false);
   const { totalItems, items, removeItemFromCart, clearItemFromCart, resetCart } = useCart();
   const [defaultData, setDefaultData] = useState<any[]>(allDatatables);
@@ -78,9 +79,10 @@ export default function POSDrawer({ className, lang, tables, branchOption, allDa
           onOrderSuccess={() => setOpenDrawer(false)}
           onSuccess={resetCart}
           orderedItems={items}
-          className="h-screen border-none"
+          className="h-[100svh] border-none"
           lang={lang}
-          simpleBarClassName="h-[calc(100vh_-_420px)] sm:h-[calc(100vh_-_430px)]"
+          simpleBarClassName="h-[calc(100svh_-_420px)] sm:h-[calc(100svh_-_430px)]"
+          defaultUser={defaultUser}
           tables={tables}
           branchOption={branchOption}
           allDatatables={defaultData}

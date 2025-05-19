@@ -53,10 +53,10 @@ export default function AddFaqForm({
   const text = {
     nameAr: lang === 'ar' ? 'الأسم (عربي)' : 'Name (Arabic)',
     nameEn: lang === 'ar' ? 'الأسم (انجليزي)' : 'Name (English)',
-    titleAr: lang === 'ar' ? 'العنوان (عربي)' : 'Title (Arabic)',
-    titleEn: lang === 'ar' ? 'العنوان (انجليزي)' : 'Title (English)',
-    metaDescriptionAr: lang === 'ar' ? 'وصف الميتا (عربي)' : 'Meta Description (Arabic)',
-    metaDescriptionEn: lang === 'ar' ? 'وصف الميتا (انجليزي)' : 'Meta Description (English)',
+    titleEn: lang === 'ar' ? 'عنوان صفحة الاسئلة الشائعة (انجليزي)' : 'Page Title (English)',
+    titleAr: lang === 'ar' ? 'عنوان صفحة الاسئلة الشائعة (عربي)' : 'Page Title (Arabic)',
+    metaDescriptionEn: lang === 'ar' ? 'وصف صفحة الاسئلة الشائعة (انجليزي)' : 'Meta Description (English)',
+    metaDescriptionAr: lang === 'ar' ? 'وصف صفحة الاسئلة الشائعة (عربي)' : 'Meta Description (Arabic)',
     chooseImage: lang === 'ar' ? 'اختر صورة' : 'Choose an Image',
 
     addQuestions: lang === 'ar' ? 'أسئلة' : 'Questions',
@@ -87,10 +87,10 @@ export default function AddFaqForm({
   const mainFormSchema = Yup.object().shape({
     nameAr: Yup.string().required(text.nameAr + ' ' + requiredMessage),
     nameEn: Yup.string().required(text.nameEn + ' ' + requiredMessage),
-    titleAr: Yup.string().required(text.titleAr + ' ' + requiredMessage),
-    titleEn: Yup.string().required(text.titleEn + ' ' + requiredMessage),
-    metaDescriptionAr: Yup.string().required(text.metaDescriptionAr + ' ' + requiredMessage),
-    metaDescriptionEn: Yup.string().required(text.metaDescriptionEn + ' ' + requiredMessage),
+    // titleAr: Yup.string().required(text.titleAr + ' ' + requiredMessage),
+    // titleEn: Yup.string().required(text.titleEn + ' ' + requiredMessage),
+    // metaDescriptionAr: Yup.string().required(text.metaDescriptionAr + ' ' + requiredMessage),
+    // metaDescriptionEn: Yup.string().required(text.metaDescriptionEn + ' ' + requiredMessage),
     imageId: Yup.string().required(`${text.chooseImage} ${requiredMessage}`),
   });
 
@@ -98,10 +98,10 @@ export default function AddFaqForm({
     initialValues: {
       nameAr: languages === 1? 'no data' : '',
       nameEn: languages === 0? 'no data' : '',
-      titleAr: languages === 1? 'no data' : '',
-      titleEn: languages === 0? 'no data' : '',
-      metaDescriptionAr: languages === 1? 'no data' : '',
-      metaDescriptionEn: languages === 0? 'no data' : '',
+      // titleAr: languages === 1? 'no data' : '',
+      // titleEn: languages === 0? 'no data' : '',
+      // metaDescriptionAr: languages === 1? 'no data' : '',
+      // metaDescriptionEn: languages === 0? 'no data' : '',
       imageId: '',
     },
     validationSchema: mainFormSchema,
@@ -110,10 +110,10 @@ export default function AddFaqForm({
         const requestBody = {
           nameAr: values.nameAr,
           nameEn: values.nameEn,
-          titleAr: values.titleAr,
-          titleEn: values.titleEn,
-          metaDescriptionAr: values.metaDescriptionAr,
-          metaDescriptionEn: values.metaDescriptionEn,
+          titleAr: values.nameAr,
+          titleEn: values.nameEn,
+          metaDescriptionAr: values.nameAr,
+          metaDescriptionEn: values.nameEn,
           imageId: values.imageId,
           shopId: shopId,
           faQs: faqs.map((faq) => ({
@@ -181,7 +181,7 @@ export default function AddFaqForm({
             {languages!=0 &&(
               <Input label={text.nameEn} placeholder={text.nameEn} name="nameEn" value={mainFormik.values.nameEn} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.nameEn && mainFormik.errors.nameEn ? mainFormik.errors.nameEn : ''} className="" />
             )}
-            {languages!=1 &&(
+            {/* {languages!=1 &&(
               <Input label={text.titleAr} placeholder={text.titleAr} name="titleAr" value={mainFormik.values.titleAr} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.titleAr && mainFormik.errors.titleAr ? mainFormik.errors.titleAr : ''} className="" />
             )}
             {languages!=0 &&(
@@ -192,7 +192,7 @@ export default function AddFaqForm({
             )}
             {languages!=0 &&(
               <Input label={text.metaDescriptionEn} placeholder={text.metaDescriptionEn} name="metaDescriptionEn" value={mainFormik.values.metaDescriptionEn} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.metaDescriptionEn && mainFormik.errors.metaDescriptionEn ? mainFormik.errors.metaDescriptionEn : ''} className="" />
-            )}
+            )} */}
           </div>
           <div className="my-4">
             <label className="block text-sm font-medium mb-2">{text.chooseImage}</label>

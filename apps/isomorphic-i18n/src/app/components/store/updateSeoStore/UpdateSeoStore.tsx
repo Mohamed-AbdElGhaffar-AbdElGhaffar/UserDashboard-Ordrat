@@ -1,6 +1,6 @@
 'use client';
 
-import { PiXBold, PiPlusBold , PiUploadSimple, PiTrashBold } from 'react-icons/pi';
+import { PiXBold, PiPlusBold, PiUploadSimple, PiTrashBold } from 'react-icons/pi';
 import { GrUpdate } from "react-icons/gr";
 
 import React, { ChangeEvent, useEffect, useState } from 'react';
@@ -24,6 +24,8 @@ import { useTranslation } from '@/app/i18n/client';
 import ShopValidation from '../../validation/ShopValidation';
 import ShopValidationAdd from '../../validation/ShopValidationAdd';
 import { GetCookiesClient } from '../../ui/getCookiesClient/GetCookiesClient';
+import DescTextField from '../../DescTextArea';
+import SeoInput from '../../SeoInput';
 
 type Feature = {
   title: string;
@@ -60,9 +62,9 @@ export default function UpdateSeoStore({
   const { t } = useTranslation(lang!, "shop");
   const { couponData, setCouponData } = useUserContext();
 
-    const shopId = GetCookiesClient('shopId') as string;
-  
- const validationSchema =ShopValidationAdd({lang})
+  const shopId = GetCookiesClient('shopId') as string;
+
+  const validationSchema = ShopValidationAdd({ lang })
 
   const mainFormik = useFormik({
     initialValues: {
@@ -70,6 +72,7 @@ export default function UpdateSeoStore({
       titleEn: '',
       metaDescriptionAr: '',
       metaDescriptionEn: '',
+      Languages: 0,
       // applyFreeShppingOnTarget: false,
       // showAllCouponsInSideBar: false,
       // freeShppingTarget: ''
@@ -85,33 +88,33 @@ export default function UpdateSeoStore({
       // formData.append('applyFreeShppingOnTarget', values.applyFreeShppingOnTarget as any);
       // formData.append('showAllCouponsInSideBar', values.showAllCouponsInSideBar as any);
       // formData.append('freeShppingTarget', values.freeShppingTarget as any);
- 
+
 
       try {
-        setLoading(true) 
+        setLoading(true)
         const response = await axiosClient.put(`${API_BASE_URL}/api/Shop/Update/${shopId}`, formData);
 
 
         if (response) {
           closeModal();
           setCouponData(true);
-          setLoading(false) 
+          setLoading(false)
 
           toast.success(lang === 'ar' ? 'تم التحديث بنجاح!' : 'Updated successfully!');
           //   setUpdateStores(true);
-        }  else {
-                  toast.error(
-                    lang === 'ar'
-                      ? `فشل في التعديل  `
-                      : `Failed to update `
-                  );
-                }
+        } else {
+          toast.error(
+            lang === 'ar'
+              ? `فشل في التعديل  `
+              : `Failed to update `
+          );
+        }
       } catch (error) {
         console.error('Error creating shop:', error);
         toast.error(lang === 'ar' ? 'حدث خطأ أثناء تعديل المتجر' : 'An error occurred while update the shop');
       }
-      finally{
-        setLoading(false) 
+      finally {
+        setLoading(false)
 
       }
     },
@@ -127,6 +130,7 @@ export default function UpdateSeoStore({
           titleEn: data.titleEn || '',
           metaDescriptionAr: data.metaDescriptionAr || '',
           metaDescriptionEn: data.metaDescriptionEn || '',
+          Languages: data.Languages || '',
           // applyFreeShppingOnTarget: data.applyFreeShppingOnTarget || false,
           // freeShppingTarget: data.freeShppingTarget !== undefined ? data.freeShppingTarget : 0,
           // showAllCouponsInSideBar: data.showAllCouponsInSideBar || false,
@@ -178,14 +182,14 @@ export default function UpdateSeoStore({
     mainFormik.setFieldValue(field, color);
   };
 
-  
+
 
 
 
   return (
-    <div    style={{
-      overscrollBehavior: 'none',      // تمنع البونس عند السحب
-      touchAction: 'none',             // تمنع السحب الأفقي أو العشوائي
+    <div style={{
+      overscrollBehavior: 'none',
+      touchAction: 'none',
     }} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="relative bg-white w-full max-w-3xl p-6 rounded-lg shadow-lg overflow-y-auto max-h-[90vh]">
         <div className="mb-6 flex items-center justify-between">
@@ -200,37 +204,40 @@ export default function UpdateSeoStore({
         }}>
 
           <div className="space-y-3 mb-5">
-            <Input label={t('titleAr')} placeholder={t('titleAr')} name="titleAr" value={mainFormik.values.titleAr} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.titleAr && mainFormik.errors.titleAr ? mainFormik.errors.titleAr : ''} className="mb-4 w-full" />
-            <Textarea
-              label={t('metaAr')}
-              placeholder={t('metaAr')}
-              id='metaDescriptionAr'
-              size='lg'
-              name='metaDescriptionAr'
-              className=''
-              value={mainFormik.values.metaDescriptionAr}
-              onChange={mainFormik.handleChange}
-              onBlur={mainFormik.handleBlur}
-              error={mainFormik.touched.metaDescriptionAr && mainFormik.errors.metaDescriptionAr ? mainFormik.errors.metaDescriptionAr : ''}
-            />
-            <Input label={t('titleEn')} placeholder={t('titleEn')} name="titleEn" value={mainFormik.values.titleEn} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.titleEn && mainFormik.errors.titleEn ? mainFormik.errors.titleEn : ''} className="mb-4 w-full" />
-            <Textarea
-              label={t('metaEn')}
-              placeholder={t('metaEn')}
-              id='metaDescriptionEn'
-              size='lg'
-              name='metaDescriptionEn'
-              className=''
-              value={mainFormik.values.metaDescriptionEn}
-              onChange={mainFormik.handleChange}
-              onBlur={mainFormik.handleBlur}
-              error={mainFormik.touched.metaDescriptionEn && mainFormik.errors.metaDescriptionEn  ? mainFormik.errors.metaDescriptionEn  : ''}
+            {(Number(mainFormik.values.Languages) === 0 || Number(mainFormik.values.Languages) === 2) && (
+              <>
+                <SeoInput id='titleAr' label={t('titleAr')} placeholder={t('titleAr')} name="titleAr" value={mainFormik.values.titleAr} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.titleAr as any && mainFormik.errors.titleAr as any ? mainFormik.errors.titleAr as any : ''} className="mb-4 w-full input-placeholder text-[16px]" inputClassName='text-[16px]' />
+                <DescTextField
+                  label={t('metaAr')}
+                  placeholder={t('metaAr')}
+                  id='metaDescriptionAr'
+                  name='metaDescriptionAr'
+                  value={mainFormik.values.metaDescriptionAr}
+                  onChange={mainFormik.handleChange}
+                  onBlur={mainFormik.handleBlur}
+                  error={mainFormik.touched.metaDescriptionAr && mainFormik.errors.metaDescriptionAr ? mainFormik.errors.metaDescriptionAr : ''}
+                />
+              </>
+            )}
+            {(Number(mainFormik.values.Languages) === 1 || Number(mainFormik.values.Languages) === 2) && (
+              <>
+                <SeoInput id='titleEn' label={t('titleEn')} placeholder={t('titleEn')} name="titleEn" value={mainFormik.values.titleEn} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.titleEn as any && mainFormik.errors.titleEn as any ? mainFormik.errors.titleEn as any : ''} className="mb-4 w-full input-placeholder text-[16px]" inputClassName='text-[16px]' />
+                <DescTextField
+                  label={t('metaEn')}
+                  placeholder={t('metaEn')}
+                  id='metaDescriptionEn'
+                  name='metaDescriptionEn'
+                  value={mainFormik.values.metaDescriptionEn}
+                  onChange={mainFormik.handleChange}
+                  onBlur={mainFormik.handleBlur}
+                  error={mainFormik.touched.metaDescriptionEn && mainFormik.errors.metaDescriptionEn ? mainFormik.errors.metaDescriptionEn : ''}
 
-            />
-
+                />
+              </>
+            )}
 
           </div>
-{/* 
+          {/* 
             <Input
               type="number"
               label={t('FreeShppingTarget')}
@@ -291,19 +298,19 @@ export default function UpdateSeoStore({
           /> */}
           {/* Submit Button */}
           <div className="flex justify-end gap-3 mt-3">
-        
-              <Button type='submit'
-                          className={`text-white text-base rounded-lg w-full  py-3   
+
+            <Button type='submit'
+              className={`text-white text-base rounded-lg w-full  py-3   
                                         ${loading ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
                                     `}>
-                          {loading ? (
-                            <Loader variant="spinner" size="lg" />
-                          ) : (
-                            <>
-                              {t('update1')}
-                            </>
-                          )}
-                        </Button>
+              {loading ? (
+                <Loader variant="spinner" size="lg" />
+              ) : (
+                <>
+                  {t('update1')}
+                </>
+              )}
+            </Button>
 
           </div>
         </form>

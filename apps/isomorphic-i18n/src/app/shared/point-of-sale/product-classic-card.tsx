@@ -37,7 +37,30 @@ export default function ProductClassicCard({
   lang,
   currencyAbbreviation
 }: ProductProps) {
-  const { price, finalPrice, discountValue } = product;
+  const { finalPrice } = product;
+  const discount = product.discount ?? 0;
+  const discountType = product.discountType ?? 0; // 0 = %, 1 = real amount
+  const isDiscountActive = product.isDiscountActive ?? false;
+
+  let price = finalPrice;
+  let discountValue = 0;
+
+  if (isDiscountActive) {
+    if (discountType === 0) {
+      price = finalPrice / (1 - discount / 100);
+    } else if (discountType === 1) {
+      price = finalPrice + discount;
+    }
+
+    price = Math.round(price * 100) / 100;
+
+    discountValue = discountType === 0
+      ? discount
+      : Math.round((discount / price) * 100);
+  } else {
+    price = 0;
+    discountValue = 0;
+  }
   const { t, i18n } = useTranslation(lang!, "home");
   useEffect(() => {
     i18n.changeLanguage(lang);

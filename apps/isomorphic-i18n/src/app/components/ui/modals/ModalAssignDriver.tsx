@@ -95,12 +95,12 @@ export default function ModalAssignDriver({ orderId, lang = 'en', status, branch
                     <Link href={`/${lang}/orders/assignToDelivery/${orderId}`} className={`w-[160px] h-[130px] flex flex-col justify-center items-center rounded-[5px] border-2 transition-all duration-200 ${
                       formik.values.deliveryMethod === option.value ? 'bg-[#E8E8E8] border-[#e11d48]' : 'bg-[#E8E8E8] border-transparent'
                     }`}>
-                      <img
+                      <Image
                         src={option.imageURL}
                         alt="Delivery Method"
                         className="w-[60px]"
-                        width="600"
-                        height="360"
+                        width={600}
+                        height={360}
                       />
                       <p className={`text-md text-center mt-2 font-bold ${
                         formik.values.deliveryMethod === option.value ? 'text-[#E92E3E]' : 'text-[#E92E3E]'

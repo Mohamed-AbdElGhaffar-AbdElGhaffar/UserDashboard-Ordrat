@@ -8,9 +8,21 @@ import PosSearch from '@/app/shared/point-of-sale/pos-search';
 // import { CartProvider } from '../../../../../../isomorphic/src/store/quick-cart/cart.context';
 import { CartProvider } from '@/store/quick-cart/cart.context';
 
-export const metadata = {
-  ...metaObject('Point of Sale'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'نقطة البيع | نظام إدارة مبيعات المتجر'
+        : 'Point of Sale | In-Store Sales Management System',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'إدارة مبيعاتك داخل المتجر من خلال نظام نقطة بيع متكامل.'
+        : 'Manage your in-store sales using an integrated point of sale system.'
+    ),
+  };
+}
 const API_URL = 'https://testapi.ordrat.com/api/Category/GetAll/952E762C-010D-4E2B-8035-26668D99E23E';
 import PizzaIcon from '@components/icons/pizza';
 import { API_BASE_URL } from '@/config/base-url';
@@ -129,6 +141,25 @@ async function fetchBranchZones(shopId: string) {
   }
 }
 
+async function fetchDefaultUsers(lang: string, shopId: string) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/EndUser/GetAll/${shopId}?PageNumber=1&PageSize=10&Name=Default+User`, {
+      headers: {
+        'Accept-Language': lang || 'en',
+      },
+      cache: 'no-store',
+    });
+
+    if (!res.ok) throw new Error('Failed to fetch default users');
+    const data = await res.json();
+
+    return data.entities || [];
+  } catch (error) {
+    console.error('Error fetching default users:', error);
+    return [];
+  }
+}
+
 export default async function PointOfSalePage({
   params: { lang },
 }: {
@@ -153,9 +184,9 @@ export default async function PointOfSalePage({
     value: branch.id
   }))
   const shopData = await fetchShopData(lang, shopId as string);
-  console.log("shopData: ",shopData);
-  
   const branchZones = await fetchBranchZones(shopId as string);
+  const defaultUsers = await fetchDefaultUsers(lang, shopId as string);
+  console.log("Default Users:", defaultUsers);
   const pageHeader = {
     title: lang =='ar'?'الكاشير':'Point of Sale (POS)',
     breadcrumb: [
@@ -182,7 +213,8 @@ export default async function PointOfSalePage({
         <POSPageView 
           lang={lang} 
           filterOptions={categories} 
-          tables={tables} 
+          tables={tables}
+          defaultUser={defaultUsers.id || "9fd5a273-7273-4a2b-ab50-0bc908d3381e"} 
           branchOption={branches} 
           allDatatables={allDatatables} 
           languages={shopData.languages} 
@@ -193,7 +225,8 @@ export default async function PointOfSalePage({
         <POSDrawer 
           className="xl:hidden" 
           lang={lang} 
-          tables={tables} 
+          tables={tables}
+          defaultUser={defaultUsers.id || "9fd5a273-7273-4a2b-ab50-0bc908d3381e"} 
           branchOption={branches} 
           allDatatables={allDatatables} 
           languages={shopData.languages} 

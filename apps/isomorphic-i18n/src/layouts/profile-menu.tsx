@@ -132,6 +132,8 @@ function DropdownMenu({ lang }: { lang?: string }) {
             Cookies.remove('mainBranch');
             Cookies.remove('name');
             Cookies.remove('email');
+            Cookies.remove('sellerId');
+            Cookies.remove('userType');
             // signOut({ redirect: false });
             window.location.href = `/${lang}/signin`;
           }}

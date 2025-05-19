@@ -55,6 +55,8 @@ axiosClient.interceptors.response.use(
           Cookies.remove('mainBranch');
           Cookies.remove('name');
           Cookies.remove('email');
+          Cookies.remove('sellerId');
+          Cookies.remove('userType');
           window.location.href = '/signin';
           throw new Error('Unauthorized');
         }
@@ -94,6 +96,8 @@ axiosClient.interceptors.response.use(
         Cookies.remove('mainBranch');
         Cookies.remove('name');
         Cookies.remove('email');
+        Cookies.remove('sellerId');
+        Cookies.remove('userType');
         window.location.href = '/signin';
         return Promise.reject(refreshError);
       }

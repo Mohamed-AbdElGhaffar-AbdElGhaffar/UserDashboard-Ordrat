@@ -270,11 +270,9 @@ export default function StoresAddForm({
               onChange={(e) => mainFormik.setFieldValue("freeShppingTarget", Number(e.target.value))}
               onBlur={mainFormik.handleBlur}
               error={mainFormik.touched.freeShppingTarget && mainFormik.errors.freeShppingTarget ? mainFormik.errors.freeShppingTarget : ''}
-              className="mt-4 w-full"
+              className="mt-4 w-full input-placeholder text-[16px]" inputClassName='text-[16px]' 
               disabled={!mainFormik.values.applyFreeShppingOnTarget}
             />
-
-
           {/* <CustomSelect
           id='applyFreeShppingOnTarget'
           name='applyFreeShppingOnTarget'

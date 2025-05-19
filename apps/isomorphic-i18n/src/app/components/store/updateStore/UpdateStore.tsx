@@ -30,6 +30,7 @@ import { GetCookiesClient } from '../../ui/getCookiesClient/GetCookiesClient';
 import { ColorPicker, useColor } from "react-color-palette";
 import "react-color-palette/css";
 import { Controller } from 'react-hook-form';
+import DescTextField from '../../DescTextArea';
 type Feature = {
   title: string;
   address: string;
@@ -123,7 +124,7 @@ export default function StoresForm({
       subdomainName: '',
       mainColor: '',
       secondaryColor: '',
-      Languages: '',
+      Languages: 0,
       ApplyServiceOnDineInOnly: false,
       ApplyVatOnDineInOnly: false,
       Service: '',
@@ -291,40 +292,43 @@ export default function StoresForm({
           mainFormik.handleSubmit();
         }}>
           <div className="flex sm:flex-row flex-col gap-4 justify-between">
+{(Number(mainFormik.values.Languages) === 0 || Number(mainFormik.values.Languages) === 2) && (
+
             <Input label={t('shopNameAr')} placeholder={t('shopNameAr')} name="nameAr"
-              value={mainFormik.values.nameAr} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.nameAr && mainFormik.errors.nameAr ? mainFormik.errors.nameAr : ''} className="mb-4 sm:w-1/2" />
-            <Input label={t('shopNameEn')} placeholder={t('shopNameEn')} name="nameEn"
-              value={mainFormik.values.nameEn} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.nameEn && mainFormik.errors.nameEn ? mainFormik.errors.nameEn : ''} className="mb-4 sm:w-1/2" />
+              value={mainFormik.values.nameAr} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.nameAr && mainFormik.errors.nameAr ? mainFormik.errors.nameAr : ''} className="mb-4 sm:w-1/2 input-placeholder text-[16px]" inputClassName='text-[16px]' />
+            )}
+{(Number(mainFormik.values.Languages) === 1 || Number(mainFormik.values.Languages) === 2) && (
+  <Input label={t('shopNameEn')} placeholder={t('shopNameEn')} name="nameEn"
+  value={mainFormik.values.nameEn} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.nameEn && mainFormik.errors.nameEn ? mainFormik.errors.nameEn : ''} className="mb-4 sm:w-1/2 input-placeholder text-[16px]" inputClassName='text-[16px]'  />
+)}
           </div>
+
           <div className="space-y-3">
+{(Number(mainFormik.values.Languages) === 0 || Number(mainFormik.values.Languages) === 2) && (
+              <DescTextField
+                label={t('descriptionAr')}
+                placeholder={t('descriptionAr')}
+                id='descriptionAr'
+                name='descriptionAr'
+                value={mainFormik.values.descriptionAr}
+                onBlur={mainFormik.handleBlur}
+                onChange={mainFormik.handleChange}
+                error={mainFormik.touched.descriptionAr as any && mainFormik.errors.descriptionAr  as any ? mainFormik.errors.descriptionAr  as any : ''}
 
-            <Textarea
-              label={t('descriptionAr')}
-              placeholder={t('descriptionAr')}
-              id='descriptionAr'
-              size='lg'
-              name='descriptionAr'
-              className=''
-              value={mainFormik.values.descriptionAr}
-              onChange={mainFormik.handleChange}
-              onBlur={mainFormik.handleBlur}
-              error={mainFormik.touched.descriptionAr && mainFormik.errors.descriptionAr ? mainFormik.errors.descriptionAr : ''}
-
+              />
+            )}
+{(Number(mainFormik.values.Languages) === 1 || Number(mainFormik.values.Languages) === 2) && (
+            <DescTextField
+            label={t('descriptionEn')}
+            placeholder={t('descriptionEn')}
+            id='descriptionEn'
+            name='descriptionEn'
+            value={mainFormik.values.descriptionEn}
+            onChange={mainFormik.handleChange}
+            onBlur={mainFormik.handleBlur}
+            error={mainFormik.touched.descriptionEn && mainFormik.errors.descriptionEn ? mainFormik.errors.descriptionEn : ''}
             />
-
-            <Textarea
-              label={t('descriptionEn')}
-              placeholder={t('descriptionEn')}
-              id='descriptionEn'
-              size='lg'
-              name='descriptionEn'
-              className=''
-              value={mainFormik.values.descriptionEn}
-              onChange={mainFormik.handleChange}
-              onBlur={mainFormik.handleBlur}
-              error={mainFormik.touched.descriptionEn && mainFormik.errors.descriptionEn ? mainFormik.errors.descriptionEn : ''}
-
-            />
+          )}
           </div>
 
           {/* <Input label={text.subDomain} placeholder={text.subDomain} name="subDomain" value={mainFormik.values.subdomainName} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.subdomainName && mainFormik.errors.subdomainName ? mainFormik.errors.subdomainName : ''} className="mb-4" /> */}
@@ -355,7 +359,7 @@ export default function StoresForm({
           <div className="flex sm:flex-row flex-col gap-4 justify-between mt-3 md:mb-0 mb-3">
 
             <Input label={t('vat')} placeholder={t('vat')} name="vat"
-              value={mainFormik.values.vat} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.vat && mainFormik.errors.vat ? mainFormik.errors.vat : ''} className="md:mb-4 sm:w-1/2" />
+              value={mainFormik.values.vat} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.vat && mainFormik.errors.vat ? mainFormik.errors.vat : ''} className="mb-4 sm:w-1/2 input-placeholder text-[16px]" inputClassName='text-[16px]'  />
             <div className=" sm:w-1/2">
               <label className="block text-sm font-medium mb-2 ">{t('vatType')}</label>
 
@@ -410,7 +414,7 @@ export default function StoresForm({
                 options={optionsApplyTwoLanguages}
                 onBlur={mainFormik.handleBlur}
                 onChange={(selectedOption: any) => {
-                  mainFormik.setFieldValue('Languages', selectedOption.value);
+                mainFormik.setFieldValue('Languages', Number(selectedOption.value));
                 }}
                 styles={{
                   control: (provided: any, state: any) => ({
@@ -800,7 +804,7 @@ export default function StoresForm({
             onChange={(e) => mainFormik.setFieldValue("Service", Number(e.target.value))}
             onBlur={mainFormik.handleBlur}
             error={mainFormik.touched.Service && mainFormik.errors.Service ? mainFormik.errors.Service : ''}
-            className="mt-4 w-full"
+            className="mt-4 w-full input-placeholder text-[16px]" inputClassName='text-[16px]' 
             disabled={!mainFormik.values.ApplyServiceOnDineInOnly}
           />
           {/* Submit Button */}

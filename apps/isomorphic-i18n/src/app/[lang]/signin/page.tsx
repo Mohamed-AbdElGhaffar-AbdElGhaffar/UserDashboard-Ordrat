@@ -5,10 +5,22 @@ import UnderlineShape from '@components/shape/underline';
 import { metaObject } from '@/config/site.config';
 import signUpBG from '@public/sign-up.webp';
 import signUpBGAr from '@public/sign-up-ar.webp';
+import { POS_CART_KEY } from '@/config/constants';
+import { CartProvider } from '@/store/quick-cart/cart.context';
 
-export const metadata = {
-  ...metaObject('Sign In'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'تسجيل الدخول'
+        : 'SignIn',
+      lang,
+      undefined,
+      
+    ),
+  };
+}
 
 const translations = {
   en: {
@@ -42,35 +54,37 @@ export default function SignIn({
 }) {
   const t = translations[lang as 'en' | 'ar'] || translations.en;
   return (
-    <AuthWrapperOne
-      title={
-        <>
-          {t.welcome}
-          <span className="relative inline-block">
-            {t.signinTitle}
-            <UnderlineShape className="absolute -bottom-2 start-0 h-2.5 w-24 text-blue md:w-28 xl:-bottom-1.5 xl:w-36" />
-          </span>{' '}
-          {t.continue}
-        </>
-      }
-      // description={t.description}
-      bannerTitle={t.bannerTitle}
-      // bannerDescription={t.bannerDescription}
-      isSocialLoginActive={false}
-      pageImage={
-        <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[620px] 2xl:w-[710px]">
-          <Image
-            src={lang === "ar"? signUpBGAr : signUpBG}
-            alt="Sign Up Thumbnail"
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw"
-            className="object-cover"
-          />
-        </div>
-      }
-    >
-      <SignInForm lang={lang} />
-    </AuthWrapperOne>
+    <CartProvider cartKey={POS_CART_KEY}>  
+      <AuthWrapperOne
+        title={
+          <>
+            {t.welcome}
+            <span className="relative inline-block">
+              {t.signinTitle}
+              <UnderlineShape className="absolute -bottom-2 start-0 h-2.5 w-24 text-blue md:w-28 xl:-bottom-1.5 xl:w-36" />
+            </span>{' '}
+            {t.continue}
+          </>
+        }
+        // description={t.description}
+        bannerTitle={t.bannerTitle}
+        // bannerDescription={t.bannerDescription}
+        isSocialLoginActive={false}
+        pageImage={
+          <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[620px] 2xl:w-[710px]">
+            <Image
+              src={lang === "ar"? signUpBGAr : signUpBG}
+              alt="Sign Up Thumbnail"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw"
+              className="object-cover"
+            />
+          </div>
+        }
+      >
+        <SignInForm lang={lang} />
+      </AuthWrapperOne>
+    </CartProvider>
   );
 }

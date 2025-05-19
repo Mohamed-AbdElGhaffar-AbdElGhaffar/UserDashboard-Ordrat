@@ -17,7 +17,8 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/base-url';
-import Cookies from 'js-cookie'; 
+import Cookies from 'js-cookie';
+import { useCart } from '@/store/quick-cart/cart.context';
 
 const initialValues: AdminLoginSchema = {
   email: '',
@@ -36,6 +37,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
   const { t } = useTranslation(lang!, 'auth');
   const { guard, setGuard } = useGuardContext();
   const router = useRouter();
+  const { resetCart } = useCart();
 
   const onSubmit: SubmitHandler<AdminLoginSchema> = async (data) => {
     console.log(data);
@@ -118,14 +120,32 @@ export default function SignInForm({lang}:{lang?: string;}) {
           sameSite: 'Lax',
           path: '/',
         });
+        
+        // (optional) Save sellerid
+        Cookies.set('sellerId', response.data.id, {
+          expires: 1,
+          secure: true,
+          sameSite: 'Lax',
+          path: '/',
+        });
+        
+        // (optional) Save sellerid
+        Cookies.set('userType', response.data.userType, {
+          expires: 1,
+          secure: true,
+          sameSite: 'Lax',
+          path: '/',
+        });
 
         setGuard(true);
+        resetCart();
         toast.success(`${text.successLogin} ${response.data.firstName} ${response.data.lastName}!`);
         router.push(`/${lang}`);
         setLoading(false);
       }else{
         setGuard(false);
         toast.error(`${text.failedLogin}`);
+        window.location.href = `https://ordrat.com/ar/sellerSettings?sellerId=${response.data.id}`;
         setLoading(false);
       }
     } catch (error) {

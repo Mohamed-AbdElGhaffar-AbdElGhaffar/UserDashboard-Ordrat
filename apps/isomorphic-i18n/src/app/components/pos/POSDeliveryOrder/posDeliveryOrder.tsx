@@ -101,6 +101,7 @@ export default function POSDeliveryOrder({
   freeShppingTarget
 }: POSDeliveryOrderProps) {
   const shopId = GetCookiesClient('shopId');
+  const userType = GetCookiesClient('userType');
   const { closeModal } = useModal();
   const text = {
     firstName: lang === 'ar' ? 'الأسم الاول' : 'First Name',
@@ -206,7 +207,11 @@ export default function POSDeliveryOrder({
             formData.append('EndUserId', userId);
             formData.append('AddressId', addressId);
             if (decodedToken.uid) {
-              formData.append('EmployeeId', decodedToken.uid);
+              if(userType == '4'){
+                formData.append('EmployeeId', decodedToken.uid);
+              }else{
+                formData.append('SellerId', decodedToken.uid);
+              }
             }
             formData.append('Discount', '0');
             formData.append('GrossProfit', '0');

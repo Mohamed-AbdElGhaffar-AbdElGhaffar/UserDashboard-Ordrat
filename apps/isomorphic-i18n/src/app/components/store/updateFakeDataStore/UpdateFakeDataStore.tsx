@@ -148,6 +148,7 @@ export default function UpdateFakeDataStore({
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <CustomInput
+              className="input-placeholder text-[16px]" inputClassName='text-[16px]' 
                 type="number"
                 label={t('MinimumFakeSoldNumber')}
                 name="minimumFakeSoldNumber"
@@ -156,6 +157,8 @@ export default function UpdateFakeDataStore({
                 disabled={!formik.values.isFakeSoldNumberAvailable}
               />
               <CustomInput
+              className="input-placeholder text-[16px]" inputClassName='text-[16px]' 
+
                 type="number"
                 label={t('MaximumFakeSoldNumber')}
                 name="maximumFakeSoldNumber"
@@ -164,6 +167,8 @@ export default function UpdateFakeDataStore({
                 disabled={!formik.values.isFakeSoldNumberAvailable}
               />
               <CustomInput
+              className="input-placeholder text-[16px]" inputClassName='text-[16px]' 
+
                 type="number"
                 label={t('LastSoldNumberInHours')}
                 name="lastSoldNumberInHours"
@@ -184,6 +189,8 @@ export default function UpdateFakeDataStore({
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <CustomInput
+              className="input-placeholder text-[16px]" inputClassName='text-[16px]' 
+
                 type="number"
                 label={t('MinimumFakeViewers')}
                 name="minimumFakeViewers"
@@ -192,6 +199,8 @@ export default function UpdateFakeDataStore({
                 disabled={!formik.values.isFakeViewersAvailable}
               />
               <CustomInput
+              className="input-placeholder text-[16px]" inputClassName='text-[16px]' 
+
                 type="number"
                 label={t('MaximumFakeViewers')}
                 name="maximumFakeViewers"

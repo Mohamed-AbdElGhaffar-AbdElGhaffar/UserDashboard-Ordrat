@@ -141,7 +141,7 @@ function TablesPosData({ lang='en', tables, languages, items, clearItemFromCart,
                     <div className={`w-full p-2 rounded-[1rem] border-8 ${getBorderColorClass(table.tableStatus)} flex flex-col justify-center items-center gap-2`}>
                       <h2 className='text-lg font-bold'>T{table.tableNumber}</h2>
                       <p className='truncate w-full text-center'>{lang == 'ar'? table.descriptionAr : table.descriptionEn}</p>
-                      {/* <ActionsPosTables data={table} lang={lang} languages={languages} items={items} clearItemFromCart={clearItemFromCart}/> */}
+                      {/* <ActionsPosTables defaultUser={defaultUser} data={table} lang={lang} languages={languages} items={items} clearItemFromCart={clearItemFromCart}/> */}
                     </div>
                     <div className='flex justify-center items-center gap-2 px-6 w-full'>
                       {[...Array(table.count ?? tableNumber)].map((_, i) => (
