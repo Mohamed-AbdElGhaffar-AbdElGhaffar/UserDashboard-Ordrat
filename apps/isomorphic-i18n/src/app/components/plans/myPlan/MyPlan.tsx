@@ -342,7 +342,7 @@ function MyPlan({ lang }: { lang: string }) {
                             }
                         </div>
                         {activePlan.nextPlanName && (
-                            <div className="bg-white shadow-md rounded-lg px-6 py-8">
+                            <div className="bg-white shadow-md  rounded-lg px-6 py-8">
                                 <div className="mb-3">
                                     <p className='text-lg text-blue-500 font-semibold'>
                                         {lang === 'ar' ? 'الخطة التالية' : 'Next Plan'}
