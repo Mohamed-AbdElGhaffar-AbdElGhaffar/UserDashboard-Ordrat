@@ -7,10 +7,21 @@ import { metaObject } from '@/config/site.config';
 import cn from '@utils/class-names';
 import Link from 'next/link';
 import { Button } from 'rizzui';
-
-export const metadata = {
-  ...metaObject('Products'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'المنتجات | إدارة وتحديث محتوى المتجر'
+        : 'Products | Manage and Update Store Content',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'أضف منتجات جديدة، حدد أسعارها، وقم بإدارتها بكفاءة لتعزيز المبيعات.'
+        : 'Add new products, set prices, and manage inventory efficiently to boost sales.'
+    ),
+  };
+}
 
 async function getProducts(lang: string, shopId:string) {
   try {

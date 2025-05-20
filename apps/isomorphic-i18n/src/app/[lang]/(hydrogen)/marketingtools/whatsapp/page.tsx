@@ -5,9 +5,21 @@ import LogoutButtom from '@/app/shared/whatsAppLogoutButtom';
 import { metaObject } from '@/config/site.config';
 import axios from 'axios';
 
-export const metadata = {
-  ...metaObject('WhatsApp - Marketing tools'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'واتساب | تواصل فوري مع عملائك'
+        : 'WhatsApp | Instant Communication with Your Customers',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'قم بربط واتساب بالمتجر لتلقي الاستفسارات والطلبات مباشرة من الزبائن.'
+        : 'Connect WhatsApp to your store to receive inquiries and orders instantly.'
+    ),
+  };
+}
 
 async function fetchChecksession(shopId: string, lang: string) {
   try {
@@ -42,6 +54,10 @@ export default async function WhatsAppPage({
       {
         href: `/${lang}/storeSetting/basicData`,
         name: lang === 'ar' ? 'المتجر' : 'Store',
+      },
+      {
+        href: `/${lang}/marketingtools`,
+        name: lang === 'ar' ? 'ادوات التسويق' : 'Marketing Tools',
       },
       {
         name: lang === 'ar' ? 'الواتساب' : 'WhatsApp',

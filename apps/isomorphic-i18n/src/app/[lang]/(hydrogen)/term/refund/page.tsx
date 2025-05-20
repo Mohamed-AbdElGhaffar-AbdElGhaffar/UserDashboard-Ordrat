@@ -58,6 +58,10 @@ export default async function RefundPolicy({
         name: lang === 'ar' ? 'المتجر' : 'Store',
       },
       {
+        href: `/${lang}/term/faq`,
+        name: lang === 'ar' ? 'سياسات المتجر' : 'Store Policies',
+      },
+      {
         name: lang === 'ar' ? 'سياسة الاسترداد' : 'Refund Policy',
       },
     ],

@@ -5,9 +5,21 @@ import BranchesTable from '@/app/shared/tan-table/branchesTable';
 import { API_BASE_URL } from '@/config/base-url';
 import { metaObject } from '@/config/site.config';
 
-export const metadata = {
-  ...metaObject('Banner - Marketing tools'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'البانر الإعلاني | اجذب انتباه عملائك بصريًا'
+        : 'Banner | Capture Customer Attention Visually',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'أضف بانرات دعائية جذابة لترويج العروض والمنتجات في الصفحة الرئيسية.'
+        : 'Add promotional banners to highlight offers and products on the homepage.'
+    ),
+  };
+}
 async function getBanners(lang: string, shopId:string) {
   try {
     const res = await fetch(`${API_BASE_URL}/api/Banner/GetAll/${shopId}`, {
@@ -43,6 +55,10 @@ export default async function Banner({
       {
         href: `/${lang}/storeSetting/basicData`,
         name: lang === 'ar' ? 'المتجر' : 'Store',
+      },
+      {
+        href: `/${lang}/marketingtools`,
+        name: lang === 'ar' ? 'ادوات التسويق' : 'Marketing Tools',
       },
       {
         name: lang === 'ar' ? 'البانر' : 'Banner',

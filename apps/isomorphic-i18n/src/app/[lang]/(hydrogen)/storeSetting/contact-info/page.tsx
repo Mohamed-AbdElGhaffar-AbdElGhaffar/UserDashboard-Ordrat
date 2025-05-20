@@ -8,9 +8,22 @@ import { metaObject } from '@/config/site.config';
 import React from 'react'
 
 
-export const metadata = {
-  ...metaObject('Contact Info'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'بيانات التواصل | سهّل على عملائك الوصول إليك'
+        : 'Contact Information | Make It Easy for Customers to Reach You',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'أضف رقم الهاتف، البريد الإلكتروني، ومواقع التواصل لتوفير دعم أفضل.'
+        : 'Add phone number, email, and social media links for better customer support.'
+    ),
+  };
+}
+
 function BasicData({
   params: { lang },
 }: {

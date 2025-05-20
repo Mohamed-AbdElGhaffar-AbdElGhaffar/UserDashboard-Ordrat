@@ -61,6 +61,10 @@ export default async function PrivacyPolicy({
         name: lang === 'ar' ? 'المتجر' : 'Store',
       },
       {
+        href: `/${lang}/term/faq`,
+        name: lang === 'ar' ? 'سياسات المتجر' : 'Store Policies',
+      },
+      {
         name: lang === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy',
       },
     ],

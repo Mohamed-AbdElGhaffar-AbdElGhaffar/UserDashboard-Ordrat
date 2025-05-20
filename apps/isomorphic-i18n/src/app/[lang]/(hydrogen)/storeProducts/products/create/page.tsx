@@ -9,9 +9,21 @@ import cn from '@utils/class-names';
 import axios from 'axios';
 import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookiesServer';
 
-export const metadata = {
-  ...metaObject('Create Product'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'إنشاء منتج جديد | أضف منتجاتك بسهولة'
+        : 'Create New Product | Add Your Products Easily',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'قم بإضافة منتج جديد إلى متجرك، حدد الاسم، السعر، الفئة، والوصف بكل سهولة.'
+        : 'Add a new product to your store by specifying name, price, category, and description easily.'
+    ),
+  };
+}
 
 async function fetchProducts(lang: string, shopId:string) {
   try {

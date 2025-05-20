@@ -30,14 +30,18 @@ function page({
   };
 }){
   const pageHeader = {
-    title: lang === 'ar' ? 'اعدادات اضافية' : 'Additional Settings',
+    title: lang === 'ar' ? 'تحفيز الشراء' : 'Purchase Motivation',
     breadcrumb: [
       {
         href: `/${lang}/storeSetting/basicData`,
         name: lang === 'ar' ? 'المتجر' : 'Store',
       },
       {
-        name: lang === 'ar' ? 'اعدادات اضافية' : 'Additional Settings',
+        href: `/${lang}/marketingtools`,
+        name: lang === 'ar' ? 'ادوات التسويق' : 'Marketing Tools',
+      },
+      {
+        name: lang === 'ar' ? 'تحفيز الشراء' : 'Purchase Motivation',
       },
     ],
   };
