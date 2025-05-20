@@ -156,7 +156,8 @@ export default function POSOrderForm({
   const [loadingCustomers, setLoadingCustomers] = useState(false);
 
   const text = {
-    addCustomer: lang === 'ar' ? 'اضافة عميل جديد' : 'Add New Customer',
+    addNewCustomer: lang === 'ar' ? 'اضافة عميل جديد' : 'Add New Customer',
+    addCustomer: lang === 'ar' ? 'اضافة عميل' : 'Add Customer',
     noCustomers: lang === 'ar' ? 'لم يتم العثور على عملاء.' : 'No customers found.',
     submit: lang === 'ar' ? 'اطلب' : 'Order',
     searchByName: lang === 'ar' ? 'بحث بالاسم' : 'Search by Name',
@@ -446,16 +447,16 @@ export default function POSOrderForm({
               <div className='grid grid-cols-2 border-b border-black mb-4 gap-x-4'>
                 {selectedCustomer && (
                   <>
-                  <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px]">
+                  <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
                     {text.firstName}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer.firstName || '----'}</span>
                   </h3>
-                  <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px]">
+                  <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
                     {text.lastName}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer.lastName || '----'}</span>
                   </h3>
-                  <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px]">
+                  <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
                     {text.email}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer.email || '----@----.com'}</span>
                   </h3>
-                  <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px]">
+                  <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
                     {text.phone}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer.phoneNumber || '-- ----------'}</span>
                   </h3>
                   </>
@@ -557,7 +558,7 @@ export default function POSOrderForm({
             )}
             <div className="flex justify-end gap-3">
               <Button onClick={()=>{setNewCustomer(true)}} variant="outline" className="w-full transition-all duration-300 ease-in-out">
-                {text.addCustomer}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
+                <span className='block md:hidden'>{text.addCustomer}</span><span className='hidden md:block'>{text.addNewCustomer}</span><PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
               </Button>
               <Button type="submit" isLoading={loading} className="w-full transition-all duration-300 ease-in-out">
                 {text.submit}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />

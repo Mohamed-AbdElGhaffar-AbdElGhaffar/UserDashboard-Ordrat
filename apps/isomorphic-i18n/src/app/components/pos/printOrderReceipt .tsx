@@ -77,9 +77,10 @@ export const printOrderReceipt = (order: Order, lang: string = 'en', endUser?: O
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   const { date, time } = formatDate(order?.createdAt);
 
-  const content = `
+  const container = document.createElement('div');
+  container.style.display = 'none';
+  container.innerHTML = `
     <div style="width: 302px; max-width: 302px; text-align: ${isRTL ? "right" : "left"}; font-family: ${isRTL ? "Arial, sans-serif" : "monospace"}; font-size: 9pt; line-height: 1.2; box-sizing: border-box; padding: 8px;" dir="${isRTL ? "rtl" : "ltr"}">
-      <!-- Header -->
       <div style="text-align: center; margin-bottom: 8px;">
         <div style="border: 1px solid black; margin-bottom: 8px; padding-bottom: 4px;">
           <div style="font-weight: bold; text-align: center; padding: 2px;">
@@ -88,7 +89,6 @@ export const printOrderReceipt = (order: Order, lang: string = 'en', endUser?: O
         </div>
       </div>
 
-      <!-- Items -->
       <table style="width: 100%; border-bottom: 1px solid black; margin-bottom: 8px; border-collapse: collapse; font-size: 8pt;">
         <thead>
           <tr style="border-bottom: 1px solid black;">
@@ -119,7 +119,6 @@ export const printOrderReceipt = (order: Order, lang: string = 'en', endUser?: O
         </tbody>
       </table>
 
-      <!-- Totals -->
       <div style="margin-bottom: 8px; font-size: 8pt;">
         <div style="display: flex; justify-content: space-between;"><span>${isRTL ? 'المجموع الفرعي:' : 'Subtotal:'}</span><span>${toCurrency(order?.price || 0, lang)}</span></div>
         <div style="display: flex; justify-content: space-between;"><span>${isRTL ? 'رسوم التوصيل:' : 'Shipping:'}</span><span>${toCurrency(order?.shippingFees || 0, lang)}</span></div>
@@ -130,14 +129,12 @@ export const printOrderReceipt = (order: Order, lang: string = 'en', endUser?: O
         <div style="display: flex; justify-content: space-between; font-weight: bold; border-top: 1px solid black; padding-top: 4px;"><span>${isRTL ? 'الإجمالي:' : 'Total:'}</span><span>${toCurrency(order?.totalPrice || 0, lang)}</span></div>
       </div>
 
-      <!-- Address -->
       ${order?.address ? `
         <div style="border-top: 1px solid black; padding-top: 4px; margin-bottom: 8px;">
           <div style="font-weight: bold;">${isRTL ? 'عنوان التوصيل:' : 'Delivery Address:'}</div>
           <div>${order.address.street}<br/>${isRTL ? `شقة: ${order.address.apartmentNumber}, الطابق: ${order.address.floor}` : `Apt: ${order.address.apartmentNumber}, Floor: ${order.address.floor}`}</div>
         </div>` : ''}
 
-      <!-- Customer Info -->
       ${endUser ? `
         <div style="border-top: 1px solid black; padding-top: 4px; margin-bottom: 8px;">
           <div style="font-weight: bold;">${isRTL ? 'بيانات العميل:' : 'Customer Info:'}</div>
@@ -147,7 +144,6 @@ export const printOrderReceipt = (order: Order, lang: string = 'en', endUser?: O
           </div>
         </div>` : ''}
 
-      <!-- Footer -->
       <div style="text-align: center; border-top: 1px solid black; padding-top: 4px;">
         <div>${isRTL ? 'شكراً لطلبك!' : 'Thank you for your order!'}</div>
         <div style="margin-top: 4px;">${isRTL ? 'تم إنشاؤه بواسطة Ordrat' : 'Powered by Ordrat'}</div>
@@ -155,90 +151,39 @@ export const printOrderReceipt = (order: Order, lang: string = 'en', endUser?: O
     </div>
   `;
 
-  if (isMobile) {
-    const win = window.open('', '_blank');
-    if (win) {
-      win.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Receipt - Order #${order.orderNumber}</title>
-          <style>
-            @page {
-              size: 80mm auto;
-              margin: 2mm;
+  document.body.appendChild(container);
+  const printWindow = window.open('', '_blank');
+  if (printWindow) {
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Receipt - Order #${order.orderNumber}</title>
+        <style>
+          @page {
+            size: 80mm auto;
+            margin: 2mm;
+          }
+          @media print {
+            body {
+              width: 80mm;
+              margin: 0;
+              padding: 0;
             }
-            @media print {
-              body {
-                width: 80mm;
-                margin: 0;
-                padding: 0;
-              }
-            }
-          </style>
-        </head>
-        <body>${content}
-          <script>
-            window.onload = function() {
-              window.print();
-              setTimeout(() => window.close(), 100);
-            };
-          </script>
-        </body>
-        </html>
-      `);
-      win.document.close();
-    }
-  } else {
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    document.body.appendChild(iframe);
-
-    const frameDoc = iframe.contentWindow?.document;
-    if (frameDoc) {
-      frameDoc.open();
-      frameDoc.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Receipt - Order #${order.orderNumber}</title>
-          <style>
-            @page {
-              size: 80mm auto;
-              margin: 2mm;
-            }
-            @media print {
-              body {
-                width: 80mm;
-                margin: 0;
-                padding: 0;
-              }
-            }
-          </style>
-        </head>
-        <body>${content}
-          <script>
-            window.onload = function() {
-              window.print();
-              setTimeout(() => window.close(), 100);
-            };
-          </script>
-        </body>
-        </html>
-      `);
-      frameDoc.close();
-    }
-
-    // Clean up
-    setTimeout(() => {
-      if (document.body.contains(iframe)) {
-        document.body.removeChild(iframe);
-      }
-    }, 1000);
+          }
+        </style>
+      </head>
+      <body>${container.innerHTML}
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(() => window.close(), 100);
+          };
+        </script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
   }
+  container.remove();
 };
