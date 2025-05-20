@@ -39,6 +39,10 @@ function BasicData({
         name: lang === 'ar' ? 'المتجر' : 'Store',
       },
       {
+        href: `/${lang}/marketingtools`,
+        name: lang === 'ar' ? 'ادوات التسويق' : 'Marketing Tools',
+      },
+      {
         name: lang === 'ar' ? 'تحسين محركات البحث' : 'Seo',
       },
     ],

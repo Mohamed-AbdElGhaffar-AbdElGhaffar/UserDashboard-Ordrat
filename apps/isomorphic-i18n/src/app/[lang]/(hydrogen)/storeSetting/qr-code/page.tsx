@@ -4,9 +4,22 @@ import { metaObject } from '@/config/site.config';
 import React from 'react'
 
 
-export const metadata = {
-  ...metaObject('qr-code'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'باركود المنتجات | إدارة وتوليد الأكواد بسهولة'
+        : 'Product Barcodes | Manage and Generate Codes Easily',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'أنشئ أكواد باركود لمنتجاتك لتسهيل عمليات الجرد والمبيعات.'
+        : 'Generate barcodes for your products to streamline inventory and sales.'
+    ),
+  };
+}
+
 function QRCode({
   params: { lang },
 }: {
@@ -29,7 +42,7 @@ function QRCode({
   return <>
     <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} /> 
     <div>
-      <Title lang={lang} title={lang==='ar'? 'ساب دومين':'Subdomain'} typeOfInput={'text'} />
+      <Title lang={lang} title={lang==='ar'? 'صب دومين':'Subdomain'} typeOfInput={'text'} />
 
     </div>
   </>

@@ -133,7 +133,60 @@ const languageValue = Number(languages);
         }
       },
     });
+const returnExchangePolicy = `
+<b>سياسة الاستبدال والاسترجاع للمتجر</b><br/><br/>
 
+<b>مدة الاسترجاع والاستبدال</b><br/>
+يحق للعميل طلب استرجاع أو استبدال المنتج خلال 7 أيام من تاريخ التسليم.<br/><br/>
+
+<b>شروط حالة المنتج</b><br/>
+يجب أن يكون المنتج بحالته الأصلية، غير مستخدم، مع التغليف الأصلي وجميع الملحقات والفواتير.<br/><br/>
+
+<b>إجراءات الطلب</b><br/>
+يُرجى ذكر رقم الطلب وسبب الاسترجاع أو الاستبدال.<br/>
+سنقوم بإرسال تعليمات الشحن أو تحديد موعد مع مندوب الاستلام.<br/><br/>
+
+<b>تكاليف الشحن</b><br/>
+- إذا كان سبب الإرجاع خطأ من المتجر (مثل منتج تالف أو غير صحيح): يتحمل المتجر رسوم الشحن.<br/>
+- إذا كان السبب من العميل (مثل تغيير رأي أو عدم مناسبة): يتحمل العميل رسوم الشحن.<br/><br/>
+
+<b>الاستبدال</b><br/>
+يتم الاستبدال بمنتج له نفس القيمة أو منتج آخر متوفر مع دفع/استرداد الفرق إن وُجد.<br/><br/>
+
+<b>الاسترداد المالي</b><br/>
+يُعاد المبلغ إلى وسيلة الدفع الأصلية خلال 5 إلى 7 أيام عمل من استلام المنتج المرتجع.<br/><br/>
+
+<b>المنتجات غير القابلة للإرجاع</b><br/>
+- المنتجات المباعة بخصم نهائي أو حسب طلب خاص (مثل المنتجات المصنوعة حسب الطلب).<br/>
+- منتجات العناية الشخصية أو المنتجات القابلة للتلف بسرعة.<br/><br/>
+
+
+`;
+const returnExchangePolicyEn=`<b>Return & Exchange Policy</b><br/><br/>
+
+<b>Return & Exchange Period</b><br/>
+Customers have the right to request a return or exchange within 7 days from the delivery date.<br/><br/>
+
+<b>Product Condition Requirements</b><br/>
+The product must be in its original condition, unused, with original packaging, complete accessories, and invoices.<br/><br/>
+
+<b>Request Procedure</b><br/>
+Please mention the order number and reason for return or exchange.<br/>
+We will send you shipping instructions or schedule a pickup with a courier.<br/><br/>
+
+<b>Shipping Costs</b><br/>
+- For returns due to store error (e.g., wrong or damaged item): the store covers shipping costs.<br/>
+- For returns due to customer reasons (e.g., not suitable, changed mind): the customer bears shipping costs.<br/><br/>
+
+<b>Exchanges</b><br/>
+Exchange is made for an item of the same value or any available item, with payment/refund of the price difference if applicable.<br/><br/>
+
+<b>Refunds</b><br/>
+The amount will be refunded to the original payment method within 5–7 business days from receiving the returned item.<br/><br/>
+
+<b>Non-Returnable Products</b><br/>
+- Items sold at final discounts or custom-made products.<br/>
+- Personal care items or perishable goods.<br/>`
     return (
       <form onSubmit={formik.handleSubmit}>
         <WidgetCard title={t('Refund')}>
@@ -144,7 +197,7 @@ const languageValue = Number(languages);
                label={t('titleAr')}
                placeholder={t('titleAr')}
                name="titleAr"
-               value={formik.values.titleAr}
+               value={formik.values.titleAr||'سياسة الاستبدال والاسترجاع للمتجر'}
                onChange={formik.handleChange}
                onBlur={formik.handleBlur}
                className="input-placeholder text-[16px]"
@@ -159,7 +212,7 @@ const languageValue = Number(languages);
                  label={t('titleEn')}
                  placeholder={t('titleEn')}
                  name="titleEn"
-                 value={formik.values.titleEn}
+                 value={formik.values.titleEn||'Store Return & Exchange Policy'}
                  onChange={formik.handleChange}
                  onBlur={formik.handleBlur}
                  className="input-placeholder text-[16px]"
@@ -173,8 +226,11 @@ const languageValue = Number(languages);
              <div className={languageValue === 0 ? 'md:col-span-2 order-first md:order-none' : ''}>
              <QuillEditor
                label={t('descAr')}
-               value={formik.values.descriptionAr}
-               placeholder={t('descAr')}
+value={
+    formik.values.descriptionAr?.trim()
+      ? formik.values.descriptionAr
+      : returnExchangePolicy
+  }                      placeholder={t('descAr')}
                onChange={(value) => formik.setFieldValue('descriptionAr', value)}
                className="@3xl:col-span-2 [&>.ql-container_.ql-editor]:min-h-[100px] w-full input-placeholder text-[16px]"
                labelClassName="font-medium text-gray-700 dark:text-gray-600 mb-1.5 text-[16px]"
@@ -196,8 +252,11 @@ const languageValue = Number(languages);
              <div className={languageValue === 1 ? 'md:col-span-2 order-first md:order-none' : ''}>
                <QuillEditor
                  label={t('descEn')}
-                 value={formik.values.descriptionEn}
-                 placeholder={t('descEn')}
+value={
+    formik.values.descriptionEn?.trim()
+      ? formik.values.descriptionEn
+      : returnExchangePolicyEn
+  }                        placeholder={t('descEn')}
                  onChange={(value) => formik.setFieldValue('descriptionEn', value)}
                  className="@3xl:col-span-2 [&>.ql-container_.ql-editor]:min-h-[100px] w-full input-placeholder text-[16px]"
                  labelClassName="font-medium text-gray-700 dark:text-gray-600 mb-1.5 text-[16px]"

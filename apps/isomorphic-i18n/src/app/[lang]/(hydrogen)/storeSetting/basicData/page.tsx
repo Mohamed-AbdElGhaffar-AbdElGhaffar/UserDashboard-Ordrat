@@ -8,9 +8,22 @@ import { metaObject } from '@/config/site.config';
 import React from 'react'
 
 
-export const metadata = {
-  ...metaObject('Shop Settings'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'البيانات الأساسية | إدارة معلومات متجرك بدقة'
+        : 'Basic Information | Manage Your Store Details Accurately',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'قم بتحديث اسم المتجر، الشعار، والوصف لتحسين ظهور متجرك وتوفير تجربة مميزة للعملاء.'
+        : 'Update your store name, logo, and description to enhance visibility and offer a better customer experience.'
+    ),
+  };
+}
+
 function BasicData({
   params: { lang },
 }: {

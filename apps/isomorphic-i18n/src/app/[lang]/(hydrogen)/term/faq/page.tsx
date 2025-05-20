@@ -5,9 +5,21 @@ import { API_BASE_URL } from '@/config/base-url';
 import { metaObject } from '@/config/site.config';
 import axios from 'axios';
 
-export const metadata = {
-  ...metaObject('FAQ'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'الأسئلة الشائعة | كل ما تحتاج معرفته عن خدماتنا'
+        : 'FAQ | Everything You Need to Know About Our Services',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'عندك استفسار؟ تصفح الأسئلة الشائعة لمعرفة المزيد عن الطلبات، التوصيل، الدفع، والاسترداد.'
+        : 'Have a question? Browse our FAQ section to learn about orders, delivery, payment, and refunds.'
+    ),
+  };
+}
  
 async function fetchShopData(lang: string, shopId:string) {
   try {
@@ -73,6 +85,10 @@ export default async function FAQ({
       {
         href: `/${lang}/storeSetting/basicData`,
         name: lang === 'ar' ? 'المتجر' : 'Store',
+      },
+      {
+        href: `/${lang}/term/faq`,
+        name: lang === 'ar' ? 'سياسات المتجر' : 'Store Policies',
       },
       {
         name: lang === 'ar' ? 'الأسئلة الشائعة' : 'FAQs',

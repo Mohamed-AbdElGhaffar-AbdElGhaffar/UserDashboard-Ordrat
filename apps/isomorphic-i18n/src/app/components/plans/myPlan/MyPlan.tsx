@@ -12,6 +12,7 @@ import SubscriptionTable from '../../SubscriptionTable';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import whatsapp from '@public/assets/whatsapp-color-svgrepo-com.svg'
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 type wallet = {
     icon: any;
@@ -110,7 +111,6 @@ function MyPlan({ lang }: { lang: string }) {
             color: 'text-[#2196F3]',
         },
         {
-
             icon: <Image
                 src={whatsapp}
                 alt="WhatsApp"
@@ -217,9 +217,9 @@ function MyPlan({ lang }: { lang: string }) {
                 currencyName = lang === 'ar' ? 'ج.م' : 'EGP';
                 break;
 
-            case 'Saudi Riyal':
-            case 'ريال':
-            case 'SAR':
+           case 'SAR':
+    case 'ر.س':
+    case 'ريال':
                 amountValue = amount.ryialAmount;
                 currencyName = lang === 'ar' ? 'ريال' : 'SAR';
                 break;
@@ -235,7 +235,6 @@ function MyPlan({ lang }: { lang: string }) {
             currencyName,
         };
     };
-
 
     const handleRecharge = async (amountValue: string, bulkId: string, egyptionAmount: number) => {
         try {
@@ -256,8 +255,7 @@ function MyPlan({ lang }: { lang: string }) {
             if (response.status === 200) {
                 toast.success(lang === 'ar' ? 'جاري التحويل للدفع...' : 'Redirecting to payment page...');
                 localStorage.setItem("rechargeId", response.data);
-                localStorage.removeItem("SubscriptionId"); // امسح القديم
-
+                localStorage.removeItem("SubscriptionId"); 
                 router.push('/pay');
             } else {
                 toast.error('فشلت عملية الشحن. حاول مرة أخرى.');
@@ -316,9 +314,14 @@ function MyPlan({ lang }: { lang: string }) {
                                 <h4 className='font-semibold text-2xl'>
                                     {activePlan.planName}
                                 </h4>
-                                <h4 className='font-semibold text-2xl'>
+                                <h4 className='font-semibold text-2xl flex items-center gap-1'>
                                     {activePlan.price} /
-                                    {currencyLabels[activePlan.currency]?.[lang === 'ar' ? 'ar' : 'en']}
+                                    {activePlan.currency === 2 && lang === 'ar' ? (
+                                    <Image src={sarIcon} alt="SAR" width={30} height={30} />
+                                    ) : (
+                                    currencyLabels[activePlan.currency]?.[lang === 'ar' ? 'ar' : 'en']
+                                    )}
+                
                                 </h4>
                             </div>
                             <p className='font-normal text-[#5C5C5C] text-sm'>
@@ -329,6 +332,14 @@ function MyPlan({ lang }: { lang: string }) {
                                     day: 'numeric',
                                 })}
                             </p>
+                            {(activePlan?.planName === 'خطة مميزة' || activePlan?.planName === 'VIP Plan')?
+                                <button onClick={
+                                    () => upgrade()
+                                } className='bg-redColor mt-2 text-white rounded-full w-32 py-3 font-medium'>
+                                    {lang === 'ar' ? 'تجديد' : 'Renewal'}
+                                </button>
+                                :''
+                            }
                         </div>
                         {activePlan.nextPlanName && (
                             <div className="bg-white shadow-md rounded-lg px-6 py-8">
@@ -339,10 +350,14 @@ function MyPlan({ lang }: { lang: string }) {
                                     <h4 className='font-semibold text-2xl'>
                                         {activePlan.nextPlanName || 'N/A'}
                                     </h4>
-                                    <h4 className='font-semibold text-2xl'>
-                                        {activePlan.nextPlanMonthlyPrice} /
-                                        {currencyLabels[activePlan.currency]?.[lang === 'ar' ? 'ar' : 'en'] || '???'}
-                                    </h4>
+                                         <h4 className='font-semibold text-2xl flex items-center gap-1'>
+                                    {activePlan.nextPlanMonthlyPrice} /
+                                    {activePlan.currency === 2 && lang === 'ar' ? (
+                                    <Image src={sarIcon} alt="SAR" width={30} height={30} />
+                                    ) : (
+                                    currencyLabels[activePlan.currency]?.[lang === 'ar' ? 'ar' : 'en']
+                                    )}
+                                </h4>
                                 </div>
                                 {/* <p className='font-normal text-[#5C5C5C] text-sm'>
                                     {t('nextPlanPriceEgp')}{" "}
@@ -361,9 +376,9 @@ function MyPlan({ lang }: { lang: string }) {
            <>
             <div className={` ${activePlan?.planName === 'خطة مميزة' || activePlan?.planName === 'VIP Plan' ?'': 'bg-white shadow-md rounded-lg pb-3  mt-8'}`}>
                 {
-  (activePlan?.planName === 'خطة مميزة' || activePlan?.planName === 'VIP Plan')?''
-  :
-<>
+                (activePlan?.planName === 'خطة مميزة' || activePlan?.planName === 'VIP Plan')?''
+                :
+                <>
                 <h3 className='text-2xl px-6 py-3'>{lang === 'ar' ? 'المحفظة' : 'Wallet'}</h3>
                 <div className="w-full h-[1px] bg-[#bebebe]"></div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-5 px-6">
@@ -380,8 +395,8 @@ function MyPlan({ lang }: { lang: string }) {
                                 )}
                             </span>
                             <span className="font-medium text-gray-700">{item.name}</span>
-                            <p className={`text-xl ${item.color}`}>
-                                {item.price} <span className="text-xl text-gray-600">{item.currency}</span>
+                            <p className={`text-xl flex items-center gap-1 ${item.color}`}>
+                                {item.price} <span className="text-xl text-gray-600">{item.currency ==='ر.س'?<Image src={sarIcon} alt="SAR" width={18} height={18} />:item.currency}</span>
                             </p>
                         </div>
                     ))}
@@ -411,9 +426,11 @@ function MyPlan({ lang }: { lang: string }) {
                                 className="flex- min-w-[180px] bg-white border-2 border-gray-200 rounded-xl p-5 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg hover:border-[#E84654] transition relative"
                             >
                                 <div className="text-2xl font-bold text-gray-800 mb-3">
-                                    <div className="text-2xl font-bold text-gray-800 mb-3">
+                                    <div className="text-2xl font-bold text-gray-800 mb-3 flex items-center gap-2">
                                         {getAmountWithCurrency(amount, currency, lang).amountValue}{" "}
-                                        <span className="text-lg text-gray-500">{currency?.toUpperCase?.()}</span>
+                                        <span className="text-lg text-gray-500">{currency?.toUpperCase?.()==='ر.س'? 
+                                    <Image src={sarIcon} alt="SAR" width={18} height={18} />
+                                        :currency?.toUpperCase?.()}</span>
                                     </div>
                                 </div>
 

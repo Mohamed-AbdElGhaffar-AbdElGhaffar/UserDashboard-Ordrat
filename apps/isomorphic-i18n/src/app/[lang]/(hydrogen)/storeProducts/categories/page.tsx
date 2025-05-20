@@ -5,9 +5,21 @@ import { API_BASE_URL } from '@/config/base-url';
 import { metaObject } from '@/config/site.config';
 import axios from 'axios';
 
-export const metadata = {
-  ...metaObject('Categories'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'تصنيفات المنتجات | تنظيم فعال لمحتوى متجرك'
+        : 'Product Categories | Efficient Store Organization',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'أنشئ ونسّق التصنيفات لتسهل على العملاء تصفح المنتجات والعثور عليها.'
+        : 'Create and manage categories to help customers browse and find products easily.'
+    ),
+  };
+}
 
 async function fetchShopData(lang: string, shopId:string) {
   try {

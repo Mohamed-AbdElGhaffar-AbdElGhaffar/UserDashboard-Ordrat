@@ -5,9 +5,21 @@ import { API_BASE_URL } from '@/config/base-url';
 import { metaObject } from '@/config/site.config';
 import axios from 'axios';
 
-export const metadata = {
-  ...metaObject('Branches'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'الفروع | إدارة الفروع الخاصة بك'
+        : 'Branches | Manage Your Store Locations',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'أضف فروع جديدة وحدد بيانات الموقع والخدمات المتاحة بكل سهولة.'
+        : 'Add new branches and define location and available services easily.'
+    ),
+  };
+}
 
 async function fetchShopData(lang: string, shopId:string) {
   try {

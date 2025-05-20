@@ -7,9 +7,21 @@ import EditProduct from '@/app/shared/ecommerce/product/edit';
 import NotFound from '@/app/not-found';
 import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookiesServer';
 
-export const metadata = {
-  ...metaObject('FAQ Details'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'تعديل منتج | حدّث بيانات منتجاتك بسرعة'
+        : 'Edit Product | Update Your Product Details Quickly',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'قم بتعديل تفاصيل المنتج مثل الاسم، السعر، الصور، أو الفئة لتحسين تجربة العملاء.'
+        : 'Update product details such as name, price, images, or category to enhance customer experience.'
+    ),
+  };
+}
 
 async function fetchProductById(shopId: string, productId: string) {
   try {
@@ -23,7 +35,7 @@ async function fetchProductById(shopId: string, productId: string) {
   }
 }
 
-async function fetchShopData(lang: string, shopId:string) {
+async function fetchShopData(lang: string, shopId: string) {
   try {
     const response = await axios.get(
       `https://testapi.ordrat.com/api/Shop/GetById/${shopId}`,
@@ -33,8 +45,8 @@ async function fetchShopData(lang: string, shopId:string) {
         },
       }
     );
-    console.log("Language: ",response.data);
-    
+    console.log("Language: ", response.data);
+
     return response.data;
   } catch (error) {
     console.error('Error fetching date:', error);
@@ -53,7 +65,7 @@ async function fetchProducts(lang: string, shopId: string) {
       }
     );
     console.log(response.data);
-    
+
     return response.data;
   } catch (error) {
     console.error('Error fetching date:', error);
@@ -71,8 +83,8 @@ export default async function ProductPage({
   const product = await fetchProductById(shopId as string, id);
   const products = await fetchProducts(lang, shopId as string);
   const shopData = await fetchShopData(lang, shopId as string);
-  console.log("product: ",product);
-  
+  console.log("product: ", product);
+
   const pageHeader = {
     title: lang === 'ar' ? 'منتجات المتجر' : 'Store Products',
     breadcrumb: [
@@ -96,7 +108,7 @@ export default async function ProductPage({
 
   return (
     <>
-      {product?
+      {product ?
         <div className="">
           <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
             {/* <Link
@@ -109,7 +121,7 @@ export default async function ProductPage({
             </Link> */}
           </PageHeader>
           {/* Pass the fetched product data to the CreateEditProduct component */}
-          <EditProduct lang={lang} product={product}  allProducts={products.entities.filter((p: any) => p.id !== id)} languages={shopData.languages}/>
+          <EditProduct lang={lang} product={product} allProducts={products.entities.filter((p: any) => p.id !== id)} languages={shopData.languages} />
         </div>
         :
         <NotFound />

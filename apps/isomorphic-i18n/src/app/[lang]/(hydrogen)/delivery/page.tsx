@@ -10,9 +10,21 @@ import Link from 'next/link';
 import { PiPlusBold } from 'react-icons/pi';
 import { Button } from 'rizzui';
 
-export const metadata = {
-  ...metaObject('Delivery'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'مندوبي التوصيل | إدارة فرق التوصيل بكفاءة'
+        : 'Delivery Drivers | Manage Your Delivery Team Efficiently',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'أضف وحدث بيانات مندوبي التوصيل لتتبع الطلبات وتحسين تجربة التوصيل.'
+        : 'Add and update delivery driver info to track orders and enhance delivery operations.'
+    ),
+  };
+}
 
 // const API_URL = 'https://testapi.ordrat.com/api/Branch/GetByShopId/952E762C-010D-4E2B-8035-26668D99E23E';
 

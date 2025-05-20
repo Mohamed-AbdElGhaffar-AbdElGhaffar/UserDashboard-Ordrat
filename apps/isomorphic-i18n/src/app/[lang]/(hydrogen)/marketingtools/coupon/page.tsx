@@ -34,6 +34,10 @@ export default function Coupon({
         name: lang === 'ar' ? 'المتجر' : 'Store',
       },
       {
+        href: `/${lang}/marketingtools`,
+        name: lang === 'ar' ? 'ادوات التسويق' : 'Marketing Tools',
+      },
+      {
         name: lang === 'ar' ? 'الكوبون' : 'Coupon',
       },
     ],

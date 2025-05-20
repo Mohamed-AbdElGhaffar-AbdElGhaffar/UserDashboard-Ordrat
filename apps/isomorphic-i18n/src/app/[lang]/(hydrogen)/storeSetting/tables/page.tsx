@@ -6,13 +6,22 @@ import TableAddButton from '@/app/shared/tableAddButtom';
 import { API_BASE_URL } from '@/config/base-url';
 import { metaObject } from '@/config/site.config';
 import axios from 'axios';
-import Link from 'next/link';
-import { PiPlusBold } from 'react-icons/pi';
-import { Button } from 'rizzui';
 
-export const metadata = {
-  ...metaObject('Tables'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'الطاولات | تنظيم جلسات المتجر أو المطعم'
+        : 'Tables | Manage Seating for Store or Restaurant',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'أضف وعدّل الطاولات لتوزيع الطلبات وتنظيم الجلوس داخل المتجر أو المطعم.'
+        : 'Add and manage tables for order distribution and customer seating.'
+    ),
+  };
+}
 
 async function getTables(lang: string, shopId:string) {
   try {
