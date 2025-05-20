@@ -198,7 +198,7 @@ export default function POSProductsFeed({ lang = 'en', filterOptions, currencyAb
   return (
     <>
       {products.length > 0 ? (
-        <div className="grid  grid-cols-2 gap-x-4 gap-y-6 @md:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] @xl:gap-x-6 @xl:gap-y-12 @4xl:grid-cols-[repeat(auto-fill,minmax(270px,1fr))] ">
+        <div className="grid  grid-cols-2 gap-x-4 gap-y-6 @md:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] @xl:gap-x-6 @xl:gap-y-12 @4xl:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] ">
           {products.map((product) => (
             <ProductClassicCard key={product.id} product={product} lang={lang} currencyAbbreviation={currencyAbbreviation}/>
           ))}

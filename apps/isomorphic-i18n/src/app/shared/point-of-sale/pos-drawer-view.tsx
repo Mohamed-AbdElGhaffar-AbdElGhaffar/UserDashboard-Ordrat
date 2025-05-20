@@ -440,7 +440,7 @@ export default function POSDrawerView({
       formData.append('TotalChoicePrices', '0');
       formData.append('sourceChannel', '1');
       formData.append('Service', '0');
-      formData.append('Status', '1');
+      formData.append('Status', '2');
       const now = new Date();
       const formattedDate = now.toISOString().slice(0, 19).replace('T', ' '); 
       

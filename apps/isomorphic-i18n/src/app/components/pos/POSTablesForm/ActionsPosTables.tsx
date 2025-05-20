@@ -69,7 +69,7 @@ const ActionsPosTables: React.FC<ActionsCellProps> = ({ data, lang, languages, i
   const { closeModal } = useModal();  
   const shopId = GetCookiesClient('shopId');
   const userType = GetCookiesClient('userType');
-  const { setTablesData, shipping, setPOSTableOrderId } = useUserContext();
+  const { setTablesData, shipping, setPOSTableOrderId, mainBranch } = useUserContext();
   const [loadingAddOrderItemsTable, setLoadingAddOrderItemsTable] = useState('');
   const [loadingEndOrder, setLoadingEndOrder] = useState('');
   
@@ -92,7 +92,7 @@ const ActionsPosTables: React.FC<ActionsCellProps> = ({ data, lang, languages, i
       // formData.append('TotalVat', String(summary?.tax || 0));
 
       formData.append('ShopId', shopId as string);
-      formData.append('BranchId', "7b509bf6-7e75-4895-8d3f-0d7c4afa28f5");
+      formData.append('BranchId', mainBranch);
       formData.append('EndUserId', defaultUser);
       if (decodedToken.uid) {
         if(userType == '4'){
@@ -114,7 +114,7 @@ const ActionsPosTables: React.FC<ActionsCellProps> = ({ data, lang, languages, i
       formData.append('Service', '0');
       // formData.append('OrderNumber', 'ORD123456');
       // formData.append('TableNumber', '5');
-      formData.append('Status', '1');
+      formData.append('Status', '2');
       // formData.append('ShopId', `${shopId}`);
       const now = new Date();
       const formattedDate = now.toISOString().slice(0, 19).replace('T', ' '); 

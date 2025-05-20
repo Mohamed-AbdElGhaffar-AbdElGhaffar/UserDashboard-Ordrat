@@ -16,7 +16,7 @@ import { useModal } from '@/app/shared/modal-views/use-modal';
 import toast from 'react-hot-toast';
 import { GetCookiesClient } from '../../ui/getCookiesClient/GetCookiesClient';
 import * as signalR from '@microsoft/signalr';
-import { API_BASE_URL } from '@/config/base-url';
+import { API_BASE_URL, Image_BASE_URL } from '@/config/base-url';
 import { useNegotiator } from '../../context/useNegotiator';
 import { Button, Empty, SearchNotFoundIcon, Text } from 'rizzui';
 import PageHeader from '@/app/shared/page-header';
@@ -69,6 +69,7 @@ export default function ChooseDelivery({ lang = 'en', branches, orderId, pageHea
   } = useNegotiator(orderId);
   console.log("broadcastStatus: ",broadcastStatus);
   console.log("isOrderBroadcasted: ",isOrderBroadcasted);
+  console.log("offers: ",offers);
   
   const text = {
     hiring: lang === 'ar' ? 'تعيين' : 'Hiring',
@@ -213,33 +214,33 @@ export default function ChooseDelivery({ lang = 'en', branches, orderId, pageHea
                 <div key={offer.deliveryId} className='w-full bg-white rounded-[5px] p-2 flex flex-col justify-between gap-4'>
                   <div className='w-full flex justify-between items-center gap-2'>
                     <div className='w-[calc(100%-48px)] flex gap-2'>
-                      <img
-                        src={delivery.src}
-                        alt={`${offer.deliveryId} ${offer.deliveryId}`}
+                      <Image
+                        src={`${Image_BASE_URL}${offer.photoUrl}` || delivery.src}
+                        alt={`${offer.name}`}
                         className="w-[40px] h-[40px] object-contain rounded-full"
-                        width="600"
-                        height="360"
+                        width={600}
+                        height={360}
                       />
                       <div className='w-[calc(100%-38px)]'>
                         <div className='w-full flex gap-1'>
                           <p className="font-bold text-[14px] capitalize text-[#E92E3E] truncate overflow-hidden whitespace-nowrap max-w-[calc(100%-84px)]">
-                            {offer.deliveryId}
+                            {offer.name}
                           </p>
                           <p className="font-semibold text-[14px] text-[#AEAEAE] truncate overflow-hidden whitespace-nowrap max-w-[80px]">
-                            ({offer.proposedPrice || 40} {text.trip})
+                            ({offer.numberOfOrders} {text.trip})
                           </p>
                         </div>
                         <p className="font-semibold text-[14px] capitalize text-[#979797]">
-                          {text.away} : <span>{offer.proposedPrice || 50} KM</span>
+                          {text.away} : <span>{offer.RouteDistanceToBranch || 50} KM</span>
                         </p>
                       </div>
                     </div>
-                    <img
+                    <Image
                       src={deliveryMotorcycle}
                       alt="Delivery Motorcycle"
                       className="w-[30px] h-[30px]"
-                      width="600"
-                      height="360"
+                      width={600}
+                      height={360}
                     />
                   </div>
                   <div className='w-full mt-3'>

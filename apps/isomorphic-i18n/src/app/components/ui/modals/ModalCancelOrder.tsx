@@ -33,9 +33,9 @@ export default function ModalCancelOrder({
   const { closeModal } = useModal();
   const router = useRouter();
   const text = {
-    cancel: lang === 'ar' ? 'إلغاء' : 'Cancel',
-    deactivate: lang === 'ar' ? 'حذف' : 'Delete',
-    activeRequst: lang === 'ar' ? 'حذف الطلب' : 'Delete The Order',
+    cancel: lang === 'ar' ? 'إغلاق' : 'Close',
+    deactivate: lang === 'ar' ? 'إلغاء' : 'Cancel',
+    activeRequst: lang === 'ar' ? 'إلغاء الطلب' : 'Delete The Order',
   };
   const { orderDetailsStatus, setOrderDetailsStatus } = useUserContext();  
 
