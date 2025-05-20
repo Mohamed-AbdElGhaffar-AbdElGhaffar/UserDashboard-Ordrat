@@ -215,7 +215,7 @@ export default function OrderView({ lang, initialOrder, phone, branches }: { lan
               <RoleExist PageRoles={['CancleOrder']}>
                 <Button onClick={()=>{handleDeleteOrders(); }} className="w-auto flex justify-end items-center gap-0 sm:gap-1.5 ">
                   <TrashIcon className="h-[17px] w-[17px]" />
-                  <span className='hidden sm:block'>{lang == "en"?"Delete Data":'حذف الطلب'}</span>
+                  <span className='hidden sm:block'>{lang == "en"?"Delete Data":'الغاء الطلب'}</span>
                 </Button>
               </RoleExist>
             )}

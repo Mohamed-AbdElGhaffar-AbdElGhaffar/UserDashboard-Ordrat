@@ -27,7 +27,13 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response && error.response.status === 403 && !originalRequest._retry) {
+    const isTokenInvalid =
+      error.response?.status === 500 &&
+      error.response?.data?.message === 'Access token is invalid';
+
+    const isUnauthorized = error.response?.status === 403;
+
+    if (error.response && (isUnauthorized || isTokenInvalid) && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         const refreshToken = GetCookiesClient('refreshToken');

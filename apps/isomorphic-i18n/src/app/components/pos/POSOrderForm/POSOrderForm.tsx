@@ -135,7 +135,7 @@ export default function POSOrderForm({
   const shopId = GetCookiesClient('shopId');
   const userType = GetCookiesClient('userType');
   const { closeModal } = useModal();
-  const { shipping } = useUserContext();
+  const { shipping, mainBranch } = useUserContext();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -267,7 +267,7 @@ export default function POSOrderForm({
         // formData.append('TotalVat', String(summary?.tax || 0));
   
         formData.append('ShopId', shopId as string);
-        formData.append('BranchId', storedBranch as string);
+        formData.append('BranchId', mainBranch as string);
         formData.append('EndUserId', selectedCustomer?.id || '');
         if (decodedToken.uid) {
           if(userType == '4'){
@@ -293,7 +293,7 @@ export default function POSOrderForm({
         formData.append('Service', '0');
         // formData.append('OrderNumber', 'ORD123456');
         // formData.append('TableNumber', '5');
-        formData.append('Status', '1');
+        formData.append('Status', '2');
         // formData.append('ShopId', `${shopId}`);
         const now = new Date();
         const formattedDate = now.toISOString().slice(0, 19).replace('T', ' '); 

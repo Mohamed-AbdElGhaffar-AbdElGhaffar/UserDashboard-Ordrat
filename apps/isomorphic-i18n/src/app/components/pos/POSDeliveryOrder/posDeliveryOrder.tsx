@@ -130,6 +130,19 @@ export default function POSDeliveryOrder({
   const { setGuard } = useGuardContext();
   const { mainBranch } = useUserContext();
 
+  
+  const filteredBranchZones = branchZones
+  .filter(zone => zone.id === mainBranch)
+  .map(zone => ({
+    lat: zone.lat,
+    lng: zone.lng,
+    zoonRadius: zone.zoonRadius
+  }));
+
+  const initLat = filteredBranchZones.length > 0 ? filteredBranchZones[0].lat : 30.023173855111207;
+  const initLng = filteredBranchZones.length > 0 ? filteredBranchZones[0].lng : 31.185028997638923;
+
+
   useEffect(() => {
     if (languages === 0) {
       mainFormik.setFieldValue('nameEn', 'no data');
@@ -156,8 +169,8 @@ export default function POSDeliveryOrder({
       firstName: '',
       lastName: '',
       phoneNumber: '',
-      lat: undefined,
-			lng: undefined,
+      lat: initLng || undefined,
+			lng: initLng || undefined,
 			type: 0,
 			aptNo: '',
 			floor: '',
@@ -200,7 +213,7 @@ export default function POSDeliveryOrder({
             const formData = new FormData();
             formData.append('paymentmethod', '0');
             formData.append('TotalPrice', "0");
-            formData.append('ShippingFees', freeShppingTarget.toString() || '0');
+            formData.append('ShippingFees', '150');
             formData.append('TotalVat', "0");
             formData.append('ShopId', shopId as string);
             formData.append('BranchId', mainBranch);
@@ -223,7 +236,7 @@ export default function POSDeliveryOrder({
             formData.append('TotalChoicePrices', '0');
             formData.append('sourceChannel', '1');
             formData.append('Service', '0');
-            formData.append('Status', '1');
+            formData.append('Status', '2');
             const now = new Date();
             const formattedDate = now.toISOString().slice(0, 19).replace('T', ' '); 
             
@@ -350,17 +363,6 @@ export default function POSDeliveryOrder({
 			}, 10);
 		}
 	};	
-
-  const filteredBranchZones = branchZones
-  .filter(zone => zone.id === mainBranch)
-  .map(zone => ({
-    lat: zone.lat,
-    lng: zone.lng,
-    zoonRadius: zone.zoonRadius
-  }));
-
-  const initLat = filteredBranchZones.length > 0 ? filteredBranchZones[0].lat : 30.023173855111207;
-  const initLng = filteredBranchZones.length > 0 ? filteredBranchZones[0].lng : 31.185028997638923;
 
   return (
     <div className='py-1'>

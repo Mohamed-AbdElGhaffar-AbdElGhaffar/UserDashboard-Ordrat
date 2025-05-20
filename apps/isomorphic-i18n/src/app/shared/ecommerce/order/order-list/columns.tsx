@@ -25,14 +25,14 @@ function getStatusBadge(lang:string , status: string) {
       return (
         <div className="flex items-center">
           <Badge color="warning" renderAsDot />
-          <Text className="ms-2 font-medium text-orange-dark">{lang=='ar'? 'يتم تحضير الطلب' : 'Order Pending' }</Text>
+          <Text className="ms-2 font-medium text-orange-dark">{lang=='ar'? "انتظار الموافقة علي الطلب" : 'Order Pending' }</Text>
         </div>
       );
     case '2':
       return (
         <div className="flex items-center">
           <Badge color="danger" renderAsDot />
-          <Text className="ms-2 font-medium text-gray-600">{lang=='ar'? 'الطلب اصبح جاهز' : 'Order Being Prepared'}</Text>
+          <Text className="ms-2 font-medium text-gray-600">{lang=='ar'? 'يتم تحضير الطلب' : 'Order Being Prepared'}</Text>
         </div>
       );
     case '4':

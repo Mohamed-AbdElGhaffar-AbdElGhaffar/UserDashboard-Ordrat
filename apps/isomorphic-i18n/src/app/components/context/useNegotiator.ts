@@ -8,6 +8,11 @@ import { GetCookiesClient } from '../ui/getCookiesClient/GetCookiesClient';
 interface DeliveryOffer {
   deliveryId: string;
   proposedPrice: number;
+  numberOfOrders: number;
+  RouteDurationToBranch: number;
+  RouteDistanceToBranch: string;
+  photoUrl: string;
+  name: string;
 }
 
 interface BroadcastStatus {
@@ -53,7 +58,7 @@ export function useNegotiator(orderId?: string) {
       return data.accessToken;
     } catch (error) {
       console.error('Token refresh error:', error);
-      window.location.href = '/signin';
+      // window.location.href = '/signin';
       return null;
     }
   }
@@ -75,14 +80,26 @@ export function useNegotiator(orderId?: string) {
     connection.on('DeliveryResponded', (response) => {
       const deliveryId = response.deliveryId;
       const proposedPrice = response.proposedFee;
-      console.log('📨 DeliveryResponded received');
+      const numberOfOrders = response.numberOfOrders;
+      const name = response.name;
+      const photoUrl = response.photoUrl;
+      const RouteDurationToBranch = response.RouteDurationToBranch;
+      const RouteDistanceToBranch = response.RouteDistanceToBranch;
+      console.log('📨 DeliveryResponded received: ', response);
       setOffers((prev) => {
         const updated = prev.filter((o) => o.deliveryId !== deliveryId);
-        return [...updated, { deliveryId, proposedPrice }];
+        return [...updated, { deliveryId, proposedPrice, name, photoUrl, numberOfOrders, RouteDistanceToBranch, RouteDurationToBranch }];
       });
       setTimeout(() => {
         setOffers((prev) => prev.filter((o) => o.deliveryId !== deliveryId));
       }, 10000);
+    });
+
+    connection.on('DeliveryCanceledOffer', (response) => {
+      // console.warn('🚫 DeliveryCanceledOffer (●●) --->', response);
+      // setOffers((prev) => prev.filter((o) => o.deliveryId !== response.deliveryId));
+      // Optional: notify or log message
+      console.log("🚫 DeliveryCanceledOffer (●'◡'●) ---> ", response);
     });
 
     connection.on('OrderBroadcastExpired', (response) => {

@@ -32,14 +32,14 @@ const getOrderStatusOptions = (status: number, lang: string): OrderStatusOption[
   switch (status) {
     case 0:
       return [
-        { label: lang === 'ar' ? 'يتم تحضير الطلب' : 'Pending', value: 1, icon: pending },
-        { label: lang === 'ar' ? 'الطلب اصبح جاهز' : 'Being Prepared', value: 2, icon: beingPrepared },
+        { label: lang === 'ar' ? "انتظار الموافقة علي الطلب" : 'Pending', value: 1, icon: pending },
+        { label: lang === 'ar' ? 'يتم تحضير الطلب' : 'Being Prepared', value: 2, icon: beingPrepared },
         { label: lang === 'ar' ? 'يتم توصيل الطلب' : 'Being Delivered', value: 3, icon: beingDelivered },
         { label: lang === 'ar' ? 'تم الاستلام' : 'Delivered', value: 4, icon: delivered },
       ];
     case 1:
       return [
-        { label: lang === 'ar' ? 'الطلب اصبح جاهز' : 'Being Prepared', value: 2, icon: beingPrepared },
+        { label: lang === 'ar' ? 'يتم تحضير الطلب' : 'Being Prepared', value: 2, icon: beingPrepared },
         { label: lang === 'ar' ? 'يتم توصيل الطلب' : 'Being Delivered', value: 3, icon: beingDelivered },
         { label: lang === 'ar' ? 'تم الاستلام' : 'Delivered', value: 4, icon: delivered },
       ];

@@ -55,6 +55,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
         localStorage.setItem('userData',  response.data);
         localStorage.setItem('role', response.data.roles);
         localStorage.setItem('mainBranch', response.data.branches[0].id);
+        localStorage.setItem('sellerId', response.data.id);
         // Save token to cookies so middleware can access it
         Cookies.set('mainBranch', response.data.branches[0].id, {
           expires: 1, // 1 day
