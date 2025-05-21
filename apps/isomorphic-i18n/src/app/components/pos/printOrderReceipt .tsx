@@ -138,20 +138,20 @@ export const printOrderReceipt = (
       <title>Receipt - Order #${order.orderNumber}</title>
       <style>
         @page { 
-          size: 80mm auto !important;
+          size: 72mm auto !important;
           margin: 0mm !important;
         }
         
         @media print {
           html, body {
-            width: 80mm !important;
+            width: 72mm !important;
             margin: 0 !important;
             padding: 0 !important;
           }
           
           .receipt {
             width: 100% !important;
-            max-width: 80mm !important;
+            max-width: 72mm !important;
             padding-left: ${xPadding} !important;
             padding-right: ${xPadding} !important;
             box-sizing: border-box !important;
@@ -165,7 +165,7 @@ export const printOrderReceipt = (
           font-size: 10pt;
           line-height: 1.2;
           width: 100%;
-          max-width: 80mm;
+          max-width: 72mm;
           background-color: white;
           color: black;
         }
@@ -601,7 +601,7 @@ export const printOrderReceipt = (
         const style = frameDoc.createElement('style');
         style.textContent = `
           @page {
-            size: 80mm auto !important;
+            size: 72mm auto !important;
             margin: 0mm !important;
           }
         `;
