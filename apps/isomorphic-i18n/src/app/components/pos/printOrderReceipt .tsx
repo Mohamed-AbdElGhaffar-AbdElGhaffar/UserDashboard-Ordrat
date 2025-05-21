@@ -355,75 +355,10 @@ export const printOrderReceipt = (
 
   // For desktop, use more advanced methods with printer selection
   
-  // Method 1: Try direct print via iframe
-  const printViaIframe = () => {
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '-9999px';
-    iframe.style.bottom = '-9999px';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    document.body.appendChild(iframe);
-    
-    const frameDoc = iframe.contentWindow?.document;
-    if (!frameDoc) {
-      console.error('Could not access iframe document');
-      useJsPDF(); // Fallback
-      return;
-    }
-    
-    frameDoc.open();
-    frameDoc.write(receiptHtml);
-    frameDoc.close();
-    
-    // Attempt printer selection if available
-    if (printerId && iframe.contentWindow) {
-      try {
-        // Add some printer-detection diagnostics
-        console.log('Attempting to use printer:', printerId);
-        
-        // Add printer selection meta tag (experimental)
-        const printerMeta = frameDoc.createElement('meta');
-        printerMeta.name = 'print-printer';
-        printerMeta.content = printerId;
-        frameDoc.head.appendChild(printerMeta);
-        
-        // Set page size to thermal receipt
-        const style = frameDoc.createElement('style');
-        style.textContent = `
-          @page {
-            size: 80mm auto !important;
-            margin: 0mm !important;
-          }
-        `;
-        frameDoc.head.appendChild(style);
-      } catch (err) {
-        console.warn('Printer selection features not fully supported:', err);
-      }
-    }
-    
-    // Print after a short delay
-    // setTimeout(() => {
-    //   try {
-    //     iframe.contentWindow?.focus();
-    //     iframe.contentWindow?.print();
-        
-    //     // Remove the iframe after printing
-    //     setTimeout(() => {
-    //       document.body.removeChild(iframe);
-    //     }, 2000);
-    //   } catch (e) {
-    //     console.error('Printing via iframe failed:', e);
-    //     useJsPDF(); // Fallback
-    //   }
-    // }, 500);
-  };
-
-  // Method 2: Use jsPDF as fallback
-  const useJsPDF = () => {
+  // Method 2: Generate PDF as fallback
+  const generatePdfReceipt = () => {
     try {
-      console.log('Falling back to jsPDF printing method');
+      console.log('Falling back to PDF printing method');
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -582,19 +517,80 @@ export const printOrderReceipt = (
         hotfixes: ['px_scaling'],
       };
       
-      // Important mobile fix: On mobile, open PDF in a new tab instead of auto-printing
-      // This gives the user more control on mobile
-      const pdfOutput = doc.output('bloburl');
-      
       // Auto-print directly without showing PDF preview on desktop
       doc.autoPrint();
-      window.open(pdfOutput, '_blank');
+      window.open(doc.output('bloburl'), '_blank');
       
     } catch (pdfError) {
       console.error("PDF generation failed:", pdfError);
       // Last resort fallback - alert user
       alert(lang === 'ar' ? 'فشل الطباعة. حاول مرة أخرى.' : 'Printing failed. Please try again.');
     }
+  };
+
+  // Method 1: Try direct print via iframe
+  const printViaIframe = () => {
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '-9999px';
+    iframe.style.bottom = '-9999px';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+    
+    const frameDoc = iframe.contentWindow?.document;
+    if (!frameDoc) {
+      console.error('Could not access iframe document');
+      generatePdfReceipt(); // Fallback to PDF method - renamed function
+      return;
+    }
+    
+    frameDoc.open();
+    frameDoc.write(receiptHtml);
+    frameDoc.close();
+    
+    // Attempt printer selection if available
+    if (printerId && iframe.contentWindow) {
+      try {
+        // Add some printer-detection diagnostics
+        console.log('Attempting to use printer:', printerId);
+        
+        // Add printer selection meta tag (experimental)
+        const printerMeta = frameDoc.createElement('meta');
+        printerMeta.name = 'print-printer';
+        printerMeta.content = printerId;
+        frameDoc.head.appendChild(printerMeta);
+        
+        // Set page size to thermal receipt
+        const style = frameDoc.createElement('style');
+        style.textContent = `
+          @page {
+            size: 80mm auto !important;
+            margin: 0mm !important;
+          }
+        `;
+        frameDoc.head.appendChild(style);
+      } catch (err) {
+        console.warn('Printer selection features not fully supported:', err);
+      }
+    }
+    
+    // Print after a short delay
+    setTimeout(() => {
+      try {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+        
+        // Remove the iframe after printing
+        setTimeout(() => {
+          document.body.removeChild(iframe);
+        }, 2000);
+      } catch (e) {
+        console.error('Printing via iframe failed:', e);
+        generatePdfReceipt(); // Fallback to PDF method - renamed function
+      }
+    }, 500);
   };
 
   // Try direct printing first, with fallback to PDF
