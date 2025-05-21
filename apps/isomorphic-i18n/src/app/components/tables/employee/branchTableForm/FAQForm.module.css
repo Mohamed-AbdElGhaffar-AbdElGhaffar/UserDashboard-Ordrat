@@ -2,7 +2,7 @@
   scrollbar-width: thin;
   scrollbar-color: #e11d48 #f0f0f0;
   overflow-y: auto;
-  max-height: 90vh;
+  max-height: 90svh;
 }
 .customScroll:hover {
   scrollbar-color: #be123c #f0f0f0;
