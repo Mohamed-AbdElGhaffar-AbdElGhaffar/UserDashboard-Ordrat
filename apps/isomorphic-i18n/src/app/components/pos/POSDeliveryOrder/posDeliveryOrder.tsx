@@ -431,7 +431,7 @@ export default function POSDeliveryOrder({
               };
 
               if (orderDetails) {
-                printOrderReceipt(orderDetails, lang, customerInfo);
+                printOrderReceipt(orderDetails, lang, customerInfo, "Microsoft Print to PDF");
               }
               toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح' : 'Order created successfully');
               onSuccess?.();
@@ -619,7 +619,7 @@ export default function POSDeliveryOrder({
               };
 
               if (orderDetails) {
-                printOrderReceipt(orderDetails, lang, customerInfo);
+                printOrderReceipt(orderDetails, lang, customerInfo, "Microsoft Print to PDF");
               }
               toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح' : 'Order created successfully');
               onSuccess?.();

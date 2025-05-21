@@ -74,7 +74,14 @@ const formatDate = (dateString: string | Date | undefined): { date: string; time
 };
 
 /**
- * Prints an order receipt directly to a specific printer
+ * Check if the current device is mobile
+ */
+const isMobileDevice = (): boolean => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
+/**
+ * Prints an order receipt directly
  * @param order The order details to print
  * @param lang Language to use (en or ar)
  * @param endUser Customer information
@@ -89,6 +96,7 @@ export const printOrderReceipt = (
   if (!order) return;
 
   const isRTL = lang === 'ar';
+  const isMobile = isMobileDevice();
   const { date, time } = formatDate(order?.createdAt);
   
   // Calculate totals
@@ -105,91 +113,122 @@ export const printOrderReceipt = (
     <html lang="${isRTL ? 'ar' : 'en'}" dir="${isRTL ? 'rtl' : 'ltr'}">
     <head>
       <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Receipt - Order #${order.orderNumber}</title>
       <style>
         @page { 
-          size: 80mm auto; 
-          margin: 0mm;
+          size: 80mm auto !important;
+          margin: 0mm !important;
         }
+        
+        @media print {
+          html, body {
+            width: 80mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          
+          .receipt {
+            width: 100% !important;
+            max-width: 80mm !important;
+          }
+        }
+        
         body {
           font-family: ${isRTL ? "'Arial', sans-serif" : "monospace"};
           margin: 0;
           padding: 8px;
           font-size: 10pt;
           line-height: 1.2;
-          width: 80mm;
+          width: 100%;
+          max-width: 80mm;
           background-color: white;
           color: black;
         }
+        
         * {
           box-sizing: border-box;
         }
+        
         .receipt {
           width: 100%;
         }
+        
         .header, .footer {
           text-align: center;
           padding-bottom: 5px;
           padding-top: 5px;
         }
+        
         .header {
           border-bottom: 1px solid black;
           margin-bottom: 8px;
         }
+        
         .footer {
           border-top: 1px solid black;
           margin-top: 8px;
         }
+        
         .bold {
           font-weight: bold;
         }
+        
         table {
           width: 100%;
           border-collapse: collapse;
           font-size: 9pt;
         }
+        
         th, td {
           padding: 2px;
           text-align: ${isRTL ? 'right' : 'left'};
         }
+        
         th:last-child, td:last-child {
           text-align: ${isRTL ? 'left' : 'right'};
         }
+        
         .price-row {
           display: flex;
           justify-content: space-between;
           font-size: 9pt;
           margin-bottom: 2px;
         }
+        
         .border-top {
           border-top: 1px solid black;
           padding-top: 4px;
         }
+        
         .border-bottom {
           border-bottom: 1px solid black;
           margin-bottom: 8px;
         }
+        
         .calculation {
           font-size: 7pt;
           color: #666;
           font-style: italic;
           margin-top: 4px;
         }
+        
         .small {
           font-size: 8pt;
         }
-        @media print {
-          html, body {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-            width: 80mm;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-        }
       </style>
+      <script>
+        function onLoadHandler() {
+          // Auto-print after a short delay
+          setTimeout(function() {
+            window.print();
+            // On mobile, we'll just close the window after printing attempt
+            ${isMobile ? 'setTimeout(function() { window.close(); }, 1000);' : ''}
+          }, 500);
+        }
+      </script>
     </head>
-    <body>
+    <body onload="onLoadHandler()">
       <div class="receipt">
         <!-- Header -->
         <div class="header">
@@ -288,45 +327,41 @@ export const printOrderReceipt = (
     </html>
   `;
 
-  // Direct Print Methods
-  
-  // Method 1: Print with specific printer using Print.js
-  const printWithPrintJS = async () => {
-    try {
-      // First import the library dynamically
-      const printJS = await import('print-js');
+  // On Mobile devices, use a simplified approach that works better
+  if (isMobile) {
+    // For mobile, we'll use a simple approach that's more reliable
+    const mobileFrameId = 'mobile-print-frame-' + Date.now();
+    const printFrame = document.createElement('iframe');
+    printFrame.id = mobileFrameId;
+    printFrame.style.width = '1px';
+    printFrame.style.height = '1px';
+    printFrame.style.position = 'absolute';
+    printFrame.style.left = '-9999px';
+    printFrame.style.top = '-9999px';
+    document.body.appendChild(printFrame);
+    
+    const frameDoc = printFrame.contentDocument || printFrame.contentWindow?.document;
+    if (frameDoc) {
+      frameDoc.open();
+      frameDoc.write(receiptHtml);
+      frameDoc.close();
       
-      // Convert HTML to a data URL or Blob
-      const blob = new Blob([receiptHtml], { type: 'text/html' });
-      const dataUrl = URL.createObjectURL(blob);
-      
-      // Print with specific printer if available, otherwise default printer
-      printJS.default({
-        printable: dataUrl,
-        type: 'raw-html',
-        documentTitle: `Receipt-${order.orderNumber}`,
-        onPrintDialogClose: () => {
-          URL.revokeObjectURL(dataUrl);
-        },
-        // This is where we would set the printer if browser API supported it
-        // Unfortunately, direct printer selection isn't fully supported in browsers
-        // Newer experimental APIs like WebUSB are starting to enable this
-        // The best approach is to use print-js and store the printer preference
-        // in the OS, so it automatically selects the right printer
-      });
-    } catch (error) {
-      console.error("PrintJS method failed:", error);
-      printWithIframe();  // Fall back to iframe method
+      // The iframe's onload handler will trigger printing
+      // and clean up automatically on mobile
     }
-  };
+    
+    return;
+  }
+
+  // For desktop, use more advanced methods with printer selection
   
-  // Method 2: Print with hidden iframe (fallback method)
-  const printWithIframe = () => {
+  // Method 1: Try direct print via iframe
+  const printViaIframe = () => {
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
     iframe.style.right = '-9999px';
     iframe.style.bottom = '-9999px';
-    iframe.style.width = '80mm';
+    iframe.style.width = '0';
     iframe.style.height = '0';
     iframe.style.border = '0';
     document.body.appendChild(iframe);
@@ -334,6 +369,7 @@ export const printOrderReceipt = (
     const frameDoc = iframe.contentWindow?.document;
     if (!frameDoc) {
       console.error('Could not access iframe document');
+      useJsPDF(); // Fallback
       return;
     }
     
@@ -341,102 +377,65 @@ export const printOrderReceipt = (
     frameDoc.write(receiptHtml);
     frameDoc.close();
     
-    // Handle specific printer selection if the browser supports it
-    if (printerId && iframe.contentWindow?.matchMedia) {
-      // Some browsers might support this experimental feature
-      // This is not widely supported but showing the approach
+    // Attempt printer selection if available
+    if (printerId && iframe.contentWindow) {
       try {
-        const mediaQueryList = iframe.contentWindow.matchMedia('print');
-        mediaQueryList.addListener(function(mql) {
-          if (mql.matches) {
-            // Before print
-            console.log(`Attempting to use printer: ${printerId}`);
-            // This part is theoretical and might not work in all browsers
-            const style = document.createElement('style');
-            style.textContent = `@page { size: 80mm auto; margin: 0mm; }`;
-            iframe.contentDocument?.head.appendChild(style);
+        // Add some printer-detection diagnostics
+        console.log('Attempting to use printer:', printerId);
+        
+        // Add printer selection meta tag (experimental)
+        const printerMeta = frameDoc.createElement('meta');
+        printerMeta.name = 'print-printer';
+        printerMeta.content = printerId;
+        frameDoc.head.appendChild(printerMeta);
+        
+        // Set page size to thermal receipt
+        const style = frameDoc.createElement('style');
+        style.textContent = `
+          @page {
+            size: 80mm auto !important;
+            margin: 0mm !important;
           }
-        });
+        `;
+        frameDoc.head.appendChild(style);
       } catch (err) {
-        console.warn('Advanced print features not supported', err);
+        console.warn('Printer selection features not fully supported:', err);
       }
     }
     
-    setTimeout(() => {
-      try {
-        iframe.contentWindow?.focus();
-        iframe.contentWindow?.print();
+    // Print after a short delay
+    // setTimeout(() => {
+    //   try {
+    //     iframe.contentWindow?.focus();
+    //     iframe.contentWindow?.print();
         
-        // Clean up after printing
-        setTimeout(() => {
-          document.body.removeChild(iframe);
-        }, 1000);
-      } catch (e) {
-        console.error('Printing failed:', e);
-        printWithWebPrintAPI(); // Try one more method
-      }
-    }, 300);
+    //     // Remove the iframe after printing
+    //     setTimeout(() => {
+    //       document.body.removeChild(iframe);
+    //     }, 2000);
+    //   } catch (e) {
+    //     console.error('Printing via iframe failed:', e);
+    //     useJsPDF(); // Fallback
+    //   }
+    // }, 500);
   };
-  
-  // Method 3: Using Web Print API (experimental, for specific printers)
-  const printWithWebPrintAPI = async () => {
+
+  // Method 2: Use jsPDF as fallback
+  const useJsPDF = () => {
     try {
-      // This is a more modern approach but still experimental
-      if ('print' in navigator && printerId) {
-        // Using the newer, experimental Web Print API
-        // Not widely supported yet but showing the concept
-        // In the future, browsers may support direct printer selection
-        const blob = new Blob([receiptHtml], { type: 'text/html' });
-        
-        // @ts-ignore - This is experimental and not in TS definitions
-        const printManager = await navigator.print?.getPrinters();
-        
-        // @ts-ignore
-        const printer = printManager?.find((p: any) => p.id === printerId);
-        
-        if (printer) {
-          // @ts-ignore
-          await navigator.print.print({
-            data: blob,
-            printer: printer,
-            options: {
-              paperWidth: 80,
-              paperUnit: 'mm',
-              margins: { top: 0, right: 0, bottom: 0, left: 0 }
-            }
-          });
-          
-          return; // Success
-        }
-      }
-      // If we get here, it means the Web Print API is not supported or failed
-      console.warn('Web Print API not supported or printer not found');
-      
-      // Fall back to PDF method
-      printWithPDF();
-    } catch (error) {
-      console.error('Web Print API error:', error);
-      // Fall back to PDF method
-      printWithPDF();
-    }
-  };
-  
-  // Method 4: Print with PDF as final fallback
-  // Method 4: Print with PDF as final fallback
-  const printWithPDF = () => {
-    try {
-      console.log('Falling back to PDF printing method');
+      console.log('Falling back to jsPDF printing method');
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: [80, 297], // Thermal receipt size
+        format: [80, 297], // Thermal receipt size (width, auto height)
       });
       
       if (isRTL) {
         doc.setR2L(true);
       }
       
-      doc.setFont(isRTL ? 'Amiri' : 'courier', 'normal');
+      // Set font - use standard fonts to avoid loading issues
+      doc.setFont(isRTL ? 'helvetica' : 'courier', 'normal');
       doc.setFontSize(10);
       
       // Header
@@ -449,7 +448,7 @@ export const printOrderReceipt = (
       doc.setLineWidth(0.1);
       doc.line(5, 17, 75, 17);
       
-      // Items Table
+      // Generate table data
       const tableColumn = [
         isRTL ? 'الكمية' : 'Qty', 
         isRTL ? 'المنتج' : 'Item', 
@@ -533,17 +532,17 @@ export const printOrderReceipt = (
       doc.line(5, y, 75, y);
       y += 3;
       
-      doc.setFont(isRTL ? 'Amiri' : 'courier', 'bold');
+      doc.setFont(isRTL ? 'helvetica' : 'courier', 'bold');
       doc.text(`${isRTL ? 'الإجمالي:' : 'Total:'}`, leftCol, y);
       doc.text(`${toCurrency(total, lang)}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
       y += 6;
       
       // Add address if available
       if (order?.address) {
-        doc.setFont(isRTL ? 'Amiri' : 'courier', 'bold');
+        doc.setFont(isRTL ? 'helvetica' : 'courier', 'bold');
         doc.text(`${isRTL ? 'عنوان التوصيل:' : 'Delivery Address:'}`, 10, y);
         y += 4;
-        doc.setFont(isRTL ? 'Amiri' : 'courier', 'normal');
+        doc.setFont(isRTL ? 'helvetica' : 'courier', 'normal');
         doc.text(`${order.address.street}`, 10, y);
         y += 4;
         doc.text(`${isRTL ? `شقة: ${order.address.apartmentNumber}, الطابق: ${order.address.floor}` : `Apt: ${order.address.apartmentNumber}, Floor: ${order.address.floor}`}`, 10, y);
@@ -552,10 +551,10 @@ export const printOrderReceipt = (
       
       // Add customer info if available
       if (endUser) {
-        doc.setFont(isRTL ? 'Amiri' : 'courier', 'bold');
+        doc.setFont(isRTL ? 'helvetica' : 'courier', 'bold');
         doc.text(`${isRTL ? 'بيانات العميل:' : 'Customer Info:'}`, 10, y);
         y += 4;
-        doc.setFont(isRTL ? 'Amiri' : 'courier', 'normal');
+        doc.setFont(isRTL ? 'helvetica' : 'courier', 'normal');
         if (endUser.firstName || endUser.lastName) {
           doc.text(`${isRTL ? 'الاسم:' : 'Name:'} ${endUser.firstName || ''} ${endUser.lastName || ''}`, 10, y);
           y += 4;
@@ -569,42 +568,35 @@ export const printOrderReceipt = (
       // Footer
       doc.line(5, y, 75, y);
       y += 5;
-      doc.setFont(isRTL ? 'Amiri' : 'courier', 'normal');
+      doc.setFont(isRTL ? 'helvetica' : 'courier', 'normal');
       doc.text(`${isRTL ? 'شكراً لطلبك!' : 'Thank you for your order!'}`, 40, y, { align: 'center' });
       y += 4;
       doc.setFontSize(7);
       doc.text(`${isRTL ? 'تم إنشاؤه بواسطة Ordrat' : 'Powered by Ordrat'}`, 40, y + 4, { align: 'center' });
       
-      // Print the PDF
-      // Use standard autoPrint without the invalid printToPDF option
-      doc.autoPrint();
+      // Critical - set pdf print options for thermal printer
+      const pdfOptions = {
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [80, 297],
+        hotfixes: ['px_scaling'],
+      };
       
-      // Open in a new window, which will trigger the print dialog
-      window.open(doc.output('bloburl'), '_blank');
+      // Important mobile fix: On mobile, open PDF in a new tab instead of auto-printing
+      // This gives the user more control on mobile
+      const pdfOutput = doc.output('bloburl');
+      
+      // Auto-print directly without showing PDF preview on desktop
+      doc.autoPrint();
+      window.open(pdfOutput, '_blank');
+      
     } catch (pdfError) {
       console.error("PDF generation failed:", pdfError);
+      // Last resort fallback - alert user
       alert(lang === 'ar' ? 'فشل الطباعة. حاول مرة أخرى.' : 'Printing failed. Please try again.');
     }
   };
-  
-  // Start with the most advanced method first, with fallbacks
-  if (printerId) {
-    try {
-      // Try to import print-js dynamically
-      import('print-js')
-        .then(() => {
-          printWithPrintJS();
-        })
-        .catch(() => {
-          // If PrintJS isn't available, try WebPrintAPI
-          printWithWebPrintAPI();
-        });
-    } catch (e) {
-      // If import fails, go to iframe method
-      printWithIframe();
-    }
-  } else {
-    // No printer ID, use standard iframe method
-    printWithIframe();
-  }
+
+  // Try direct printing first, with fallback to PDF
+  printViaIframe();
 };
