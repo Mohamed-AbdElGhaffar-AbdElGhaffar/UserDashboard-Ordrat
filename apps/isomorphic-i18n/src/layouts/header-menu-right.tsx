@@ -15,6 +15,17 @@ type BranchOption = {
   label: string;
   value: string;
 };
+
+function safeParseJSON(value: string | undefined | null): any[] {
+  try {
+    if (!value || value === "undefined" || value === "null") return [];
+    return JSON.parse(value);
+  } catch (e) {
+    console.error("Failed to parse branches cookie:", e);
+    return [];
+  }
+}
+
 export default function HeaderMenuRight({ lang }: { lang?: string }) {
   const { t } = useTranslation(lang!, 'common');
   const text = {
@@ -23,7 +34,7 @@ export default function HeaderMenuRight({ lang }: { lang?: string }) {
     placeholderBranch: lang === 'ar' ? "اختر فرع" : "Select Branch",
   };
   const cookiebranches = GetCookiesClient('branches') as string;
-  const cookiesBranches = JSON.parse(cookiebranches) || [];
+  const cookiesBranches = safeParseJSON(cookiebranches);
   const branchOption = cookiesBranches.map((branch: any) => ({
     label: lang == 'ar'? branch.nameAr : branch.nameEn,
     value: branch.id

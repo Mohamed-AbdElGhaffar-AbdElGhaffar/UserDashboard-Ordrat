@@ -161,6 +161,16 @@ async function fetchDefaultUsers(lang: string, shopId: string) {
   }
 }
 
+function safeParseJSON(value: string | undefined | null): any[] {
+  try {
+    if (!value || value === "undefined" || value === "null") return [];
+    return JSON.parse(value);
+  } catch (e) {
+    console.error("Failed to parse branches cookie:", e);
+    return [];
+  }
+}
+
 export default async function PointOfSalePage({
   params: { lang },
 }: {
@@ -179,7 +189,7 @@ export default async function PointOfSalePage({
   }));;
   // const branches = await getBranches(lang, shopId as string);
   const cookiebranches = GetCookiesServer('branches') as string;
-  const cookiesBranches = JSON.parse(cookiebranches);
+  const cookiesBranches = safeParseJSON(cookiebranches);
   const branches = cookiesBranches.map((branch: any) => ({
     label: lang == 'ar'? branch.nameAr : branch.nameEn,
     value: branch.id
