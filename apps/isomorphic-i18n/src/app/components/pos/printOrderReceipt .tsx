@@ -583,9 +583,7 @@ export const printOrderReceipt = (
         iframe.contentWindow?.print();
         
         // Remove the iframe after printing
-        setTimeout(() => {
-          document.body.removeChild(iframe);
-        }, 2000);
+        document.body.removeChild(iframe);
       } catch (e) {
         console.error('Printing via iframe failed:', e);
         generatePdfReceipt(); // Fallback to PDF method - renamed function
