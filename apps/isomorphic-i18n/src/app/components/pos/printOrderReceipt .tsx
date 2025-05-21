@@ -77,7 +77,25 @@ const formatDate = (dateString: string | Date | undefined): { date: string; time
  * Check if the current device is mobile
  */
 const isMobileDevice = (): boolean => {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  // Method 1: User Agent detection (traditional but can be less reliable)
+  const userAgentCheck = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  // Method 2: Screen size-based detection
+  const screenSizeCheck = window.innerWidth <= 768;
+  
+  // Method 3: Touch points detection (touchscreen capability)
+  const touchCheck = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  
+  // Method 4: Platform detection for iOS specifically
+  const iosPlatformCheck = /iPad|iPhone|iPod/.test(navigator.platform) || 
+                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  
+  // iOS 13+ detection using userAgent for newer iPhones (14 Pro Max, etc.)
+  const modernIosCheck = /iPhone|iPad|iPod/.test(navigator.userAgent) && 
+                         ('ontouchend' in document);
+  
+  // Combine checks with preference for iOS-specific detection
+  return iosPlatformCheck || modernIosCheck || (userAgentCheck && touchCheck) || (screenSizeCheck && touchCheck);
 };
 
 /**
@@ -107,6 +125,9 @@ export const printOrderReceipt = (
   const discount = order?.discount || 0;
   const total = order?.totalPrice || 0;
 
+  // Set padding value - you can adjust this as needed
+  const xPadding = '5mm';
+
   // Create the HTML receipt content
   const receiptHtml = `
     <!DOCTYPE html>
@@ -131,13 +152,16 @@ export const printOrderReceipt = (
           .receipt {
             width: 100% !important;
             max-width: 80mm !important;
+            padding-left: ${xPadding} !important;
+            padding-right: ${xPadding} !important;
+            box-sizing: border-box !important;
           }
         }
         
         body {
           font-family: ${isRTL ? "'Arial', sans-serif" : "monospace"};
           margin: 0;
-          padding: 8px;
+          padding: 0;
           font-size: 10pt;
           line-height: 1.2;
           width: 100%;
@@ -152,6 +176,10 @@ export const printOrderReceipt = (
         
         .receipt {
           width: 100%;
+          padding-left: ${xPadding};
+          padding-right: ${xPadding};
+          padding-top: 8px;
+          padding-bottom: 8px;
         }
         
         .header, .footer {
@@ -359,6 +387,9 @@ export const printOrderReceipt = (
   const generatePdfReceipt = () => {
     try {
       console.log('Falling back to PDF printing method');
+      // Convert xPadding to number (remove 'mm')
+      const paddingValue = parseInt(xPadding, 10) || 5; // Default to 5mm if parsing fails
+      
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -378,10 +409,10 @@ export const printOrderReceipt = (
       doc.setFontSize(8);
       doc.text(`${isRTL ? `التاريخ: ${date} - الوقت: ${time}` : `Date: ${date} - Time: ${time}`}`, 40, 15, { align: 'center' });
       
-      // Draw a line
+      // Draw a line - adjusted for padding
       doc.setDrawColor(0);
       doc.setLineWidth(0.1);
-      doc.line(5, 17, 75, 17);
+      doc.line(paddingValue, 17, 80 - paddingValue, 17);
       
       // Generate table data
       const tableColumn = [
@@ -411,6 +442,9 @@ export const printOrderReceipt = (
         });
       });
       
+      // Calculate available width for the table considering padding
+      const availableWidth = 80 - (2 * paddingValue);
+      
       // @ts-ignore - jsPDF-AutoTable typing issue
       doc.autoTable({
         head: [tableColumn],
@@ -421,10 +455,11 @@ export const printOrderReceipt = (
           fontSize: 8,
           cellPadding: 1,
         },
+        margin: { left: paddingValue, right: paddingValue },
         columnStyles: {
-          0: { cellWidth: 8 },
-          1: { cellWidth: 47 },
-          2: { cellWidth: 20, halign: isRTL ? 'left' : 'right' }
+          0: { cellWidth: availableWidth * 0.15 },  // 15% of available width 
+          1: { cellWidth: availableWidth * 0.60 },  // 60% of available width
+          2: { cellWidth: availableWidth * 0.25, halign: isRTL ? 'left' : 'right' }  // 25% of available width
         },
       });
       
@@ -434,8 +469,8 @@ export const printOrderReceipt = (
       
       // Draw totals
       let y = finalY;
-      const leftCol = isRTL ? 60 : 10;
-      const rightCol = isRTL ? 10 : 70;
+      const leftCol = isRTL ? (80 - paddingValue * 2) : paddingValue;
+      const rightCol = isRTL ? paddingValue : (80 - paddingValue);
       
       doc.text(`${isRTL ? 'المجموع الفرعي:' : 'Subtotal:'}`, leftCol, y);
       doc.text(`${toCurrency(subtotal, lang)}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
@@ -463,8 +498,8 @@ export const printOrderReceipt = (
         y += 4;
       }
       
-      // Draw a line before total
-      doc.line(5, y, 75, y);
+      // Draw a line before total - adjusted for padding
+      doc.line(paddingValue, y, 80 - paddingValue, y);
       y += 3;
       
       doc.setFont(isRTL ? 'helvetica' : 'courier', 'bold');
@@ -472,36 +507,36 @@ export const printOrderReceipt = (
       doc.text(`${toCurrency(total, lang)}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
       y += 6;
       
-      // Add address if available
+      // Add address if available - adjusted for padding
       if (order?.address) {
         doc.setFont(isRTL ? 'helvetica' : 'courier', 'bold');
-        doc.text(`${isRTL ? 'عنوان التوصيل:' : 'Delivery Address:'}`, 10, y);
+        doc.text(`${isRTL ? 'عنوان التوصيل:' : 'Delivery Address:'}`, paddingValue, y);
         y += 4;
         doc.setFont(isRTL ? 'helvetica' : 'courier', 'normal');
-        doc.text(`${order.address.street}`, 10, y);
+        doc.text(`${order.address.street}`, paddingValue, y);
         y += 4;
-        doc.text(`${isRTL ? `شقة: ${order.address.apartmentNumber}, الطابق: ${order.address.floor}` : `Apt: ${order.address.apartmentNumber}, Floor: ${order.address.floor}`}`, 10, y);
+        doc.text(`${isRTL ? `شقة: ${order.address.apartmentNumber}, الطابق: ${order.address.floor}` : `Apt: ${order.address.apartmentNumber}, Floor: ${order.address.floor}`}`, paddingValue, y);
         y += 6;
       }
       
-      // Add customer info if available
+      // Add customer info if available - adjusted for padding
       if (endUser) {
         doc.setFont(isRTL ? 'helvetica' : 'courier', 'bold');
-        doc.text(`${isRTL ? 'بيانات العميل:' : 'Customer Info:'}`, 10, y);
+        doc.text(`${isRTL ? 'بيانات العميل:' : 'Customer Info:'}`, paddingValue, y);
         y += 4;
         doc.setFont(isRTL ? 'helvetica' : 'courier', 'normal');
         if (endUser.firstName || endUser.lastName) {
-          doc.text(`${isRTL ? 'الاسم:' : 'Name:'} ${endUser.firstName || ''} ${endUser.lastName || ''}`, 10, y);
+          doc.text(`${isRTL ? 'الاسم:' : 'Name:'} ${endUser.firstName || ''} ${endUser.lastName || ''}`, paddingValue, y);
           y += 4;
         }
         if (endUser.phoneNumber) {
-          doc.text(`${isRTL ? 'رقم الهاتف:' : 'Phone:'} ${endUser.phoneNumber}`, 10, y);
+          doc.text(`${isRTL ? 'رقم الهاتف:' : 'Phone:'} ${endUser.phoneNumber}`, paddingValue, y);
           y += 6;
         }
       }
       
-      // Footer
-      doc.line(5, y, 75, y);
+      // Footer - adjusted for padding
+      doc.line(paddingValue, y, 80 - paddingValue, y);
       y += 5;
       doc.setFont(isRTL ? 'helvetica' : 'courier', 'normal');
       doc.text(`${isRTL ? 'شكراً لطلبك!' : 'Thank you for your order!'}`, 40, y, { align: 'center' });
