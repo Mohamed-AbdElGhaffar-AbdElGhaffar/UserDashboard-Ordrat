@@ -179,7 +179,7 @@ axiosClient.interceptors.response.use(
     
     // If the error is not related to authentication or the retry has already happened
     return Promise.reject(error);
-  }
+  } 
 );
 
 export default axiosClient;
