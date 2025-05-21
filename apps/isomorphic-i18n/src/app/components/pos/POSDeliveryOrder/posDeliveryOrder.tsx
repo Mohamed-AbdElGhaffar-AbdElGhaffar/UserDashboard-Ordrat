@@ -25,6 +25,10 @@ import { RadioGroup } from '@headlessui/react';
 import { CartItem as Item } from '@/types';
 import { printOrderReceipt } from '../printOrderReceipt ';
 
+import 'react-datepicker/dist/react-datepicker.css';
+import { RadioGroup as Radio, AdvancedRadio } from 'rizzui';
+import { PiCheckCircleFill } from 'react-icons/pi';
+
 function parseProductData(productString: string) {
   const dataPairs = productString.split('&&');
 
@@ -81,6 +85,15 @@ function decodeJWT(token: string) {
     return null;
   }
 }
+
+type Customer = {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phoneNumber: string;
+};
+
 type POSDeliveryOrderProps = {
   title?: string;
   onSuccess?: () => void;
@@ -121,16 +134,56 @@ export default function POSDeliveryOrder({
     wrongPhone: lang === 'ar' ? 'رقم الهاتف غير صالح' : 'Invalid phone number',
 
     submit: lang === 'ar' ? 'انشاء' : 'Create',
+    return: lang === 'ar' ? 'رجوع' : 'Return',
+  };
+  
+  const secondText = {
+    addNewCustomer: lang === 'ar' ? 'اضافة عميل جديد' : 'Add New Customer',
+    addCustomer: lang === 'ar' ? 'اضافة عميل' : 'Add Customer',
+    noCustomers: lang === 'ar' ? 'لم يتم العثور على عملاء.' : 'No customers found.',
+    submit: lang === 'ar' ? 'اطلب' : 'Order',
+    searchByName: lang === 'ar' ? 'بحث بالاسم' : 'Search by Name',
+    searchByPhone: lang === 'ar' ? 'بحث برقم الهاتف' : 'Search by Phone',
+    
+    firstName: lang === 'ar' ? 'الاسم الاول' : 'First Name',
+    lastName: lang === 'ar' ? 'الاسم الاخير' : 'Last Name',
+    email: lang === 'ar' ? 'البريد الألكتروني' : 'Email',
+    phone: lang === 'ar' ? 'رقم الهاتف' : 'Phone Number',
+    branchId: lang === 'ar' ? 'الفرع' : 'Branch',
+    branchLable: lang === 'ar' ? "الفروع:" : "Branches:",
+    placeholderBranch: lang === 'ar' ? "اختر فرع" : "Select Branch",
+
+    tablePlaceLable: lang === 'ar' ? 'رقم التربيزة:' : 'Table Number:',
+    selectIsRequired: lang === 'ar' ? 'الرجاء اختيار العميل' : 'Please select a customer',
+    addressIsRequired: lang === 'ar' ? 'الرجاء اختيار عنوان' : 'Please select an address',
+    tablePlaceIsRequired: lang === 'ar' ? 'الرجاء تحديد رقم التربيزة' : 'Please select a table number',
   };
 
   const requiredMessage = lang === 'ar' ? 'مطلوب' : 'is required';
-  const [loading, setLoading] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
   const [radius, setRadius] = useState<number | ''>('');
   const { setGuard } = useGuardContext();
   const { mainBranch } = useUserContext();
+  const [pages, setPages] = useState('');
 
-  
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true); 
+  const [loading, setLoading] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+  } | null>(null);  
+  const [searchName, setSearchName] = useState('');
+  const [searchPhone, setSearchPhone] = useState('');
+  const [loadingCustomers, setLoadingCustomers] = useState(false);
+
+  const [userAddressData, setUserAddressData] = useState<any>(null);
+  const [isFetchingAddress, setIsFetchingAddress] = useState(false);
+
   const filteredBranchZones = branchZones
   .filter(zone => zone.id === mainBranch)
   .map(zone => ({
@@ -142,6 +195,49 @@ export default function POSDeliveryOrder({
   const initLat = filteredBranchZones.length > 0 ? filteredBranchZones[0].lat : 30.023173855111207;
   const initLng = filteredBranchZones.length > 0 ? filteredBranchZones[0].lng : 31.185028997638923;
 
+  const fetchCustomers = async (reset = false) => {
+    if (loadingCustomers) return;
+    setLoadingCustomers(true);
+  
+    try {
+      const response = await axiosClient.get(`/api/EndUser/GetAll/${shopId}`, {
+        params: {
+          PageNumber: reset ? 1 : page,
+          PageSize: 10,
+          Name: searchName || null,
+          PhoneNumber: searchPhone || null,
+        },
+        headers: { 'Accept-Language': lang },
+      });
+  
+      const newCustomers = response.data.entities || [];
+  
+      if (reset) {
+        setCustomers(newCustomers);
+      } else {
+        setCustomers(prev => [...prev, ...newCustomers]);
+      }
+  
+      setHasMore(response.data.nextPage !== 0);
+      if (reset) setPage(2);
+      else setPage(prev => prev + 1);
+    } catch (error) {
+      console.error('Failed to fetch customers:', error);
+    } finally {
+      setLoadingCustomers(false);
+    }
+  };
+    
+  const handleScroll = (e: any) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop <= clientHeight + 50 && hasMore && !loadingCustomers) {
+      fetchCustomers();
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers(true);
+  }, [searchName, searchPhone]);
 
   useEffect(() => {
     if (languages === 0) {
@@ -150,6 +246,51 @@ export default function POSDeliveryOrder({
       mainFormik.setFieldValue('nameAr', 'no data');
     }
   }, [languages]);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (pages === 'chooseAddress' && selectedCustomer?.id) {
+        setIsFetchingAddress(true);
+        try {
+          const response = await axiosClient.get(`/api/EndUser/GetById/${selectedCustomer.id}`);
+          const data = response.data;
+          console.log('Fetched address data:', data);
+
+          const isInsideZone = (lat: number, lng: number) => {
+            return filteredBranchZones.some(zone => {
+              const dx = zone.lat - lat;
+              const dy = zone.lng - lng;
+              const distance = Math.sqrt(dx * dx + dy * dy) * 111000;
+              return distance <= zone.zoonRadius;
+            });
+          };
+
+          const validAddresses = (data.addresses || []).filter(
+            (address: any) =>
+              typeof address.latitude === 'number' &&
+              typeof address.longtude === 'number' &&
+              isInsideZone(address.latitude, address.longtude)
+          );
+
+          if (validAddresses.length > 0) {
+            setUserAddressData(validAddresses);
+          } else {
+            mainFormik.setFieldValue('firstName', data.firstName || '');
+            mainFormik.setFieldValue('lastName', data.lastName || '');
+            mainFormik.setFieldValue('phoneNumber', data.phoneNumber || '');
+            setPages('newCustomer');
+          }
+        } catch (error) {
+          console.error('Failed to fetch address data:', error);
+          toast.error(lang === 'ar' ? 'حدث خطأ أثناء تحميل العنوان' : 'Failed to fetch address');
+        } finally {
+          setIsFetchingAddress(false);
+        }
+      }
+    };
+  
+    fetchUserDetails();
+  }, [pages, selectedCustomer]);  
   
   const mainFormSchema = Yup.object().shape({
     firstName: Yup.string().required(text.firstName + ' ' + requiredMessage),
@@ -318,14 +459,6 @@ export default function POSDeliveryOrder({
     },
   });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[200px]">
-        <Loader className="animate-spin text-blue-500" width={40} height={40} />
-      </div>
-    );
-  }
-
 	const addressTypes = [
 		{
 			name: text.apartment,
@@ -364,6 +497,154 @@ export default function POSDeliveryOrder({
 		}
 	};	
 
+  
+  const secondFormik = useFormik({
+    initialValues: {
+      selectedCustomer: '',
+    },
+    validationSchema: () => {
+      let schema = Yup.object({
+        selectedCustomer: Yup.string().required(secondText.selectIsRequired),
+      });
+  
+      return schema;
+    },
+    onSubmit: async (values) => {
+      console.log("Selected Customer:", selectedCustomer);
+      console.log("values:", values);
+      setPages('chooseAddress');
+    },
+  });
+
+  
+  const thirdFormik = useFormik({
+    initialValues: {
+      selectedAddress: '',
+    },
+    validationSchema: () => {
+      let schema = Yup.object({
+        selectedAddress: Yup.string().required(secondText.addressIsRequired),
+      });
+  
+      return schema;
+    },
+    onSubmit: async (values) => {
+      console.log("values:", values);
+      setLoading(true);
+      const accessToken = GetCookiesClient('accessToken') as string;
+      const decodedToken = decodeJWT(accessToken);
+      console.log("decodedToken: ",decodedToken);
+      if (selectedCustomer) {
+        try {
+          const userId = selectedCustomer.id;
+          const addressId = values.selectedAddress;
+          try {
+            const formData = new FormData();
+            formData.append('paymentmethod', '0');
+            formData.append('TotalPrice', "0");
+            formData.append('ShippingFees', '150');
+            formData.append('TotalVat', "0");
+            formData.append('ShopId', shopId as string);
+            formData.append('BranchId', mainBranch);
+            formData.append('EndUserId', userId);
+            formData.append('AddressId', addressId);
+            if (decodedToken.uid) {
+              if(userType == '4'){
+                formData.append('EmployeeId', decodedToken.uid);
+              }else{
+                formData.append('SellerId', decodedToken.uid);
+              }
+            }
+            formData.append('Discount', '0');
+            formData.append('GrossProfit', '0');
+            formData.append('IsPaid', 'false');
+            formData.append('OrderType', '2');
+            formData.append('OrderNumber', '0');
+            formData.append('GrossProfit', '0');
+            formData.append('Price', '0');
+            formData.append('TotalChoicePrices', '0');
+            formData.append('sourceChannel', '1');
+            formData.append('Service', '0');
+            formData.append('Status', '2');
+            const now = new Date();
+            const formattedDate = now.toISOString().slice(0, 19).replace('T', ' '); 
+            
+            formData.append('CreatedAt', formattedDate);
+            
+            items.forEach((item, index) => {
+              const realProductData = parseProductData(item.id as string)
+              formData.append(`Items[${index}].quantity`, item.quantity.toString());
+              formData.append(`Items[${index}].productId`, realProductData.id.toString());
+              item.orderItemVariations?.forEach((order, orderIndex) => {
+                const hasValidChoice = order.choices?.some(
+                  (choice) => choice.choiceId || choice.inputValue || choice.image
+                );
+                if (order.variationId && hasValidChoice) {
+                  formData.append(`Items[${index}].orderItemVariations[${orderIndex}].variationId`, order.variationId);
+                }
+                order.choices?.forEach((choice, choiceIndex) => {
+                  if (choice.inputValue) {
+                    formData.append(`Items[${index}].orderItemVariations[${orderIndex}].choices[${choiceIndex}].inputValue`, choice.inputValue);
+                  }
+                  if (choice.choiceId) {
+                    formData.append(`Items[${index}].orderItemVariations[${orderIndex}].choices[${choiceIndex}].choiceId`, choice.choiceId);
+                  }
+                  if (choice.image) {
+                    formData.append(`Items[${index}].orderItemVariations[${orderIndex}].choices[${choiceIndex}].image`, choice.image);
+                  }
+                })
+              });
+            });
+      
+            formData.forEach((value, key) => {
+              console.log(`${key}: ${value}`);
+            });
+      
+            const response = await axiosClient.post(`/api/Order/Create/${shopId}`, formData);
+      
+            if (response.status === 200) {
+              const orderId = response.data.id;
+              const orderNumber = response.data.orderNumber;
+      
+              if (orderNumber) {
+                localStorage.setItem('orderNumber', orderNumber.toString());
+              }
+              const orderDetails: any | null = await fetchOrderDetails(orderId, lang);
+              const customerInfo: any | undefined = {
+                id: userId,
+                firstName: selectedCustomer.firstName,
+                lastName: selectedCustomer.lastName,
+                email: '',
+                phoneNumber: selectedCustomer.phoneNumber
+              };
+
+              if (orderDetails) {
+                printOrderReceipt(orderDetails, lang, customerInfo);
+              }
+              toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح' : 'Order created successfully');
+              onSuccess?.();
+              closeModal();
+            } else {
+              console.error('Error creating order:', response.data);
+              toast.error(<Text as="b">{lang === 'ar' ? 'حدث خطأ أثناء الإنشاء' : 'Failed to create order'}</Text>);
+            }
+          } catch (error: any) {
+            console.error('Error during order submission:', error);
+            toast.error(<Text as="b" className="text-center">{error.response.data.message ? error.response.data.message : 'An error occurred. Please try again later.'}</Text>);
+          }
+        } catch (error: any) {
+          console.error('Registration error:', error);
+          toast.error(
+            error?.response?.data?.message ||
+            (lang === 'ar' ? 'حدث خطأ. حاول مرة أخرى' : 'An error occurred. Please try again')
+          );
+        } finally {
+          setLoading(false);
+        }
+      }
+    },
+  });
+
   return (
     <div className='py-1'>
       <div className={`m-auto ps-3 rounded-xl pe-1.5 me-1.5 pb-4 pt-4 IBM-Plex-sans ${styles.customScroll}`}>
@@ -373,85 +654,271 @@ export default function POSDeliveryOrder({
             <PiXBold className="h-[18px] w-[18px]" />
           </ActionIcon>
         </div>
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          mainFormik.handleSubmit();
-          }}
-          className='flex flex-col mt-6'
-        >
-          <div className="grid grid-cols-1 gap-4 max-h-[60vh] md:max-h-full overflow-y-auto scrollable">
-            <div className="flex flex-col gap-4  me-1 md:me-0">
-              {/* <MapPicker /> */} 
-              {/* <LocationPicker
-                onLocationChange={vals => {
-                  setFieldValue('lat', vals?.lat);
-                  setFieldValue('lng', vals?.lng);
-                }}
-                initialLocation={initialLocation}
-              /> */}
-              <LocationPicker
-                apiKey='AIzaSyCPQicAmrON3EtFwOmHvSZQ9IbONbLQmtA' 
-                onLocationSelect={(lat, lng, address) => handleLocationSelect(lat, lng, address, mainFormik.validateForm)}
-                initLat={initLat}
-                initLng={initLng}
-                branchZones={filteredBranchZones}
-                lang={lang!}
-              />
-              <RadioGroup
-                value={mainFormik.values.type}
-                onChange={(val) => mainFormik.setFieldValue('type', val)}
-                className={'grid md:flex grid-cols-3 gap-1 sm:gap-2 col-span-full'}
-              >
-                {addressTypes.map((a, i) => (
-                  <RadioGroup.Option key={i} value={a.value} className="flex gap-3">
-                  {({ checked }) => (
-                    <span
-                    className={`px-1 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 w-full capitalize cursor-pointer rounded-lg transition duration-150 ${
-                      checked ? 'bg-primary text-white' : 'hover:bg-primary/20'
-                    }`}
-                    >
-                    <a.icon className='w-4 xs:w-auto'/>
-                    {a.name}
-                    </span>
-                  )}
-                  </RadioGroup.Option>
-                ))}
-              </RadioGroup>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input label={text.firstName} placeholder={text.firstName} name="firstName" value={mainFormik.values.firstName} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.firstName && mainFormik.errors.firstName ? mainFormik.errors.firstName : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
-              <Input label={text.lastName} placeholder={text.lastName} name="lastName" value={mainFormik.values.lastName} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.lastName && mainFormik.errors.lastName ? mainFormik.errors.lastName : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
-              <PhoneNumber
-                country={'eg'}
-                onlyCountries={['eg']}
-                value={mainFormik.values.phoneNumber}
-                onChange={(value) => mainFormik.setFieldValue('phoneNumber', value)}
-                onBlur={mainFormik.handleBlur}
-                label={text.phoneNumber}
-                error={mainFormik.touched.phoneNumber && mainFormik.errors.phoneNumber ? mainFormik.errors.phoneNumber : ''}
-              />
-              <Input type='number' label={text.aptNo} placeholder={text.aptNo} name="aptNo" value={mainFormik.values.aptNo} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.aptNo && mainFormik.errors.aptNo ? mainFormik.errors.aptNo : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
-              <Input label={text.floor} placeholder={text.floor} name="floor" value={mainFormik.values.floor} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.floor && mainFormik.errors.floor ? mainFormik.errors.floor : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
-              <Input label={text.street} placeholder={text.street} name="street" value={mainFormik.values.street} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.street && mainFormik.errors.street ? mainFormik.errors.street : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
-              <div className="col-span-full">
-                <Textarea
-                  label={text.additionalDirections} placeholder={text.additionalDirections} 
-                  name="additionalDirections" value={mainFormik.values.additionalDirections}
-                  onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} 
-                  error={mainFormik.touched.additionalDirections && mainFormik.errors.additionalDirections ? mainFormik.errors.additionalDirections : ''} 
-                  className="input-placeholder text-[16px]"
+        {pages == 'newCustomer' ?
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            mainFormik.handleSubmit();
+            }}
+            className='flex flex-col mt-6'
+          >
+            <div className="grid grid-cols-1 gap-4 max-h-[60vh] md:max-h-full overflow-y-auto scrollable">
+              <div className="flex flex-col gap-4  me-1 md:me-0">
+                {/* <MapPicker /> */} 
+                {/* <LocationPicker
+                  onLocationChange={vals => {
+                    setFieldValue('lat', vals?.lat);
+                    setFieldValue('lng', vals?.lng);
+                  }}
+                  initialLocation={initialLocation}
+                /> */}
+                <LocationPicker
+                  apiKey='AIzaSyCPQicAmrON3EtFwOmHvSZQ9IbONbLQmtA' 
+                  onLocationSelect={(lat, lng, address) => handleLocationSelect(lat, lng, address, mainFormik.validateForm)}
+                  initLat={initLat}
+                  initLng={initLng}
+                  branchZones={filteredBranchZones}
+                  lang={lang!}
                 />
+                <RadioGroup
+                  value={mainFormik.values.type}
+                  onChange={(val) => mainFormik.setFieldValue('type', val)}
+                  className={'grid md:flex grid-cols-3 gap-1 sm:gap-2 col-span-full'}
+                >
+                  {addressTypes.map((a, i) => (
+                    <RadioGroup.Option key={i} value={a.value} className="flex gap-3">
+                    {({ checked }) => (
+                      <span
+                      className={`px-1 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 w-full capitalize cursor-pointer rounded-lg transition duration-150 ${
+                        checked ? 'bg-primary text-white' : 'hover:bg-primary/20'
+                      }`}
+                      >
+                      <a.icon className='w-4 xs:w-auto'/>
+                      {a.name}
+                      </span>
+                    )}
+                    </RadioGroup.Option>
+                  ))}
+                </RadioGroup>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input label={text.firstName} placeholder={text.firstName} name="firstName" value={mainFormik.values.firstName} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.firstName && mainFormik.errors.firstName ? mainFormik.errors.firstName : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+                <Input label={text.lastName} placeholder={text.lastName} name="lastName" value={mainFormik.values.lastName} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.lastName && mainFormik.errors.lastName ? mainFormik.errors.lastName : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+                <PhoneNumber
+                  country={'eg'}
+                  onlyCountries={['eg']}
+                  value={mainFormik.values.phoneNumber}
+                  onChange={(value) => mainFormik.setFieldValue('phoneNumber', value)}
+                  onBlur={mainFormik.handleBlur}
+                  label={text.phoneNumber}
+                  error={mainFormik.touched.phoneNumber && mainFormik.errors.phoneNumber ? mainFormik.errors.phoneNumber : ''}
+                />
+                <Input type='number' label={text.aptNo} placeholder={text.aptNo} name="aptNo" value={mainFormik.values.aptNo} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.aptNo && mainFormik.errors.aptNo ? mainFormik.errors.aptNo : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+                <Input label={text.floor} placeholder={text.floor} name="floor" value={mainFormik.values.floor} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.floor && mainFormik.errors.floor ? mainFormik.errors.floor : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+                <Input label={text.street} placeholder={text.street} name="street" value={mainFormik.values.street} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.street && mainFormik.errors.street ? mainFormik.errors.street : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+                <div className="col-span-full">
+                  <Textarea
+                    label={text.additionalDirections} placeholder={text.additionalDirections} 
+                    name="additionalDirections" value={mainFormik.values.additionalDirections}
+                    onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} 
+                    error={mainFormik.touched.additionalDirections && mainFormik.errors.additionalDirections ? mainFormik.errors.additionalDirections : ''} 
+                    className="input-placeholder text-[16px]"
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end gap-3 pt-4">
-            <Button type="submit" isLoading={isSubmit} disabled={isSubmit} className="w-full">
-              {text.submit}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
-            </Button>
-          </div>
-        </form>
+            {/* Submit Button */}
+            <div className="flex justify-end gap-3 pt-4">
+              <Button type="submit" isLoading={isSubmit} disabled={isSubmit} className="w-full">
+                {text.submit}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
+              </Button>
+              <Button onClick={()=>{setPages('');}} variant="outline" className="w-full transition-all duration-300 ease-in-out">
+                {text.return}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
+              </Button>
+            </div>
+          </form>
+          :
+          <>
+            {pages == 'chooseAddress'?(
+              isFetchingAddress ? (
+                <div className="flex justify-center py-6">
+                  <Loader className="animate-spin text-primary" />
+                </div>
+              ) : (
+                  <>
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      thirdFormik.handleSubmit();
+                    }}>
+                      <div className="grid grid-cols-2 border-b border-black mb-4 gap-x-4">
+                        <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                          {secondText.firstName}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer?.firstName || '----'}</span>
+                        </h3>
+                        <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                          {secondText.lastName}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer?.lastName || '----'}</span>
+                        </h3>
+                        <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                          {secondText.email}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer?.email || '----@----.com'}</span>
+                        </h3>
+                        <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                          {secondText.phone}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer?.phoneNumber || '-- ----------'}</span>
+                        </h3>
+                      </div>
+                      <div>
+                        <Radio
+                          value={thirdFormik.values.selectedAddress}
+                          setValue={(value) => thirdFormik.setFieldValue('selectedAddress', value)}
+                          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4 items-stretch"
+                        >
+                          {userAddressData && userAddressData.length > 0 ? (
+                            userAddressData.map((address: any) => (
+                              <AdvancedRadio
+                                key={address.id}
+                                value={address.id}
+                                contentClassName="h-full px-2 py-2 flex items-start justify-between"
+                                inputClassName="[&~span]:border-0 [&~span]:ring-1 [&~span]:ring-gray-200 [&~span:hover]:ring-primary [&:checked~span:hover]:ring-primary [&~span]:bg-white [&:checked~span]:bg-primary-lighter [&:checked~span]:border-1 [&:checked~.rizzui-advanced-checkbox]:ring-2 [&~span>.icon]:opacity-0 [&:checked~span>.icon]:opacity-100"
+                              >
+                                <div className="text-sm">
+                                  <p><b>{text.aptNo}:</b> {address.apartmentNumber}</p>
+                                  <p><b>{text.floor}:</b> {address.floor}</p>
+                                  <p><b>{text.street}:</b> {address.street}</p>
+                                  {address.additionalDirections && (
+                                    <p><b>{text.additionalDirections}:</b> {address.additionalDirections}</p>
+                                  )}
+                                </div>
+                                <PiCheckCircleFill className="icon h-5 min-w-[1.25rem] text-primary" />
+                              </AdvancedRadio>
+                            ))
+                          ) : (
+                            <Text as="p" className="text-gray-500">{secondText.noCustomers}</Text>
+                          )}
+                        </Radio>
+                      </div>
+                      {thirdFormik.errors.selectedAddress && thirdFormik.touched.selectedAddress && (
+                        <Text as="p" className="text-red-500 text-sm mb-2">{thirdFormik.errors.selectedAddress}</Text>
+                      )}
+                      <div className="flex justify-end gap-3">
+                        <Button type="submit" isLoading={loading} className="w-full transition-all duration-300 ease-in-out">
+                          {text.submit}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
+                        </Button>
+                        <Button onClick={()=>{setPages('');}} variant="outline" className="w-full transition-all duration-300 ease-in-out">
+                          {text.return}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
+                        </Button>
+                      </div> 
+                    </form>
+                  </>
+                )
+              ) 
+              :
+              <>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  secondFormik.handleSubmit();
+                }}>
+                  {(selectedCustomer) && (
+                    <div className='grid grid-cols-2 border-b border-black mb-4 gap-x-4'>
+                      {selectedCustomer && (
+                        <>
+                        <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                          {secondText.firstName}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer.firstName || '----'}</span>
+                        </h3>
+                        <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                          {secondText.lastName}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer.lastName || '----'}</span>
+                        </h3>
+                        <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                          {secondText.email}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer.email || '----@----.com'}</span>
+                        </h3>
+                        <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                          {secondText.phone}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer.phoneNumber || '-- ----------'}</span>
+                        </h3>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  {/* Search Inputs */}
+                  <div className="grid col-span-full sm:grid-cols-2 gap-4 mb-4">
+                    <Input
+                      placeholder={secondText.searchByName}
+                      value={searchName}
+                      onChange={(e) => {
+                        setSearchName(e.target.value);
+                        // handleSearch(e.target.value);
+                      }}
+                    />
+                    <Input
+                      type='number'
+                      placeholder={secondText.searchByPhone}
+                      value={searchPhone}
+                      onChange={(e) => {
+                        setSearchPhone(e.target.value);
+                        // handleSearch(e.target.value);
+                      }}
+                    />
+                  </div>
+
+                  {/* Customer List with Radio Selection */}
+                  <div 
+                    className={`overflow-auto ${customers.length > 9 ? `max-h-56 pl-1 ${secondFormik.errors.selectedCustomer && secondFormik.touched.selectedCustomer ? 'mb-0':'mb-4'}` : ''}`}
+                    onScroll={handleScroll}
+                  >
+                    <Radio
+                      value={secondFormik.values.selectedCustomer}
+                      setValue={(value) => {
+                        secondFormik.setFieldValue('selectedCustomer', value);
+                        const customer = customers.find(c => c.phoneNumber === value);
+                        setSelectedCustomer(customer ? {
+                          id: customer.id,
+                          firstName: customer.firstName || '',
+                          lastName: customer.lastName || '',
+                          email: customer.email || '',
+                          phoneNumber: customer.phoneNumber,
+                        } : null);
+                      }}
+                      className="grid gap-4 pb-4 px-1 pt-1 col-span-full  sm:grid-cols-2 md:grid-cols-3 @4xl:gap-4"
+                    >
+                      {customers.length > 0 ? (
+                        customers.map((customer) => (
+                          <AdvancedRadio
+                            key={customer.id}
+                            value={customer.phoneNumber}
+                            contentClassName="px-2 py-2 flex items-center justify-between"
+                            inputClassName="[&~span]:border-0 [&~span]:ring-1 [&~span]:ring-gray-200 [&~span:hover]:ring-primary [&:checked~span:hover]:ring-primary [&:checked~span]:border-1 [&:checked~.rizzui-advanced-checkbox]:ring-2 [&~span>.icon]:opacity-0 [&:checked~span>.icon]:opacity-100"
+                          >
+                            <div className='h-14'>
+                              <Text as="p" className="font-medium">{customer.firstName} {customer.lastName}</Text>
+                              {customer.email && <Text as="p" className="text-gray-500">{customer.email}</Text>}
+                              <Text as="p" className="text-gray-700">{customer.phoneNumber}</Text>
+                            </div>
+                            <PiCheckCircleFill className="icon h-5 min-w-[1.25rem] text-primary" />
+                          </AdvancedRadio>
+                        ))
+                      ) : (
+                        <Text as="p" className="text-gray-500">{secondText.noCustomers}</Text>
+                      )}
+                    </Radio>
+                  </div>
+                  {secondFormik.errors.selectedCustomer && secondFormik.touched.selectedCustomer && (
+                    <Text as="p" className="text-red-500 text-sm mb-2">{secondFormik.errors.selectedCustomer}</Text>
+                  )}
+                  <div className="flex justify-end gap-3">
+                    <Button type="submit" className="w-full transition-all duration-300 ease-in-out">
+                      {text.submit}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
+                    </Button>
+                    <Button 
+                      onClick={()=>{
+                        setSelectedCustomer(null);
+                        secondFormik.setFieldValue('selectedCustomer', '');
+                        setPages('newCustomer');
+                      }} variant="outline" className="w-full transition-all duration-300 ease-in-out"
+                    >
+                      <span className='block md:hidden'>{secondText.addCustomer}</span><span className='hidden md:block'>{secondText.addNewCustomer}</span><PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
+                    </Button>
+                  </div> 
+                </form>
+              </>
+            }
+          </>
+        }
       </div>
     </div>
   );

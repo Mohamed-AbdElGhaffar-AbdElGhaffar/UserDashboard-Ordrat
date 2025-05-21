@@ -12,9 +12,10 @@ import cn from '@utils/class-names';
 import ExpandedOrderRow from '@/app/shared/ecommerce/order/order-list/expanded-row';
 import axiosClient from '@/app/components/context/api';
 import { useTranslation } from '@/app/i18n/client';
+import { useUserContext } from '@/app/components/context/UserContext';
 // dynamic import
 const FilterElement = dynamic(
-  () => import('@/app/shared/ecommerce/order/order-list/filter-element'),
+  () => import('@/app/shared/ecommerce/order/order-list/order-filter-element'),
   { ssr: false }
 );
 
@@ -121,15 +122,39 @@ export default function OrderTable({
   const [totalPages, setTotalPages] = useState(1); // Total number of pages from API
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [searchTerm, setSearchTerm] = useState(''); // Total number of pages from API
+  const [filters, setFilters] = useState(filterState);
+  const { mainBranch } = useUserContext();
   console.log("searchTerm: ",searchTerm);
-  
+
+  const updateFilter = (key: string, value: any) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleReset = () => {
+    setFilters(filterState);
+  };
+
+  const isFiltered = useMemo(() => {
+    return Object.values(filters).some(
+      (val) =>
+        (Array.isArray(val) && val.some((v) => v !== '' && v !== null)) ||
+        (typeof val === 'string' && val.trim() !== '')
+    );
+  }, [filters]);
+
   // const t = translations[lang as 'en' | 'ar'] || translations.en;
 
   // ✅ Fetch data from API
   const fetchData = async () => {
     try {
       const response = await axiosClient.get(`/api/Order/Filter/filter/${shopId}`, {
-        params: { PageNumber: currentPage, PageSize: pageSize, OrderNumber: searchTerm?searchTerm:null },
+        params: { 
+          PageNumber: currentPage, 
+          PageSize: pageSize, 
+          OrderNumber: searchTerm?searchTerm:null,
+          OrderStatus: filters.status || null,
+          branchId: mainBranch
+        },
         headers: { 'Accept-Language': lang },
       });
       console.log("response.data.entities: ",response.data.entities);
@@ -154,7 +179,7 @@ export default function OrderTable({
     if (!firstLoad) {
       fetchData();
     }
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, filters.status, mainBranch]);
   // ✅ Handle pagination change
   const handlePaginate = (page: number) => {
     setCurrentPage(page);
@@ -229,16 +254,18 @@ export default function OrderTable({
           columns,
           checkedColumns,
           setCheckedColumns,
+          drawerTitle: lang === 'ar' ? 'تصفية الجدول' : 'Table Filters',
           enableDrawerFilter: true,
         }}
-        // filterElement={
-        //   <FilterElement
-        //     isFiltered={isFiltered}
-        //     filters={filters}
-        //     updateFilter={updateFilter}
-        //     handleReset={handleReset}
-        //   />
-        // }
+        filterElement={
+          <FilterElement
+            isFiltered={isFiltered}
+            filters={filters}
+            updateFilter={updateFilter}
+            handleReset={handleReset}
+            lang={lang}
+          />
+        }
         className={
           'rounded-md border border-muted text-sm shadow-sm [&_.rc-table-placeholder_.rc-table-expanded-row-fixed>div]:h-60 [&_.rc-table-placeholder_.rc-table-expanded-row-fixed>div]:justify-center [&_.rc-table-row:last-child_td.rc-table-cell]:border-b-0 [&_thead.rc-table-thead]:border-t-0'
         }

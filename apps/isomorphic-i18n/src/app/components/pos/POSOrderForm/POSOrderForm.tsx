@@ -557,11 +557,11 @@ export default function POSOrderForm({
               <Text as="p" className="text-red-500 text-sm mb-2">{mainFormik.errors.selectedCustomer}</Text>
             )}
             <div className="flex justify-end gap-3">
-              <Button onClick={()=>{setNewCustomer(true)}} variant="outline" className="w-full transition-all duration-300 ease-in-out">
-                <span className='block md:hidden'>{text.addCustomer}</span><span className='hidden md:block'>{text.addNewCustomer}</span><PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
-              </Button>
               <Button type="submit" isLoading={loading} className="w-full transition-all duration-300 ease-in-out">
                 {text.submit}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
+              </Button>
+              <Button onClick={()=>{setNewCustomer(true)}} variant="outline" className="w-full transition-all duration-300 ease-in-out">
+                <span className='block md:hidden'>{text.addCustomer}</span><span className='hidden md:block'>{text.addNewCustomer}</span><PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
               </Button>
             </div> 
           </form>
