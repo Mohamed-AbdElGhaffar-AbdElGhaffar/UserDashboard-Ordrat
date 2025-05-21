@@ -211,11 +211,11 @@ export default function POSNewCustomerForm({
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button onClick={()=>{onReturn();}} variant="outline" className="w-full transition-all duration-300 ease-in-out">
-          {text.return}
-        </Button>
         <Button type="submit" isLoading={loading} className="w-full transition-all duration-300 ease-in-out">
           {text.submit}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
+        </Button>
+        <Button onClick={()=>{onReturn();}} variant="outline" className="w-full transition-all duration-300 ease-in-out">
+          {text.return}
         </Button>
       </div> 
     </form>

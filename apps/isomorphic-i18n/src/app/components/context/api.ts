@@ -44,8 +44,13 @@ axiosClient.interceptors.response.use(
 
         const refreshResponse = await axios.post(
           '/api/Auth/RefreshAccessToken',
-          { refreshToken },
-          { baseURL: API_BASE_URL }
+          {},
+          { 
+            baseURL: API_BASE_URL,
+            headers: {
+              'refreshToken': refreshToken,
+            },
+          }
         );
 
         console.log("refreshResponse.data.token: ", refreshResponse.data.accessToken);
@@ -86,11 +91,15 @@ axiosClient.interceptors.response.use(
         Cookies.set('name', `${refreshResponse.data.firstName} ${refreshResponse.data.lastName}`, { expires: 1, secure: true, sameSite: 'Lax', path: '/', });
         // (optional) Save roles
         Cookies.set('email', refreshResponse.data.email, { expires: 1, secure: true, sameSite: 'Lax', path: '/', });
-        // Update axios headers for future requests
+        // Update new token in cookie and memory
         axiosClient.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+
+        // ✅ Update original request
+        originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
-        return axiosClient(originalRequest);
+        // ✅ Retry the original request using axios (not axiosClient)
+        return axios(originalRequest);
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
         localStorage.clear();
