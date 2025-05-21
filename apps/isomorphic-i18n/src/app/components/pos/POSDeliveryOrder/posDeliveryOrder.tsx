@@ -778,13 +778,27 @@ export default function POSDeliveryOrder({
                                 contentClassName="h-full px-2 py-2 flex items-start justify-between"
                                 inputClassName="[&~span]:border-0 [&~span]:ring-1 [&~span]:ring-gray-200 [&~span:hover]:ring-primary [&:checked~span:hover]:ring-primary [&~span]:bg-white [&:checked~span]:bg-primary-lighter [&:checked~span]:border-1 [&:checked~.rizzui-advanced-checkbox]:ring-2 [&~span>.icon]:opacity-0 [&:checked~span>.icon]:opacity-100"
                               >
-                                <div className="text-sm">
-                                  <p><b>{text.aptNo}:</b> {address.apartmentNumber}</p>
-                                  <p><b>{text.floor}:</b> {address.floor}</p>
-                                  <p><b>{text.street}:</b> {address.street}</p>
-                                  {address.additionalDirections && (
-                                    <p><b>{text.additionalDirections}:</b> {address.additionalDirections}</p>
-                                  )}
+                                <div className="w-full h-full flex flex-col justify-between text-sm gap-2">
+                                  <div>
+                                    <p><b>{text.aptNo}:</b> {address.apartmentNumber}</p>
+                                    <p><b>{text.floor}:</b> {address.floor}</p>
+                                    <p><b>{text.street}:</b> {address.street}</p>
+                                    {address.additionalDirections && (
+                                      <p><b>{text.additionalDirections}:</b> {address.additionalDirections}</p>
+                                    )}
+                                  </div>
+                                  
+                                  {(() => {
+                                    const type = addressTypes.find((a) => a.value === address.buildingType);
+                                    return type ? (
+                                      <p className='w-full'>
+                                        <span className="py-2 flex items-center gap-1 sm:gap-2 w-full capitalize rounded-sm transition duration-150 bg-transparent text-primary-dark">
+                                          <type.icon className="w-4 xs:w-auto" />
+                                          {type.name}
+                                        </span>
+                                      </p>
+                                    ) : null;
+                                  })()}
                                 </div>
                                 <PiCheckCircleFill className="icon h-5 min-w-[1.25rem] text-primary" />
                               </AdvancedRadio>
