@@ -514,7 +514,7 @@ export default function POSOrderForm({
 
             {/* Customer List with Radio Selection */}
             <div 
-              className={`overflow-auto ${customers.length > 9 ? `max-h-56 pl-1 ${mainFormik.errors.selectedCustomer && mainFormik.touched.selectedCustomer ? 'mb-0':'mb-4'}` : ''}`}
+              className={`overflow-auto ${customers.length > 9 ? `max-h-56 ps-1 ${mainFormik.errors.selectedCustomer && mainFormik.touched.selectedCustomer ? 'mb-0':'mb-4'}` : ''}`}
               onScroll={handleScroll}
             >
               <RadioGroup

@@ -69,6 +69,18 @@ function decodeJWT(token: string) {
   }
 }
 
+async function fetchOrderDetails(orderId: string, lang: string): Promise<any | null> {
+  try {
+    const response = await axiosClient.get(`/api/Order/GetById/GetById/${orderId}`, {
+      headers: { 'Accept-Language': lang },
+    });
+    return response.data as any;
+  } catch (error) {
+    console.error('Failed to fetch order details:', error);
+    return null;
+  }
+};
+
 type POSOrderTypes = {
   className?: string;
   lang?: string;
@@ -171,6 +183,7 @@ export default function POSDrawerView({
               languages={languages} branchZones={branchZones}
               items={items}
               freeShppingTarget={freeShppingTarget}
+              shopData={shopData}
             />
           ),
           customSize: '700px',
@@ -617,7 +630,8 @@ export default function POSDrawerView({
             lastName: "Ali",
             phoneNumber: "+966501234567"
           };
-          printOrderReceipt(mockOrder, lang);
+          const orderDetails: any | null = await fetchOrderDetails(posTableOrderId.order.id, lang!);
+          printOrderReceipt(orderDetails, lang);
         } else {
           console.error('Error changing order status:', changeOrderStatusResponse.data);
           toast.error(

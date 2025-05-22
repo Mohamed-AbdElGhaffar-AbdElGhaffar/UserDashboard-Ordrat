@@ -102,6 +102,7 @@ type POSDeliveryOrderProps = {
   branchZones: { id:string; lat: number; lng: number; zoonRadius: number }[]; 
   items: Item[];
   freeShppingTarget: number;
+  shopData: any;
 };
 
 export default function POSDeliveryOrder({
@@ -111,7 +112,8 @@ export default function POSDeliveryOrder({
   languages,
   branchZones,
   items,
-  freeShppingTarget
+  freeShppingTarget,
+  shopData
 }: POSDeliveryOrderProps) {
   const shopId = GetCookiesClient('shopId');
   const userType = GetCookiesClient('userType');
@@ -152,11 +154,16 @@ export default function POSDeliveryOrder({
     branchId: lang === 'ar' ? 'الفرع' : 'Branch',
     branchLable: lang === 'ar' ? "الفروع:" : "Branches:",
     placeholderBranch: lang === 'ar' ? "اختر فرع" : "Select Branch",
-
+    
     tablePlaceLable: lang === 'ar' ? 'رقم التربيزة:' : 'Table Number:',
     selectIsRequired: lang === 'ar' ? 'الرجاء اختيار العميل' : 'Please select a customer',
     addressIsRequired: lang === 'ar' ? 'الرجاء اختيار عنوان' : 'Please select an address',
     tablePlaceIsRequired: lang === 'ar' ? 'الرجاء تحديد رقم التربيزة' : 'Please select a table number',
+
+    shippingFees: lang === 'ar' ? "رسوم التوصيل" : "Shipping Fees",
+    vat: lang === 'ar' ? "الضريبة" : "Vat",
+    service: lang === 'ar' ? "رسوم الخدمة" : "Service",
+    currency: lang === 'ar' ? "ج.م" : "EGP",
   };
 
   const requiredMessage = lang === 'ar' ? 'مطلوب' : 'is required';
@@ -183,6 +190,7 @@ export default function POSDeliveryOrder({
 
   const [userAddressData, setUserAddressData] = useState<any>(null);
   const [isFetchingAddress, setIsFetchingAddress] = useState(false);
+  const [shippingFees, setShippingFees] = useState<number | null>(null);
 
   const filteredBranchZones = branchZones
   .filter(zone => zone.id === mainBranch)
@@ -194,6 +202,137 @@ export default function POSDeliveryOrder({
 
   const initLat = filteredBranchZones.length > 0 ? filteredBranchZones[0].lat : 30.023173855111207;
   const initLng = filteredBranchZones.length > 0 ? filteredBranchZones[0].lng : 31.185028997638923;
+
+  
+  const thirdFormik = useFormik({
+    initialValues: {
+      selectedAddress: '',
+    },
+    validationSchema: () => {
+      let schema = Yup.object({
+        selectedAddress: Yup.string().required(secondText.addressIsRequired),
+      });
+  
+      return schema;
+    },
+    onSubmit: async (values) => {
+      console.log("values:", values);
+      setLoading(true);
+      const accessToken = GetCookiesClient('accessToken') as string;
+      const decodedToken = decodeJWT(accessToken);
+      console.log("decodedToken: ",decodedToken);
+      if (selectedCustomer) {
+        try {
+          const userId = selectedCustomer.id;
+          const addressId = values.selectedAddress;
+          const service =
+            shopData?.applyServiceOnDineInOnly ? 0 : shopData?.service;
+          try {
+            const formData = new FormData();
+            formData.append('paymentmethod', '0');
+            formData.append('TotalPrice', "0");
+            formData.append('ShippingFees', shippingFees? shippingFees.toString() : '0');
+            formData.append('TotalVat', shopData.vat? shopData.vat.toString() : "0");
+            formData.append('Service', service || '0');
+            formData.append('ShopId', shopId as string);
+            formData.append('BranchId', mainBranch);
+            formData.append('EndUserId', userId);
+            formData.append('AddressId', addressId);
+            if (decodedToken.uid) {
+              if(userType == '4'){
+                formData.append('EmployeeId', decodedToken.uid);
+              }else{
+                formData.append('SellerId', decodedToken.uid);
+              }
+            }
+            formData.append('Discount', '0');
+            formData.append('GrossProfit', '0');
+            formData.append('IsPaid', 'false');
+            formData.append('OrderType', '2');
+            formData.append('OrderNumber', '0');
+            formData.append('GrossProfit', '0');
+            formData.append('Price', '0');
+            formData.append('TotalChoicePrices', '0');
+            formData.append('sourceChannel', '1');
+            formData.append('Status', '2');
+            const now = new Date();
+            const formattedDate = now.toISOString().slice(0, 19).replace('T', ' '); 
+            
+            formData.append('CreatedAt', formattedDate);
+            
+            items.forEach((item, index) => {
+              const realProductData = parseProductData(item.id as string)
+              formData.append(`Items[${index}].quantity`, item.quantity.toString());
+              formData.append(`Items[${index}].productId`, realProductData.id.toString());
+              item.orderItemVariations?.forEach((order, orderIndex) => {
+                const hasValidChoice = order.choices?.some(
+                  (choice) => choice.choiceId || choice.inputValue || choice.image
+                );
+                if (order.variationId && hasValidChoice) {
+                  formData.append(`Items[${index}].orderItemVariations[${orderIndex}].variationId`, order.variationId);
+                }
+                order.choices?.forEach((choice, choiceIndex) => {
+                  if (choice.inputValue) {
+                    formData.append(`Items[${index}].orderItemVariations[${orderIndex}].choices[${choiceIndex}].inputValue`, choice.inputValue);
+                  }
+                  if (choice.choiceId) {
+                    formData.append(`Items[${index}].orderItemVariations[${orderIndex}].choices[${choiceIndex}].choiceId`, choice.choiceId);
+                  }
+                  if (choice.image) {
+                    formData.append(`Items[${index}].orderItemVariations[${orderIndex}].choices[${choiceIndex}].image`, choice.image);
+                  }
+                })
+              });
+            });
+      
+            formData.forEach((value, key) => {
+              console.log(`${key}: ${value}`);
+            });
+      
+            const response = await axiosClient.post(`/api/Order/Create/${shopId}`, formData);
+      
+            if (response.status === 200) {
+              const orderId = response.data.id;
+              const orderNumber = response.data.orderNumber;
+      
+              if (orderNumber) {
+                localStorage.setItem('orderNumber', orderNumber.toString());
+              }
+              const orderDetails: any | null = await fetchOrderDetails(orderId, lang);
+              const customerInfo: any | undefined = {
+                id: userId,
+                firstName: selectedCustomer.firstName,
+                lastName: selectedCustomer.lastName,
+                email: '',
+                phoneNumber: selectedCustomer.phoneNumber
+              };
+              
+              if (orderDetails) {
+                printOrderReceipt(orderDetails, lang, customerInfo);
+              }
+              toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح' : 'Order created successfully');
+              onSuccess?.();
+              closeModal();
+            } else {
+              console.error('Error creating order:', response.data);
+              toast.error(<Text as="b">{lang === 'ar' ? 'حدث خطأ أثناء الإنشاء' : 'Failed to create order'}</Text>);
+            }
+          } catch (error: any) {
+            console.error('Error during order submission:', error);
+            toast.error(<Text as="b" className="text-center">{error.response.data.message ? error.response.data.message : 'An error occurred. Please try again later.'}</Text>);
+          }
+        } catch (error: any) {
+          console.error('Registration error:', error);
+          toast.error(
+            error?.response?.data?.message ||
+            (lang === 'ar' ? 'حدث خطأ. حاول مرة أخرى' : 'An error occurred. Please try again')
+          );
+        } finally {
+          setLoading(false);
+        }
+      }
+    },
+  });
 
   const fetchCustomers = async (reset = false) => {
     if (loadingCustomers) return;
@@ -291,6 +430,26 @@ export default function POSDeliveryOrder({
   
     fetchUserDetails();
   }, [pages, selectedCustomer]);  
+
+  useEffect(() => {
+    const fetchDeliveryCharge = async () => {
+      if (thirdFormik.values.selectedAddress) {
+        try {
+          const response = await axiosClient.get(
+            `/api/Order/GetDeliveryCharge/${shopId}/${thirdFormik.values.selectedAddress}`
+          );
+          setShippingFees(response.data.message.shippingFees || 0);
+        } catch (error) {
+          console.error('Failed to fetch shipping fees:', error);
+          setShippingFees(null);
+        }
+      } else {
+        setShippingFees(null);
+      }
+    };
+  
+    fetchDeliveryCharge();
+  }, [thirdFormik.values.selectedAddress, shopId]);  
   
   const mainFormSchema = Yup.object().shape({
     firstName: Yup.string().required(text.firstName + ' ' + requiredMessage),
@@ -350,12 +509,20 @@ export default function POSDeliveryOrder({
           console.log("response.message: ", response.data.message);
           const userId = response.data.message.userId;
           const addressId = response.data.message.addressId;
+          const deliveryChargeRes = await axiosClient.get(
+            `/api/Order/GetDeliveryCharge/${shopId}/${addressId}`
+          );
+          const shippingFees = deliveryChargeRes?.data?.message?.shippingFees || 0;
+        
+          const service =
+            shopData?.applyServiceOnDineInOnly ? 0 : shopData?.service;
           try {
             const formData = new FormData();
             formData.append('paymentmethod', '0');
             formData.append('TotalPrice', "0");
-            formData.append('ShippingFees', '150');
-            formData.append('TotalVat', "0");
+            formData.append('ShippingFees', shippingFees.toString());
+            formData.append('TotalVat', shopData.vat? shopData.vat.toString() : "0");
+            formData.append('Service', service || '0');
             formData.append('ShopId', shopId as string);
             formData.append('BranchId', mainBranch);
             formData.append('EndUserId', userId);
@@ -376,7 +543,6 @@ export default function POSDeliveryOrder({
             formData.append('Price', '0');
             formData.append('TotalChoicePrices', '0');
             formData.append('sourceChannel', '1');
-            formData.append('Service', '0');
             formData.append('Status', '2');
             const now = new Date();
             const formattedDate = now.toISOString().slice(0, 19).replace('T', ' '); 
@@ -431,7 +597,7 @@ export default function POSDeliveryOrder({
               };
 
               if (orderDetails) {
-                printOrderReceipt(orderDetails, lang, customerInfo, "Microsoft Print to PDF");
+                printOrderReceipt(orderDetails, lang, customerInfo);
               }
               toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح' : 'Order created successfully');
               onSuccess?.();
@@ -513,135 +679,6 @@ export default function POSDeliveryOrder({
       console.log("Selected Customer:", selectedCustomer);
       console.log("values:", values);
       setPages('chooseAddress');
-    },
-  });
-
-  
-  const thirdFormik = useFormik({
-    initialValues: {
-      selectedAddress: '',
-    },
-    validationSchema: () => {
-      let schema = Yup.object({
-        selectedAddress: Yup.string().required(secondText.addressIsRequired),
-      });
-  
-      return schema;
-    },
-    onSubmit: async (values) => {
-      console.log("values:", values);
-      setLoading(true);
-      const accessToken = GetCookiesClient('accessToken') as string;
-      const decodedToken = decodeJWT(accessToken);
-      console.log("decodedToken: ",decodedToken);
-      if (selectedCustomer) {
-        try {
-          const userId = selectedCustomer.id;
-          const addressId = values.selectedAddress;
-          try {
-            const formData = new FormData();
-            formData.append('paymentmethod', '0');
-            formData.append('TotalPrice', "0");
-            formData.append('ShippingFees', '150');
-            formData.append('TotalVat', "0");
-            formData.append('ShopId', shopId as string);
-            formData.append('BranchId', mainBranch);
-            formData.append('EndUserId', userId);
-            formData.append('AddressId', addressId);
-            if (decodedToken.uid) {
-              if(userType == '4'){
-                formData.append('EmployeeId', decodedToken.uid);
-              }else{
-                formData.append('SellerId', decodedToken.uid);
-              }
-            }
-            formData.append('Discount', '0');
-            formData.append('GrossProfit', '0');
-            formData.append('IsPaid', 'false');
-            formData.append('OrderType', '2');
-            formData.append('OrderNumber', '0');
-            formData.append('GrossProfit', '0');
-            formData.append('Price', '0');
-            formData.append('TotalChoicePrices', '0');
-            formData.append('sourceChannel', '1');
-            formData.append('Service', '0');
-            formData.append('Status', '2');
-            const now = new Date();
-            const formattedDate = now.toISOString().slice(0, 19).replace('T', ' '); 
-            
-            formData.append('CreatedAt', formattedDate);
-            
-            items.forEach((item, index) => {
-              const realProductData = parseProductData(item.id as string)
-              formData.append(`Items[${index}].quantity`, item.quantity.toString());
-              formData.append(`Items[${index}].productId`, realProductData.id.toString());
-              item.orderItemVariations?.forEach((order, orderIndex) => {
-                const hasValidChoice = order.choices?.some(
-                  (choice) => choice.choiceId || choice.inputValue || choice.image
-                );
-                if (order.variationId && hasValidChoice) {
-                  formData.append(`Items[${index}].orderItemVariations[${orderIndex}].variationId`, order.variationId);
-                }
-                order.choices?.forEach((choice, choiceIndex) => {
-                  if (choice.inputValue) {
-                    formData.append(`Items[${index}].orderItemVariations[${orderIndex}].choices[${choiceIndex}].inputValue`, choice.inputValue);
-                  }
-                  if (choice.choiceId) {
-                    formData.append(`Items[${index}].orderItemVariations[${orderIndex}].choices[${choiceIndex}].choiceId`, choice.choiceId);
-                  }
-                  if (choice.image) {
-                    formData.append(`Items[${index}].orderItemVariations[${orderIndex}].choices[${choiceIndex}].image`, choice.image);
-                  }
-                })
-              });
-            });
-      
-            formData.forEach((value, key) => {
-              console.log(`${key}: ${value}`);
-            });
-      
-            const response = await axiosClient.post(`/api/Order/Create/${shopId}`, formData);
-      
-            if (response.status === 200) {
-              const orderId = response.data.id;
-              const orderNumber = response.data.orderNumber;
-      
-              if (orderNumber) {
-                localStorage.setItem('orderNumber', orderNumber.toString());
-              }
-              const orderDetails: any | null = await fetchOrderDetails(orderId, lang);
-              const customerInfo: any | undefined = {
-                id: userId,
-                firstName: selectedCustomer.firstName,
-                lastName: selectedCustomer.lastName,
-                email: '',
-                phoneNumber: selectedCustomer.phoneNumber
-              };
-
-              if (orderDetails) {
-                printOrderReceipt(orderDetails, lang, customerInfo, "Microsoft Print to PDF");
-              }
-              toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح' : 'Order created successfully');
-              onSuccess?.();
-              closeModal();
-            } else {
-              console.error('Error creating order:', response.data);
-              toast.error(<Text as="b">{lang === 'ar' ? 'حدث خطأ أثناء الإنشاء' : 'Failed to create order'}</Text>);
-            }
-          } catch (error: any) {
-            console.error('Error during order submission:', error);
-            toast.error(<Text as="b" className="text-center">{error.response.data.message ? error.response.data.message : 'An error occurred. Please try again later.'}</Text>);
-          }
-        } catch (error: any) {
-          console.error('Registration error:', error);
-          toast.error(
-            error?.response?.data?.message ||
-            (lang === 'ar' ? 'حدث خطأ. حاول مرة أخرى' : 'An error occurred. Please try again')
-          );
-        } finally {
-          setLoading(false);
-        }
-      }
     },
   });
 
@@ -763,6 +800,30 @@ export default function POSDeliveryOrder({
                         <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
                           {secondText.phone}: <span className="font-normal text-sm leading-[28px] text-gray-500">{selectedCustomer?.phoneNumber || '-- ----------'}</span>
                         </h3>
+                        <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                          {secondText.shippingFees}: 
+                          <span className="font-normal text-sm leading-[28px] text-gray-500">
+                            {shippingFees !== null ? ` ${shippingFees} ${secondText.currency}` : ` 0.00 ${secondText.currency}`}
+                          </span>
+                        </h3>
+                        {!shopData?.applyVatOnDineInOnly && Number(shopData?.vat) > 0 && (
+                          <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                            {secondText.vat}:{' '}
+                            <span className="font-normal text-sm leading-[28px] text-gray-500">
+                              {shopData.vatType === 1
+                                ? `${Number(shopData.vat).toFixed(2)} ${secondText.currency}`
+                                : `${Number(shopData.vat)}%`}
+                            </span>
+                          </h3>
+                        )}
+                        {!shopData?.applyServiceOnDineInOnly && Number(shopData?.service) > 0 && (
+                          <h3 className="font-bold text-sm leading-[28px] text-black pb-[10px] truncate overflow-hidden whitespace-nowrap">
+                            {secondText.service}:{' '}
+                            <span className="font-normal text-sm leading-[28px] text-gray-500">
+                              {`${Number(shopData.service).toFixed(2)} ${secondText.currency}`}
+                            </span>
+                          </h3>
+                        )}
                       </div>
                       <div>
                         <Radio
@@ -815,7 +876,13 @@ export default function POSDeliveryOrder({
                         <Button type="submit" isLoading={loading} className="w-full transition-all duration-300 ease-in-out">
                           {text.submit}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
                         </Button>
-                        <Button onClick={()=>{setPages('');}} variant="outline" className="w-full transition-all duration-300 ease-in-out">
+                        <Button 
+                          onClick={()=>{
+                            setPages('');
+                            setShippingFees(null);
+                            thirdFormik.setFieldValue('selectedAddress', '')
+                          }} variant="outline" className="w-full transition-all duration-300 ease-in-out"
+                        >
                           {text.return}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
                         </Button>
                       </div> 
@@ -872,7 +939,7 @@ export default function POSDeliveryOrder({
 
                   {/* Customer List with Radio Selection */}
                   <div 
-                    className={`overflow-auto ${customers.length > 9 ? `max-h-56 pl-1 ${secondFormik.errors.selectedCustomer && secondFormik.touched.selectedCustomer ? 'mb-0':'mb-4'}` : ''}`}
+                    className={`overflow-auto ${customers.length > 9 ? `max-h-56 ps-1 ${secondFormik.errors.selectedCustomer && secondFormik.touched.selectedCustomer ? 'mb-0':'mb-4'}` : ''}`}
                     onScroll={handleScroll}
                   >
                     <Radio

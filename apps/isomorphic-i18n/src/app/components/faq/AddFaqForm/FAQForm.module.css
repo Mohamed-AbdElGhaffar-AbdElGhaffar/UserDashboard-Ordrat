@@ -3,6 +3,8 @@
   scrollbar-color: #e11d48 #f0f0f0;
   overflow-y: auto;
   max-height: 90svh;
+  -webkit-overflow-scrolling: touch; /* iOS smooth scroll */
+  -ms-overflow-style: none; /* IE/Edge */
 }
 .customScroll:hover {
   scrollbar-color: #be123c #f0f0f0;
