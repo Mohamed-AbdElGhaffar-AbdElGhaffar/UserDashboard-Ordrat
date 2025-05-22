@@ -60,7 +60,38 @@ function TablesPage({ lang='en', tables, languages }: { lang?: string; tables: a
       setTablesData(false);
     }
   };
+  
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await axiosClient.get(`api/Table/GetAllShopTables/${mainBranch}`, {
+          headers: {
+            'Accept-Language': lang,
+          },
+        });
+        const data = response.data;
+  
+        console.log("Fetched client-side tables:", data);
+        console.log("Server-side tables prop:", tables);
+  
+        // Optional deep comparison if needed
+        const areEqual = JSON.stringify(data) === JSON.stringify(tables);
+        console.log("Is same data as server:", areEqual);
+  
+        if (!areEqual) {
+          setDefaultData(data);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching client-side tables:', error);
+      }
+    })();
+  }, []);  
 
+  useEffect(() => {
+    if (tablesData == true) {
+      fetchTablesData();
+    }
+  }, [tablesData]);
   useEffect(() => {
     if (tablesData == true) {
       fetchTablesData();

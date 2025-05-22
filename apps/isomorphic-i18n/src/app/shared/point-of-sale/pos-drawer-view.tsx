@@ -660,12 +660,12 @@ export default function POSDrawerView({
   const options = [
     {
       value: 'delivery',
-      name: 'Delivery',
+      name: lang === 'ar' ? 'توصيل' : 'Delivery',
       image: delivery,
     },
     {
       value: 'takeaway',
-      name: 'Take Away',
+      name: lang === 'ar' ? 'استلام يدوي' : 'Take Away',
       image: takeaway,
     },
   ];
@@ -755,16 +755,19 @@ export default function POSDrawerView({
                 <RadioGroup
                   value={shipping}
                   setValue={setShipping}
-                  className="grid gap-4 p-4 grid-cols-2 @4xl:gap-4"
+                  className="grid gap-4 p-4 grid-cols-2 @4xl:gap-4 items-stretch"
                 >
                   {options.map((item) => (
                     <AdvancedRadio
                       key={item.value}
                       value={item.value}
-                      contentClassName="px-2 py-2 flex items-center justify-around"
+                      contentClassName="h-full px-2 py-2 flex items-center justify-around"
                       inputClassName="[&~span]:border-0 [&~span]:ring-1 [&~span]:ring-gray-200 [&~span:hover]:ring-primary [&:checked~span:hover]:ring-primary [&:checked~span]:border-1 [&:checked~.rizzui-advanced-checkbox]:ring-2 [&~span>.icon]:opacity-0 [&:checked~span>.icon]:opacity-100"
                     >
-                      <Image src={item.image} alt={item.name} className='w-14 h-14 object-cover' width={650} height={300} />
+                      <div className='flex flex-col justify-between gap-2 font-bold'>
+                        <Image src={item.image} alt={item.name} className='w-14 h-14 object-cover' width={650} height={300} />
+                        <p>{item.name}</p>
+                      </div>
                       <PiCheckCircleFill className="icon h-5 min-w-[1.25rem] text-primary" />
                     </AdvancedRadio>
                   ))}

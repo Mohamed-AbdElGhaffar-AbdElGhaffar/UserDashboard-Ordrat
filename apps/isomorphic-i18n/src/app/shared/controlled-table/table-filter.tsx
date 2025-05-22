@@ -62,6 +62,7 @@ export function FilterDrawerView({
 }
 
 export type TableFilterProps = {
+  lang?: string;
   searchTerm: string;
   onSearchClear: () => void;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -79,6 +80,7 @@ export type TableFilterProps = {
 };
 
 export default function TableFilter({
+  lang='en',
   searchTerm,
   onSearchClear,
   onSearchChange,
@@ -180,6 +182,7 @@ export default function TableFilter({
           checkedColumns={checkedColumns}
           setCheckedColumns={setCheckedColumns}
           hideIndex={hideIndex}
+          lang={lang}
         />
       </div>
     </div>

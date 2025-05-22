@@ -62,7 +62,7 @@ export default function ControlledTable({
   return (
     <>
       {!isEmpty(filterOptions) && (
-        <TableFilter {...filterOptions}>{filterElement}</TableFilter>
+        <TableFilter lang={lang} {...filterOptions}>{filterElement}</TableFilter>
       )}
 
       <div className="relative">

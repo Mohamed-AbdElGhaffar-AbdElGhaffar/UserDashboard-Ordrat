@@ -186,6 +186,7 @@ type ToggleColumnsTypes<T> = {
   checkedColumns: string[];
   setCheckedColumns: React.Dispatch<React.SetStateAction<string[]>>;
   hideIndex?: number;
+  lang?: string;
 };
 
 export function ToggleColumns<T>({
@@ -193,19 +194,20 @@ export function ToggleColumns<T>({
   checkedColumns,
   setCheckedColumns,
   hideIndex,
+  lang='en',
 }: ToggleColumnsTypes<T>) {
   return (
     <div>
       <Popover shadow="sm" placement="bottom-end">
         <Popover.Trigger>
-          <ActionIcon variant="outline" title={"Toggle Columns"}>
+          <ActionIcon variant="outline" title={lang=='ar'? "تبديل الأعمدة" : "Toggle Columns"}>
             <PiTextColumns strokeWidth={3} className=" h-6 w-6" />
           </ActionIcon>
         </Popover.Trigger>
         <Popover.Content className="z-0">
           <div className="px-0.5 pt-2 text-left rtl:text-right">
             <Title as="h6" className="mb-1 px-0.5 text-sm font-semibold">
-              Toggle Columns
+              {lang=='ar'? "تبديل الأعمدة" : "Toggle Columns"}
             </Title>
             <CheckboxGroup
               values={checkedColumns}

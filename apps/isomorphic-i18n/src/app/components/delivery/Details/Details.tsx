@@ -13,7 +13,8 @@ import {
   BadgeCheck, 
   Shield, 
   Zap, 
-  User
+  User,
+  StarIcon
 } from 'lucide-react';
 import GoogleMap from '../GoogleMap/GoogleMap';
 import { Button } from 'rizzui';
@@ -21,6 +22,7 @@ import user from '@public/assets/user.png';
 import Link from 'next/link';
 import ImageViewerModal from '../../ui/Chat/ImageViewerModal/ImageViewerModal';
 import { RoleClientExist } from '../../ui/roleClientExist/RoleClientExist';
+import { FaCalendarAlt, FaCalendarCheck, FaClock, FaEnvelope, FaIdCard, FaMapMarkerAlt, FaPhoneAlt, FaRoute, FaStar, FaStarHalfAlt, FaTruck } from 'react-icons/fa';
 
 // Define enums and types
 enum VehicleType {
@@ -184,6 +186,39 @@ function CertificateCard({
   );
 }
 
+// Certificate Card Component
+function CertificateCard2({
+  title,
+  imageUrl,
+  key
+}: {
+  title: string;
+  imageUrl: string;
+  key:any;
+}) {
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  
+  return (
+    <>
+      <div key={key} className="cursor-pointer border rounded-lg p-2 text-center shadow-md hover:shadow-lg transition-all duration-300"  onClick={()=>setImageModalOpen(true)}>
+        <p className="text-sm text-gray-600 mb-2">{title}</p>
+        {/* <div className="h-32 bg-gray-100 rounded flex items-center justify-center">
+          <FaIdCard className="text-gray-400 text-2xl" />
+        </div> */}
+        <div className="h-32 bg-gray-100 rounded overflow-hidden">
+          <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
+        </div>
+      </div>             
+      <ImageViewerModal
+        isOpen={imageModalOpen}
+        imageUrl={imageUrl}
+        alt={title}
+        onClose={() => setImageModalOpen(false)}
+      />
+    </>
+  );
+}
+
 function formatDateDMYYYY(dateString: string) {
   const date = new Date(dateString);
   const day = date.getDate();
@@ -220,6 +255,10 @@ export default function DriverDetails({
     message: isRTL ? 'رسالة' : 'Message',
     phone: isRTL ? 'الهاتف' : 'Phone',
     joined: isRTL ? 'تاريخ الانضمام' : 'Joined',
+    avgDestance: isRTL ? 'متوسط مسافة التوصيل' : 'Average delivery distance',
+    avgTime: isRTL ? 'متوسط وقت التوصيل' : 'Average delivery time',
+    minute: isRTL ? 'دقيقة' : 'minute',
+    infoDriver: isRTL ? 'معلومات السائق' : 'Driver information',
     
     // Vehicle
     vehicleTitle: isRTL ? 'معلومات المركبة' : 'Vehicle Information',
@@ -312,243 +351,364 @@ export default function DriverDetails({
   ]);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 pb-10 ${isRTL ? 'text-right' : 'text-left'}
-    mb-[-1.5rem] lg:mb-[-2rem] 4xl:mb-[-2.25rem] md:mx-[-1.25rem] lg:mx-[-1.5rem] 3xl:mx-[-2rem] 4xl:mx-[-2.5rem] mt-[-24px] lg:mt-[-28px]`} dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header Section */}
-      <header className="p-4">
-        <div className="w-fit mx-auto flex items-center justify-between">
-          {/* <button className="flex items-center text-gray-800 hover:text-blue-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${isRTL ? 'ml-1' : 'mr-1'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isRTL ? "M9 5l7 7-7 7" : "M15 19l-7-7 7-7"} />
-            </svg>
-            <span className="text-sm font-medium">Back</span>
-          </button> */}
-          {/* <div className="w-24"></div> Spacer for alignment */}
-          <h1 className="text-xl font-bold text-gray-900">{text.pageTitle}</h1>
-          {/* <div className="w-24"></div> Spacer for alignment */}
-        </div>
-      </header>
+    // <div className={`min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 pb-10 ${isRTL ? 'text-right' : 'text-left'}
+    // mb-[-1.5rem] lg:mb-[-2rem] 4xl:mb-[-2.25rem] md:mx-[-1.25rem] lg:mx-[-1.5rem] 3xl:mx-[-2rem] 4xl:mx-[-2.5rem] mt-[-24px] lg:mt-[-28px]`} dir={isRTL ? 'rtl' : 'ltr'}>
+    //   {/* Header Section */}
+    //   <header className="p-4">
+    //     <div className="w-fit mx-auto flex items-center justify-between">
+    //       {/* <button className="flex items-center text-gray-800 hover:text-blue-600 transition-colors">
+    //         <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${isRTL ? 'ml-1' : 'mr-1'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    //           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isRTL ? "M9 5l7 7-7 7" : "M15 19l-7-7 7-7"} />
+    //         </svg>
+    //         <span className="text-sm font-medium">Back</span>
+    //       </button> */}
+    //       {/* <div className="w-24"></div> Spacer for alignment */}
+    //       <h1 className="text-xl font-bold text-gray-900">{text.pageTitle}</h1>
+    //       {/* <div className="w-24"></div> Spacer for alignment */}
+    //     </div>
+    //   </header>
 
-      <main className="max-w-full mx-auto px-4 pt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    //   <main className="max-w-full mx-auto px-4 pt-6">
+    //     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
-          {/* Profile Card Section */}
-          <div className="md:col-span-1 lg:col-span-1">
-            <div className="rounded-2xl transition-all duration-300 p-6 relative overflow-hidden">
-              {/* Status Badge */}
-              <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} px-3 py-1 rounded-full text-xs font-medium ${driver.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                {driver.isAvailable ? text.status : text.unavailable}
-              </div>
+    //       {/* Profile Card Section */}
+    //       <div className="md:col-span-1 lg:col-span-1">
+    //         <div className="rounded-2xl transition-all duration-300 p-6 relative overflow-hidden">
+    //           {/* Status Badge */}
+    //           <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} px-3 py-1 rounded-full text-xs font-medium ${driver.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+    //             {driver.isAvailable ? text.status : text.unavailable}
+    //           </div>
               
-              {/* Driver Photo */}
-              <div className="flex flex-col items-center">
-                <div className="relative w-24 h-24 mb-4">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                  <img
-                    src={driver.personalPhotoUrl}
-                    alt={`${driver.firstName} ${driver.lastName}`}
-                    width={96}
-                    height={96}
-                    className="w-full h-full object-cover"
-                  />
-                  </div>
-                  <div className={`absolute bottom-0 ${isRTL ? 'left-0' : 'right-0'} w-8 h-8 rounded-full flex items-center justify-center border-2 border-white`}>
-                    {getVehicleIcon(driver.vehicleType)}
-                  </div>
-                </div>
+    //           {/* Driver Photo */}
+    //           <div className="flex flex-col items-center">
+    //             <div className="relative w-24 h-24 mb-4">
+    //               <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg">
+    //               <img
+    //                 src={driver.personalPhotoUrl}
+    //                 alt={`${driver.firstName} ${driver.lastName}`}
+    //                 width={96}
+    //                 height={96}
+    //                 className="w-full h-full object-cover"
+    //               />
+    //               </div>
+    //               <div className={`absolute bottom-0 ${isRTL ? 'left-0' : 'right-0'} w-8 h-8 rounded-full flex items-center justify-center border-2 border-white`}>
+    //                 {getVehicleIcon(driver.vehicleType)}
+    //               </div>
+    //             </div>
                 
-                <h2 className="text-xl font-bold text-gray-900 mb-1">{`${driver.firstName} ${driver.lastName}`}</h2>
-                <p className="text-gray-500 text-sm mb-4">{getVehicleTypeText(driver.vehicleType)} • ID: {driver.id.substring(0, 8)}</p>
+    //             <h2 className="text-xl font-bold text-gray-900 mb-1">{`${driver.firstName} ${driver.lastName}`}</h2>
+    //             <p className="text-gray-500 text-sm mb-4">{getVehicleTypeText(driver.vehicleType)} • ID: {driver.id.substring(0, 8)}</p>
                 
-                {/* Rating Stars */}
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={20}
-                      className={`${i < 4 ? "text-yellow-400 fill-yellow-400" : "text-gray-300"} mx-0.5`}
-                    />
-                  ))}
-                  <span className="ml-2 text-gray-600 font-medium">4.8</span>
-                </div>
+    //             {/* Rating Stars */}
+    //             <div className="flex items-center mb-4">
+    //               {[...Array(5)].map((_, i) => (
+    //                 <Star
+    //                   key={i}
+    //                   size={20}
+    //                   className={`${i < 4 ? "text-yellow-400 fill-yellow-400" : "text-gray-300"} mx-0.5`}
+    //                 />
+    //               ))}
+    //               <span className="ml-2 text-gray-600 font-medium">4.8</span>
+    //             </div>
                 
-                {/* Contact Buttons */}
-                <div className="flex w-full gap-3 mb-4">
-                  <Link href={`tel:${driver.phoneNumber}`} className='flex-1'>
-                    <Button className="w-full h-full rounded-xl py-3 flex items-center justify-center gap-2 transition-colors">
-                      <Phone size={18} />
-                      <span>{text.contact}</span>
-                    </Button>
-                  </Link>
-                  {chatButton &&(
-                    <Link href={`https://wa.me/${driver.phoneNumber}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-gray-100 text-gray-800 rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors">
-                      <Send size={18} />
-                      <span>{text.message}</span>
-                    </Link>
-                  )}
-                </div>
+    //             {/* Contact Buttons */}
+    //             <div className="flex w-full gap-3 mb-4">
+    //               <Link href={`tel:${driver.phoneNumber}`} className='flex-1'>
+    //                 <Button className="w-full h-full rounded-xl py-3 flex items-center justify-center gap-2 transition-colors">
+    //                   <Phone size={18} />
+    //                   <span>{text.contact}</span>
+    //                 </Button>
+    //               </Link>
+    //               {chatButton &&(
+    //                 <Link href={`https://wa.me/${driver.phoneNumber}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-gray-100 text-gray-800 rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors">
+    //                   <Send size={18} />
+    //                   <span>{text.message}</span>
+    //                 </Link>
+    //               )}
+    //             </div>
                 
-                {/* Contact Details */}
-                <div className="w-full">
-                  <div className="border-t border-gray-100 pt-4 pb-2">
-                    <div className="flex items-center py-2">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                        <Phone size={16} className="text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-500 mb-0.5">{text.phone}</p>
-                        <p className="font-medium">{driver.phoneNumber}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center py-2">
-                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                        <Calendar size={16} className="text-green-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-500 mb-0.5">{text.joined}</p>
-                        <p className="font-medium">{formatDateDMYYYY(driver.createdAt)}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    //             {/* Contact Details */}
+    //             <div className="w-full">
+    //               <div className="border-t border-gray-100 pt-4 pb-2">
+    //                 <div className="flex items-center py-2">
+    //                   <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+    //                     <Phone size={16} className="text-blue-600" />
+    //                   </div>
+    //                   <div className="flex-1">
+    //                     <p className="text-sm text-gray-500 mb-0.5">{text.phone}</p>
+    //                     <p className="font-medium">{driver.phoneNumber}</p>
+    //                   </div>
+    //                 </div>
+    //                 <div className="flex items-center py-2">
+    //                   <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+    //                     <Calendar size={16} className="text-green-600" />
+    //                   </div>
+    //                   <div className="flex-1">
+    //                     <p className="text-sm text-gray-500 mb-0.5">{text.joined}</p>
+    //                     <p className="font-medium">{formatDateDMYYYY(driver.createdAt)}</p>
+    //                   </div>
+    //                 </div>
+    //               </div>
+    //             </div>
+    //           </div>
+    //         </div>
+    //       </div>
           
-          {/* Stats Section */}
-          <div className="md:col-span-1 lg:col-span-2">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">{text.statsTitle}</h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <StatCard 
-                icon={<Star size={24} className="text-yellow-600" />} 
-                value="4.8" 
-                label={text.rating} 
-                color="bg-yellow-100" 
-              />
-              <StatCard 
-                icon={<Clock size={24} className="text-purple-600" />} 
-                value="98%" 
-                label={text.onTime} 
-                color="bg-purple-100" 
-              />
-              <StatCard 
-                icon={<Truck size={24} className="text-blue-600" />} 
-                value={totalOrders > 0 ? totalOrders : 52} 
-                label={text.deliveries} 
-                color="bg-blue-100" 
-              />
-              <StatCard 
-                icon={<BadgeCheck size={24} className="text-green-600" />} 
-                value={`${diffMonths} ${text.months}`}
-                label={text.experience} 
-                color="bg-green-100" 
-              />
-            </div>
+    //       {/* Stats Section */}
+    //       <div className="md:col-span-1 lg:col-span-2">
+    //         <h2 className="text-xl font-bold text-gray-900 mb-4">{text.statsTitle}</h2>
+    //         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    //           <StatCard 
+    //             icon={<Star size={24} className="text-yellow-600" />} 
+    //             value="4.8" 
+    //             label={text.rating} 
+    //             color="bg-yellow-100" 
+    //           />
+    //           <StatCard 
+    //             icon={<Clock size={24} className="text-purple-600" />} 
+    //             value="98%" 
+    //             label={text.onTime} 
+    //             color="bg-purple-100" 
+    //           />
+    //           <StatCard 
+    //             icon={<Truck size={24} className="text-blue-600" />} 
+    //             value={totalOrders > 0 ? totalOrders : 52} 
+    //             label={text.deliveries} 
+    //             color="bg-blue-100" 
+    //           />
+    //           <StatCard 
+    //             icon={<BadgeCheck size={24} className="text-green-600" />} 
+    //             value={`${diffMonths} ${text.months}`}
+    //             label={text.experience} 
+    //             color="bg-green-100" 
+    //           />
+    //         </div>
             
-            {/* Delivery Zone Map */}
-            <h2 className="text-xl font-bold text-gray-900 mb-4">{text.zoneTitle}</h2>
-            <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden mb-6">
-              <div className="relative h-64 w-full">
-                {/* Map visualization */}
-                <GoogleMap
-                  centerLatitude={driver.zone.centerLatitude} 
-                  centerLongitude={driver.zone.centerLongitude} 
-                  coverageRadius={driver.zone.coverageRadius}
-                />
-                {/* Map overlay */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white to-transparent h-16"></div>
+    //         {/* Delivery Zone Map */}
+    //         <h2 className="text-xl font-bold text-gray-900 mb-4">{text.zoneTitle}</h2>
+    //         <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden mb-6">
+    //           <div className="relative h-64 w-full">
+    //             {/* Map visualization */}
+    //             <GoogleMap
+    //               centerLatitude={driver.zone.centerLatitude} 
+    //               centerLongitude={driver.zone.centerLongitude} 
+    //               coverageRadius={driver.zone.coverageRadius}
+    //             />
+    //             {/* Map overlay */}
+    //             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white to-transparent h-16"></div>
+    //           </div>
+    //           <div className="p-4">
+    //             <div className="flex items-center justify-between mb-2">
+    //               <h3 className="font-medium text-gray-900">{driver.zone.name}</h3>
+    //               <span className="text-sm text-gray-500">{`${driver.zone.coverageRadius} ${text.meters}`}</span>
+    //             </div>
+    //             <p className="text-sm text-gray-600 mb-3">
+    //               {`${text.coverageRadius}: ${driver.zone.coverageRadius}m`}
+    //             </p>
+    //             <div className="flex items-center text-xs text-gray-500">
+    //               <MapPin size={14} className="mr-1 text-gray-400" />
+    //               <span>{`${driver.zone.centerLatitude.toFixed(4)}, ${driver.zone.centerLongitude.toFixed(4)}`}</span>
+    //             </div>
+    //           </div>
+    //         </div>
+    //       </div>
+          
+    //       {/* Documents & Certificates Section */}
+    //       <div className="md:col-span-2 lg:col-span-3">
+    //         <h2 className="text-xl font-bold text-gray-900 mb-4">{text.documentsTitle}</h2>
+    //         <div className="grid grid-cols-1 md:grid-cols-3 3xl:grid-cols-4 gap-6 mb-8">
+    //           <CertificateCard 
+    //             title={text.frontPersonalId}
+    //             imageUrl={driver.personalVerificationCardFrontUrl}
+    //             icon={<Shield size={20} className="text-blue-600" />}
+    //             isRTL={isRTL}
+    //           />
+    //           <CertificateCard 
+    //             title={text.backPersonalId}
+    //             imageUrl={driver.personalVerificationCardBackUrl}
+    //             icon={<Shield size={20} className="text-blue-600" />}
+    //             isRTL={isRTL}
+    //           />
+    //           <CertificateCard 
+    //             title={text.frontDrivingLicense}
+    //             imageUrl={driver.vehicleLicenseFrontUrl}
+    //             icon={<BadgeCheck size={20} className="text-green-600" />}
+    //             isRTL={isRTL}
+    //           />
+    //           <CertificateCard 
+    //             title={text.backDrivingLicense}
+    //             imageUrl={driver.vehicleLicenseBackUrl}
+    //             icon={<BadgeCheck size={20} className="text-green-600" />}
+    //             isRTL={isRTL}
+    //           />
+    //           <CertificateCard 
+    //             title={text.frontVehicleRegistration}
+    //             imageUrl={driver.vehicleFrontImageUrl}
+    //             icon={<Zap size={20} className="text-purple-600" />}
+    //             isRTL={isRTL}
+    //           />
+    //           <CertificateCard 
+    //             title={text.backVehicleRegistration}
+    //             imageUrl={driver.vehicleBackImageUrl}
+    //             icon={<Zap size={20} className="text-purple-600" />}
+    //             isRTL={isRTL}
+    //           />
+    //         </div>
+    //       </div>
+          
+    //       {/* Customer Reviews Section */}
+    //       {/* <div className="md:col-span-2 lg:col-span-3">
+    //         <div className="flex items-center justify-between mb-4">
+    //           <h2 className="text-xl font-bold text-gray-900">{text.reviewsTitle}</h2>
+    //           <button className="text-blue-600 text-sm flex items-center gap-1">
+    //             {text.viewAll}
+    //             <ChevronRight size={16} className={isRTL ? "transform rotate-180" : ""} />
+    //           </button>
+    //         </div>
+            
+    //         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mb-6">
+    //           {reviews.map((review) => (
+    //             <ReviewCard
+    //               key={review.id}
+    //               image={review.image}
+    //               name={review.name}
+    //               date={review.date}
+    //               rating={review.rating}
+    //               comment={review.comment}
+    //               isRTL={isRTL}
+    //             />
+    //           ))}
+    //         </div>
+            
+    //         <button className="w-full bg-gray-100 text-gray-800 rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors">
+    //           <User size={18} />
+    //           <span>{text.addReview}</span>
+    //         </button>
+    //       </div> */}
+          
+    //     </div>
+    //   </main>
+    // </div>
+    <div className="w-full space-y-6">
+      <div className="w-full bg-white rounded-lg shadow-sm p-6">
+        <div className="w-full flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0">
+          <div className='flex items-center gap-2 flex-grow w-full sm:w-[calc(100%-220px)]'>
+            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-xl text-gray-500">
+              <img
+                src={driver.personalPhotoUrl}
+                alt={`${driver.firstName} ${driver.lastName}`}
+                width={96}
+                height={96}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="me-4 flex-grow w-[calc(100%-72px)]">
+              <div className="flex items-center">
+                <h2 className="text-lg font-bold truncate overflow-hidden whitespace-nowrap max-w-[calc(100%-64px)]">{`${driver.firstName} ${driver.lastName}`}</h2>
+                <span className={`inline-block px-2 py-1 ${driver.isAvailable ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'} rounded-full text-xs ms-2`}>{driver.isAvailable ? text.status : text.unavailable}</span>
               </div>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-gray-900">{driver.zone.name}</h3>
-                  <span className="text-sm text-gray-500">{`${driver.zone.coverageRadius} ${text.meters}`}</span>
-                </div>
-                <p className="text-sm text-gray-600 mb-3">
-                  {`${text.coverageRadius}: ${driver.zone.coverageRadius}m`}
-                </p>
-                <div className="flex items-center text-xs text-gray-500">
-                  <MapPin size={14} className="mr-1 text-gray-400" />
-                  <span>{`${driver.zone.centerLatitude.toFixed(4)}, ${driver.zone.centerLongitude.toFixed(4)}`}</span>
-                </div>
+              <p className="text-gray-600 text-sm">{getVehicleTypeText(driver.vehicleType)} • ID: {driver.id.substring(0, 8)}</p>
+              <div className="flex items-center mt-1 space-x-1 space-x-reverse">
+                {[...Array(4)].map((_, i) => <FaStar key={i} className="text-yellow-400" />)}
+                <FaStarHalfAlt className="text-yellow-400" />
+                <span className="text-gray-600 me-1">4.8</span>
               </div>
             </div>
           </div>
-          
-          {/* Documents & Certificates Section */}
-          <div className="md:col-span-2 lg:col-span-3">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">{text.documentsTitle}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 3xl:grid-cols-4 gap-6 mb-8">
-              <CertificateCard 
-                title={text.frontPersonalId}
-                imageUrl={driver.personalVerificationCardFrontUrl}
-                icon={<Shield size={20} className="text-blue-600" />}
-                isRTL={isRTL}
-              />
-              <CertificateCard 
-                title={text.backPersonalId}
-                imageUrl={driver.personalVerificationCardBackUrl}
-                icon={<Shield size={20} className="text-blue-600" />}
-                isRTL={isRTL}
-              />
-              <CertificateCard 
-                title={text.frontDrivingLicense}
-                imageUrl={driver.vehicleLicenseFrontUrl}
-                icon={<BadgeCheck size={20} className="text-green-600" />}
-                isRTL={isRTL}
-              />
-              <CertificateCard 
-                title={text.backDrivingLicense}
-                imageUrl={driver.vehicleLicenseBackUrl}
-                icon={<BadgeCheck size={20} className="text-green-600" />}
-                isRTL={isRTL}
-              />
-              <CertificateCard 
-                title={text.frontVehicleRegistration}
-                imageUrl={driver.vehicleFrontImageUrl}
-                icon={<Zap size={20} className="text-purple-600" />}
-                isRTL={isRTL}
-              />
-              <CertificateCard 
-                title={text.backVehicleRegistration}
-                imageUrl={driver.vehicleBackImageUrl}
-                icon={<Zap size={20} className="text-purple-600" />}
-                isRTL={isRTL}
-              />
-            </div>
-          </div>
-          
-          {/* Customer Reviews Section */}
-          {/* <div className="md:col-span-2 lg:col-span-3">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">{text.reviewsTitle}</h2>
-              <button className="text-blue-600 text-sm flex items-center gap-1">
-                {text.viewAll}
-                <ChevronRight size={16} className={isRTL ? "transform rotate-180" : ""} />
+          <div className="flex justify-between w-full sm:w-fit gap-2">
+            <Link href={`tel:${driver.phoneNumber}`}>
+              <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center">
+                <FaPhoneAlt className="me-1" /> {text.contact}
               </button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mb-6">
-              {reviews.map((review) => (
-                <ReviewCard
-                  key={review.id}
-                  image={review.image}
-                  name={review.name}
-                  date={review.date}
-                  rating={review.rating}
-                  comment={review.comment}
-                  isRTL={isRTL}
-                />
-              ))}
-            </div>
-            
-            <button className="w-full bg-gray-100 text-gray-800 rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors">
-              <User size={18} />
-              <span>{text.addReview}</span>
-            </button>
-          </div> */}
-          
+            </Link>
+            {chatButton &&(
+              <Link href={`https://wa.me/${driver.phoneNumber}`} target="_blank" rel="noopener noreferrer" className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-lg flex items-center">
+                <FaEnvelope className="me-1" /> {text.message}
+              </Link>
+            )}
+          </div>
         </div>
-      </main>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { icon: <FaCalendarCheck className="text-green-500" />, title: text.experience, value: `${diffMonths} ${text.months}`, bg: 'bg-green-100' },
+          { icon: <FaTruck className="text-blue-500" />, title: text.deliveries, value: totalOrders > 0 ? `${totalOrders}` : '52', bg: 'bg-blue-100' },
+          { icon: <FaClock className="text-purple-500" />, title: text.onTime, value: '98%', bg: 'bg-purple-100' },
+          { icon: <StarIcon className="text-yellow-500" />, title: text.rating, value: '4.8', bg: 'bg-yellow-100' },
+        ].map((stat, index) => (
+          <div key={index} className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-transform hover:-translate-y-1">
+            <div className="flex items-center">
+              <div className={`p-2 rounded-full me-3 ${stat.bg}`}>{stat.icon}</div>
+              <div>
+                <p className="text-gray-500 text-sm">{stat.title}</p>
+                <p className="font-bold text-xl">{stat.value}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Additional Info */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-bold mb-4">{text.infoDriver}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[
+            { icon: <FaPhoneAlt className="text-blue-500" />, title: text.phone, value: driver.phoneNumber, bg: 'bg-blue-50' },
+            { icon: <FaCalendarAlt className="text-green-500" />, title: text.joined, value: formatDateDMYYYY(driver.createdAt), bg: 'bg-green-50' },
+            { icon: <FaRoute className="text-purple-500" />, title: text.avgDestance, value: '3.5 كم', bg: 'bg-purple-50' },
+            { icon: <FaClock className="text-yellow-500" />, title: text.avgTime, value: `28 ${text.minute}`, bg: 'bg-yellow-50' },
+          ].map((item, i) => (
+            <div key={i} className="flex items-start mb-4">
+              <div className={`w-9 h-9 rounded-full flex items-center justify-center mr-3 ${item.bg}`}>{item.icon}</div>
+              <div>
+                <p className="text-gray-500 text-sm mb-1">{item.title}</p>
+                <p className="font-medium">{item.value}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Delivery Area */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-bold mb-4">{text.zoneTitle}</h3>
+        <div className="relative mb-3 h-72 rounded-xl overflow-hidden">
+          <GoogleMap
+            centerLatitude={driver.zone.centerLatitude} 
+            centerLongitude={driver.zone.centerLongitude} 
+            coverageRadius={driver.zone.coverageRadius}
+          />
+          <div className="absolute top-3 left-3 bg-white bg-opacity-80 px-3 py-2 rounded-lg text-sm flex items-center">
+            <FaMapMarkerAlt className="text-red-500 me-1" /> {`${text.coverageRadius}: ${driver.zone.coverageRadius}${text.meters}`}
+          </div>
+        </div>
+        <p className="text-center text-gray-700 mb-2">
+          {driver.zone.name}
+        </p>
+      </div>
+
+      {/* Documents */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-bold mb-4">{text.documentsTitle}</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            { title: text.frontPersonalId, imageUrl: driver.personalVerificationCardFrontUrl },
+            { title: text.backPersonalId, imageUrl: driver.personalVerificationCardBackUrl },
+            { title: text.frontDrivingLicense, imageUrl: driver.vehicleLicenseFrontUrl },
+            { title: text.backDrivingLicense, imageUrl: driver.vehicleLicenseBackUrl },
+            { title: text.frontVehicleRegistration, imageUrl: driver.vehicleFrontImageUrl },
+            { title: text.backVehicleRegistration, imageUrl: driver.vehicleBackImageUrl },
+          ].map((item, i) => (
+            <CertificateCard2 
+              title={item.title}
+              imageUrl={item.imageUrl}
+              key={i}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
