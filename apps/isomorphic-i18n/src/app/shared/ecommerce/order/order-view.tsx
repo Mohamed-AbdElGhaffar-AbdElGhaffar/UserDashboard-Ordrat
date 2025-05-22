@@ -32,6 +32,7 @@ import ModalChangeOrderStatus from '@/app/components/ui/modals/ModalChangeOrderS
 import { useUserContext } from '@/app/components/context/UserContext';
 import ModalAssignDriver from '@/app/components/ui/modals/ModalAssignDriver';
 import PrintInvoice from '../../print-invoice';
+import { printOrderReceipt } from '@/app/components/pos/printOrderReceipt ';
 
 
 interface DeliveryOption {
@@ -72,7 +73,7 @@ function WidgetCard({
   );
 }
 
-export default function OrderView({ lang, initialOrder, phone, branches }: { lang: string; initialOrder: Order | null; phone:string; branches: DeliveryOption[]; }) {
+export default function OrderView({ lang, initialOrder, orderPrint, userData, phone, branches }: { lang: string; initialOrder: Order | null; orderPrint: any; userData: any; phone:string; branches: DeliveryOption[]; }) {
   const { items, total, totalItems } = useCart();
   const { price: subtotal } = usePrice(
     items && {
@@ -243,7 +244,26 @@ export default function OrderView({ lang, initialOrder, phone, branches }: { lan
             )}
             {!printOrder && (
               <RoleExist PageRoles={['PrintOrderInvoice']}>
-                <PrintInvoice order={order} lang={lang} />
+                {/* <PrintInvoice order={order} lang={lang} /> */}
+                <Button className='w-auto' 
+                  onClick={()=>{
+                    if(orderPrint.type == 2){
+                      const customerInfo: any | undefined = {
+                        id: userData.id,
+                        firstName: userData.firstName,
+                        lastName: userData.lastName,
+                        email: '',
+                        phoneNumber: userData.phoneNumber
+                      };
+                      printOrderReceipt(orderPrint, lang, customerInfo);
+                    }else{
+                      printOrderReceipt(orderPrint, lang);
+                    }
+                  }}
+                >
+                  <PiPrinterBold className={cn("h-[17px] w-[17px]", lang=='ar' ? "ms-1.5" : "me-1.5")} />
+                  <span className='hidden sm:block'>{lang=='ar' ? 'فاتورة' : 'Invoice'}</span>
+                </Button>
               </RoleExist>
             )}
           </div>

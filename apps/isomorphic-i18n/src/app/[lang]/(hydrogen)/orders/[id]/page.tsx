@@ -111,7 +111,7 @@ export default async function OrderId({
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
       <CartProvider>
-        <OrderView lang={lang} initialOrder={order} phone={endUser?.phoneNumber || ''} branches={branches} />
+        <OrderView lang={lang} initialOrder={order} orderPrint={order} userData={endUser} phone={endUser?.phoneNumber || ''} branches={branches} />
       </CartProvider>
     </>
   :
