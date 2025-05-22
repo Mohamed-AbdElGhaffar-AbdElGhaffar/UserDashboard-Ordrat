@@ -338,6 +338,7 @@ export type Order = {
   totalVat: number;
   shippingFees: number;
   createdAt: string;
+  branchName: string;
   status: number;
   type: number;
   totalChoicePrices: number;

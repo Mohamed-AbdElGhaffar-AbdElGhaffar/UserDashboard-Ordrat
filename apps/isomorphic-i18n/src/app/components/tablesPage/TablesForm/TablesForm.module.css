@@ -2,6 +2,8 @@
   scrollbar-width: thin;
   overflow-y: auto;
   max-height: 85svh;
+  -webkit-overflow-scrolling: touch; /* iOS smooth scroll */
+  -ms-overflow-style: none; /* IE/Edge */
 }
 /* .customScroll:hover {
   scrollbar-color: #323232 #f0f0f0;

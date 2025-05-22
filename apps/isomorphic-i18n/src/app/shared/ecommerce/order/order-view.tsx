@@ -203,7 +203,13 @@ export default function OrderView({ lang, initialOrder, phone, branches }: { lan
       <div className="flex flex-wrap justify-center border-b border-t border-gray-300 py-4 font-medium text-gray-700 @5xl:justify-start">
         <span className="w-full flex flex-col md:flex-row justify-between items-center gap-4 my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
           {/* October 22, 2022 at 10:30 pm */}
-          <div>
+          <div className='flex flex-col items-center md:items-start gap-2'>
+            <Title
+              as="h3"
+              className="mb-0 text-base font-semibold @7xl:text-lg"
+            >
+              {order?.branchName}
+            </Title>
             {t('ordered-At')}: {order?.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
@@ -432,26 +438,27 @@ export default function OrderView({ lang, initialOrder, phone, branches }: { lan
               </Text>
             </div>
           </WidgetCard>
-
-          <WidgetCard
-            title={t('Shipping-Address')}
-            childrenWrapperClass="@5xl:py-6 py-5"
-          >
-           {order?.address && (
-              <div key={order.address.id}>
-                <Title as="h3" className="mb-2.5 text-base font-semibold @7xl:text-lg">
-                  {t('Apartment')} {order.address.apartmentNumber}
-                  <br/>
-                  {t('Floor')} {order.address.floor}
-                  <br/>
-                   {t('Street')} {order.address.street}, 
-                </Title>
-                <Text as="p" className="mb-2 leading-loose last:mb-0">
-                  {order.address.additionalDirections}
-                </Text>
-              </div>
-            )}
-          </WidgetCard>
+          {order?.address && order?.type == 2 && (
+            <WidgetCard
+              title={t('Shipping-Address')}
+              childrenWrapperClass="@5xl:py-6 py-5"
+            >
+            {order?.address && (
+                <div key={order.address.id}>
+                  <Title as="h3" className="mb-2.5 text-base font-semibold @7xl:text-lg">
+                    {t('Apartment')} {order.address.apartmentNumber}
+                    <br/>
+                    {t('Floor')} {order.address.floor}
+                    <br/>
+                    {t('Street')} {order.address.street}, 
+                  </Title>
+                  <Text as="p" className="mb-2 leading-loose last:mb-0">
+                    {order.address.additionalDirections}
+                  </Text>
+                </div>
+              )}
+            </WidgetCard>
+          )}
           {!isEmpty(shippingAddress) && (
             <WidgetCard
               title="Billing Address"

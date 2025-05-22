@@ -58,6 +58,7 @@ export interface Order {
   totalPrice?: number;
   address?: OrderAddress;
   serviceCharge?: number;
+  type: number;
 }
 
 const formatDate = (dateString: string | Date | undefined): { date: string; time: string } => {
@@ -305,7 +306,8 @@ export const printOrderReceipt = (
         <div style="margin-bottom: 8px;">
           <div class="price-row"><span>${isRTL ? 'المجموع الفرعي:' : 'Subtotal:'}</span><span>${toCurrency(subtotal, lang)}</span></div>
           
-          <div class="price-row"><span>${isRTL ? 'رسوم التوصيل:' : 'Delivery Charge:'}</span><span>${toCurrency(shippingFees, lang)}</span></div>
+          ${order.type == 2 ? `
+          <div class="price-row"><span>${isRTL ? 'رسوم التوصيل:' : 'Delivery Charge:'}</span><span>${toCurrency(shippingFees, lang)}</span></div>` : ''}
           
           ${serviceCharge > 0 ? `
           <div class="price-row"><span>${isRTL ? 'رسوم الخدمة:' : 'Service Charge:'}</span><span>${toCurrency(serviceCharge, lang)}</span></div>` : ''}
@@ -319,12 +321,6 @@ export const printOrderReceipt = (
           <div class="price-row bold border-top">
             <span>${isRTL ? 'الإجمالي:' : 'Total:'}</span>
             <span>${toCurrency(total, lang)}</span>
-          </div>
-          
-          <div class="calculation">
-            ${isRTL 
-              ? `(المجموع الفرعي + رسوم التوصيل + رسوم الخدمة + ضريبة القيمة المضافة - الخصم = الإجمالي)` 
-              : `(Subtotal + Delivery + Service + VAT - Discount = Total)`}
           </div>
         </div>
         

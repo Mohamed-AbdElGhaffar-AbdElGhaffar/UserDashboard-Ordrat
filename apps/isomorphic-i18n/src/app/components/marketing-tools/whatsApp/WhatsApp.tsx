@@ -431,12 +431,12 @@ function WhatsApp({ lang, checksession, pageHeader }: { lang?: string; checksess
               ? "حدث خطأ اثناء الاتصال"
               : "An error occurred while connecting"}
           </p>
-          <Link
-            href={`/${lang}/marketingtools/whatsapp`}
+          <button
+            onClick={() => window.location.href = `/${lang}/marketingtools/whatsapp`}
             className="flex justify-center items-center bg-primary w-fit py-2 px-8 hover:bg-transparent hover:text-primary duration-200 hover:border-2 hover:border-primary gap-3 rounded-full cursor-pointer mx-auto text-white mt-3"
           >
             {lang === "ar" ? "إعادة الاتصال" : "Reconnect"}
-          </Link>
+          </button>
         </div>
       }
     </>
