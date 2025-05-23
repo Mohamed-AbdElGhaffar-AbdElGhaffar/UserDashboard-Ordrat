@@ -103,4 +103,5 @@ export const messages = {
   choiceImageIsInvalid: "form-product-variant-choices-image-invalid",
 
   variantRadioIsRequired: "form-product-variant-radio-required",
+  variantInputIsRequired: "form-product-variant-input-required",
 };

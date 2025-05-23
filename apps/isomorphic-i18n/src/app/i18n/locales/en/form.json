@@ -477,7 +477,8 @@
   "freeShippingHint": "Applying free shipping above a certain amount encourages customers to spend more.",
   "viewersHint": "Setting a reasonable visible viewers count builds trust in your products.",
   "salesTimeHint": "Choose your sales display times carefully to reflect real store activity.",
-  "form-product-variant-radio-required": "You must choose"
+  "form-product-variant-radio-required": "You must choose",
+  "form-product-variant-input-required": "You must enter data"
   
 
 }

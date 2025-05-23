@@ -702,7 +702,7 @@ function POSModal({
                                             placeholder={variation.name}
                                             inputClassName="text-[16px] [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
                                             className="input-placeholder text-[16px] w-full"
-                                            error={String(methods.formState.errors[variation.id]?.message || '')}
+                                            error={errorMassages.t(String(methods.formState.errors[variation.id]?.message || ''))}
                                           />
                                         )}
                                       />
@@ -738,7 +738,7 @@ function POSModal({
                                             {...methods.register(variation.id)}
                                             onChange={onChange}
                                             // @ts-ignore
-                                            error={methods.formState.errors[variation.id]?.message}
+                                            error={errorMassages.t(methods.formState.errors[variation.id]?.message)}
                                           />
                                         )}
                                       />
@@ -778,7 +778,7 @@ function POSModal({
                                             placeholder={variation.name}
                                             inputClassName="text-[16px] [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
                                             className="input-placeholder text-[16px] w-full"
-                                            error={String(methods.formState.errors[variation.id]?.message || '')}
+                                            error={errorMassages.t(String(methods.formState.errors[variation.id]?.message || ''))}
                                           />
                                         )}
                                       />
@@ -1022,7 +1022,7 @@ function POSModal({
                                           placeholder={variation.name}
                                           inputClassName="text-[16px] [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
                                           className="input-placeholder text-[16px] w-full"
-                                          error={String(methods.formState.errors[variation.id]?.message || '')}
+                                          error={errorMassages.t(String(methods.formState.errors[variation.id]?.message || ''))}
                                         />
                                       )}
                                     />
@@ -1056,7 +1056,7 @@ function POSModal({
                                           {...methods.register(variation.id)}
                                           onChange={onChange}
                                           // @ts-ignore
-                                          error={methods.formState.errors[variation.id]?.message}
+                                          error={errorMassages.t(methods.formState.errors[variation.id]?.message)}
                                         />
                                       )}
                                     />
@@ -1096,7 +1096,7 @@ function POSModal({
                                           placeholder={variation.name}
                                           inputClassName="text-[16px] [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
                                           className="input-placeholder w-full text-[16px]"
-                                          error={String(methods.formState.errors[variation.id]?.message || '')}
+                                          error={errorMassages.t(String(methods.formState.errors[variation.id]?.message || ''))}
                                         />
                                       )}
                                     />
