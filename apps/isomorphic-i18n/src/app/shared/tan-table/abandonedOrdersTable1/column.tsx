@@ -1,19 +1,13 @@
-import Link from 'next/link';
-import { routes } from '@/config/routes';
-import EyeIcon from '@components/icons/eye';
-import DateCell from '@ui/date-cell';
-import PencilIcon from '@components/icons/pencil';
-import AvatarCard from '@ui/avatar-card';
-import DeletePopover from '@/app/shared/delete-popover';
+import ActionsCellActive from '@/app/components/tables/branch/actionsCellActive/ActionsCellActive';
+import ActionsCellBranch from '@/app/components/tables/branch/actionsCellBranch/ActionsCellBranch';
+import ActionsCellCoupon from '@/app/components/tables/coupon/actionsCellCoupon/ActionsCellCoupon';
+import { RoleClientExist } from '@/app/components/ui/roleClientExist/RoleClientExist';
+import { Branches, CouponEntity, PhoneNumberOrder } from '@/data/tan-table-data';
 import { createColumnHelper } from '@tanstack/react-table';
-import { ActionIcon, Badge, Checkbox, Text, Tooltip } from 'rizzui';
-import { PhoneNumberOrder } from '@/data/tan-table-data';
+import DateCell from '@ui/date-cell';
+import { Checkbox, Text } from 'rizzui';
 
 const columnHelper = createColumnHelper<PhoneNumberOrder>();
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return date ? date.toLocaleDateString("en-GB") : "Invalid Date";
-};
 
 export const defaultColumns = (lang: string) => {
 

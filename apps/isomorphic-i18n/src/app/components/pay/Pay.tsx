@@ -30,22 +30,39 @@ export default function Pay({ lang }: { lang: string }) {
     const router = useRouter();
     const [redirecting, setRedirecting] = useState(false);
     useEffect(() => {
-        
-        const rechargeInfoString = localStorage.getItem("rechargeInfo")||  localStorage.getItem("SubscriptionId");
 
+        const rechargeInfoString = localStorage.getItem("rechargeInfo");
+        const subscriptionId = localStorage.getItem("SubscriptionId");
+        const updateSubscriptionId = localStorage.getItem("updateSubscriptionId");
         const currencyName = localStorage.getItem("currencyName");
-        if (rechargeInfoString) {
-            const rechargeInfo = JSON.parse(rechargeInfoString);
-            const price = rechargeInfo.amountValue;
-            const egp = rechargeInfo.egyptionAmount;
-            setcurrency(currencyName)
-            setPriceOnly(String(price));
-            setPriceInEGP(String(egp));
-            setSelectedPlan(String(egp)); 
 
-            console.log("✅ بيانات الشحن:", rechargeInfo);
+        if (rechargeInfoString) {
+            try {
+                const rechargeInfo = JSON.parse(rechargeInfoString);
+                const price = rechargeInfo.amountValue;
+                const egp = rechargeInfo.egyptionAmount;
+
+                setcurrency(currencyName);
+                setPriceOnly(String(price));
+                setPriceInEGP(String(egp));
+                setSelectedPlan(String(egp));
+                console.log("✅ بيانات الشحن من rechargeInfo:", rechargeInfo);
+            } catch (e) {
+                console.warn("⚠️ rechargeInfo موجود لكن غير قابل للقراءة.");
+            }
+        } else if (subscriptionId) {
+            // fallback لو مفيش rechargeInfo بس في SubscriptionId
+            setSelectedPlan("0");
+            setPriceOnly("0");
+            setPriceInEGP("0");
+            console.log("ℹ️ استخدام SubscriptionId فقط بدون بيانات شحن.");
+        } else if (updateSubscriptionId) {
+            setSelectedPlan("0");
+            setPriceOnly("0");
+            setPriceInEGP("0");
+            console.log("ℹ️ استخدام SubscriptionId فقط بدون بيانات شحن.");
         } else {
-            console.error("❌ لم يتم العثور على معلومات الشحن.");
+            console.error("❌ لم يتم العثور على معلومات الشحن أو اشتراك.");
         }
     }, []);
 
@@ -80,7 +97,7 @@ export default function Pay({ lang }: { lang: string }) {
             // script.setAttribute("data-complete", "completeCallback");
             // script.onload = () => initiateCheckout();
             // document.body.appendChild(script);
-          initiateCheckout();
+            initiateCheckout();
 
         }
     }, [selectedPlan, redirecting]);
@@ -92,40 +109,52 @@ export default function Pay({ lang }: { lang: string }) {
             return existingInvoice;
         }
 
-   const rechargeId = localStorage.getItem("rechargeId")
-const subscriptionId=localStorage.getItem("SubscriptionId")
+        const rechargeId = localStorage.getItem("rechargeId")
+        const subscriptionId = localStorage.getItem("SubscriptionId")
+        const updateSubscriptionId = localStorage.getItem("updateSubscriptionId")
+        const oldSubscriptionId = localStorage.getItem("oldSubscriptionId")
 
 
 
         const rechargeInfoString = localStorage.getItem("rechargeInfo");
-        const rechargeInfo = rechargeInfoString ? JSON.parse(rechargeInfoString) : null;
+        let rechargeInfo = null;
+        try {
+            if (rechargeInfoString && rechargeInfoString.startsWith("{")) {
+                rechargeInfo = JSON.parse(rechargeInfoString);
+            }
+        } catch (e) {
+            console.warn("⚠️ فشل في قراءة rechargeInfo");
+        }
 
-        if (!rechargeInfo) {
-            console.error("❌ لا توجد معلومات شحن.");
+        if (!subscriptionId && !rechargeId && !updateSubscriptionId) {
+            console.error("❌ لا توجد معلومات لإنشاء الفاتورة (لا SubscriptionId ولا rechargeId).");
             return null;
         }
 
-    let url = "https://testapi.ordrat.com/api/Invoice/Create";
+        let url = "https://testapi.ordrat.com/api/Invoice/Create";
 
-if (subscriptionId) {
+       if (updateSubscriptionId && oldSubscriptionId) {
+  url += `?OldSellerPlanSubscriptionId=${oldSubscriptionId}&sellerPlanSubscriptionId=${updateSubscriptionId}&period=monthly&invoiceType=3`;
+} else if (subscriptionId) {
   url += `?sellerPlanSubscriptionId=${subscriptionId}&period=monthly&invoiceType=1`;
 } else if (rechargeId) {
   url += `?subscriptionWalletRechargeId=${rechargeId}&invoiceType=2`;
 }
-const res = await fetch(url, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
 
-            const data = await res.json();
-            const invoiceNumber = data.id;
-            localStorage.setItem("invoiceNumber", invoiceNumber);
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
 
-            console.log("🧾 فاتورة تم إنشاؤها:", invoiceNumber);
-            return invoiceNumber;
-     };
+        const data = await res.json();
+        const invoiceNumber = data.id;
+        localStorage.setItem("invoiceNumber", invoiceNumber);
+
+        console.log("🧾 فاتورة تم إنشاؤها:", invoiceNumber);
+        return invoiceNumber;
+    };
 
 
     const initiateCheckout = async () => {
@@ -154,14 +183,14 @@ const res = await fetch(url, {
             //     setMessageType("error");
             // }
 
-if (result.paymentUrl) {
-  console.log("🔁 Redirecting to payment URL:", result.paymentUrl);
-  window.location.href = result.paymentUrl;
-  return;
-} else {
-  setMessage(lang === 'ar' ? "حدثت مشكلة أثناء إعداد بوابة الدفع." : "There was a problem while preparing the payment gateway.");
-  setMessageType("error");
-}
+            if (result.paymentUrl) {
+                console.log("🔁 Redirecting to payment URL:", result.paymentUrl);
+                window.location.href = result.paymentUrl;
+                return;
+            } else {
+                setMessage(lang === 'ar' ? "حدثت مشكلة أثناء إعداد بوابة الدفع." : "There was a problem while preparing the payment gateway.");
+                setMessageType("error");
+            }
 
 
             setLoading(false);

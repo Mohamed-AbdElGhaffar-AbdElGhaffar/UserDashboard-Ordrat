@@ -1,6 +1,7 @@
 import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookiesServer';
 import PageHeader from '@/app/shared/page-header';
-import AbandonedOrdersTable from '@/app/shared/tan-table/abandonedOrdersTable';
+import AbandonedOrdersTable1 from '@/app/shared/tan-table/abandonedOrdersTable';
+import AbandonedOrdersTable from '@/app/shared/tan-table/abandonedOrdersTable1';
 import BranchesTable from '@/app/shared/tan-table/branchesTable';
 import { metaObject } from '@/config/site.config';
 import WidgetCard from '@components/cards/widget-card';
@@ -45,7 +46,7 @@ export default async function AbandonedOrders({
   };
   return <>
     <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-    <AbandonedOrdersTable lang={lang} shopId={shopId as string} />
+    <AbandonedOrdersTable1 lang={lang} shopId={shopId as string} />
     <WidgetCard className='mt-5' title={lang === 'ar' ? 'ارشادات التواصل' : 'Contact Information Tips'}>
       <ul className="ps-5 list-disc text-[#4A5568] font-medium text-base mt-3">
         <li className='mb-2'>
