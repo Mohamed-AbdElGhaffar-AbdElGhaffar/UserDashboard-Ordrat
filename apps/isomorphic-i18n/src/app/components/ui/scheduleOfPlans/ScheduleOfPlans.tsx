@@ -22,10 +22,10 @@ function ScheduleOfPlans({ lang, plan ,ActivePlan}: { lang: string; plan: string
           "name": lang === 'ar' ? 'عدد الطلبات' : 'Order Count',
           "values": {
             "الخطة التجريبية": "محدود",
-            "خطة التوفير": ActivePlan?.currency === 0 ? "٥٠  قرش / طلب" : ActivePlan?.currency === 2 ? "10 هللة / طلب" : "0.02 دولار / طلب",
+            "خطة التوفير": ActivePlan?.currency === 1 ? "٥٠  قرش / طلب" : ActivePlan?.currency === 2 ? "10 هللة / طلب" : "0.02 دولار / طلب",
             "خطة مميزة": "غير محدود",
             "Trial Plan": "Limited",
-            "Saving Plan": ActivePlan?.currency === 0  ? " 50pt per order" : ActivePlan?.currency === 2  ? "10 halala per order" : "USD 0.02 per order",
+            "Saving Plan": ActivePlan?.currency === 1  ? " 50pt per order" : ActivePlan?.currency === 2  ? "10 halala per order" : "USD 0.02 per order",
             "VIP Plan": "Unlimited"
           }
         },
@@ -44,10 +44,10 @@ function ScheduleOfPlans({ lang, plan ,ActivePlan}: { lang: string; plan: string
           "name": lang === 'ar' ? 'نظام نقاط بيع سحابى' : 'Cloud POS',
           "values": {
             "الخطة التجريبية": "محدود",
-             "خطة التوفير": ActivePlan?.currency === 0 ? "٥٠  قرش / طلب" : ActivePlan?.currency === 2 ? "10 هللة / طلب" : "0.02 دولار / طلب",
+             "خطة التوفير": ActivePlan?.currency === 1 ? "٥٠  قرش / طلب" : ActivePlan?.currency === 2 ? "10 هللة / طلب" : "0.02 دولار / طلب",
             "خطة مميزة": "غير محدود",
             "Trial Plan": "Limited",
-            "Saving Plan": ActivePlan?.currency === 0  ? " 50pt per order" : ActivePlan?.currency === 2  ? "10 halala per order" : "USD 0.02 per order",
+            "Saving Plan": ActivePlan?.currency === 1  ? " 50pt per order" : ActivePlan?.currency === 2  ? "10 halala per order" : "USD 0.02 per order",
             "VIP Plan": "Unlimited"
           }
         },
@@ -55,10 +55,10 @@ function ScheduleOfPlans({ lang, plan ,ActivePlan}: { lang: string; plan: string
           "name": lang === 'ar' ? 'الزيارات' : 'Visits',
           "values": {
             "الخطة التجريبية": "محدود",
-            "خطة التوفير": ActivePlan?.currency === 0  ? "5 قروش / زيارة" : ActivePlan?.currency === 2 ? "ربع هللة / زيارة" : "0.0004 دولار / زيارة",
+            "خطة التوفير": ActivePlan?.currency === 1  ? "5 قروش / زيارة" : ActivePlan?.currency === 2 ? "ربع هللة / زيارة" : "0.0004 دولار / زيارة",
             "خطة مميزة": "غير محدود",
             "Trial Plan": "Limited",
-            "Saving Plan": ActivePlan?.currency === 0  ? " 5pt per visit" : ActivePlan?.currency === 2 ? "0.25 halala per visit" : "USD 0.0004 per visit",
+            "Saving Plan": ActivePlan?.currency === 1  ? " 5pt per visit" : ActivePlan?.currency === 2 ? "0.25 halala per visit" : "USD 0.0004 per visit",
             "VIP Plan": "Unlimited"
           }
         },
@@ -104,10 +104,10 @@ function ScheduleOfPlans({ lang, plan ,ActivePlan}: { lang: string; plan: string
           "name": lang === 'ar' ? 'أدوات التسويق عبر واتساب' : 'WhatsApp Marketing Tools',
           "values": {
             "الخطة التجريبية": false,
-            "خطة التوفير": ActivePlan?.currency === 0  ? "٥ قروش / رسالة" : ActivePlan?.currency === 2  ? "1 هللة / رسالة" : "0.002 دولار / رسالة",
+            "خطة التوفير": ActivePlan?.currency === 1  ? "٥ قروش / رسالة" : ActivePlan?.currency === 2  ? "1 هللة / رسالة" : "0.002 دولار / رسالة",
             "خطة مميزة": "غير محدود",
             "Trial Plan": false,
-            "Saving Plan":ActivePlan?.currency === 0  ? "5pt per message" : ActivePlan?.currency === 2 ? "1 halala per message" : "USD 0.002 per message",
+            "Saving Plan":ActivePlan?.currency === 1  ? "5pt per message" : ActivePlan?.currency === 2 ? "1 halala per message" : "USD 0.002 per message",
             "VIP Plan": "Unlimited"
           }
         },
