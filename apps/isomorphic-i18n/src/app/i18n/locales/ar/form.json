@@ -467,5 +467,6 @@
   "freeShippingHint": "تطبيق الشحن المجاني عند مبلغ معين يشجع العملاء على زيادة قيمة مشترياتهم.",
   "viewersHint": "ضبط عدد المشاهدين المرئيين بشكل معقول يخلق شعوراً بالثقة في منتجاتك.",
   "salesTimeHint": "اختر بعناية ساعات عرض المبيعات لتعكس النشاط الحقيقي لمتجرك.",
-  "form-product-variant-radio-required": "يجب ان تختار"
+  "form-product-variant-radio-required": "يجب ان تختار",
+  "form-product-variant-input-required": "يجب ان تدخل البيانات"
 }
