@@ -17,7 +17,7 @@ interface ActionsCellProps {
 
 const ActionsCellTables: React.FC<ActionsCellProps> = ({ data, lang, languages }) => {    
   const { openModal } = useModal();
-  const { setTablesData } = useUserContext();
+  const { setTablesData, setPOSTableOrderId } = useUserContext();
 
   const handleUpdateModal = () => {
     openModal({
@@ -32,6 +32,8 @@ const ActionsCellTables: React.FC<ActionsCellProps> = ({ data, lang, languages }
   
       if (response.status === 200 || response.status === 204) {
         setTablesData(true);
+        setPOSTableOrderId('');
+        localStorage.removeItem('posTableOrderId');
         toast.success(lang === 'ar' ? 'تم حذف الطاولة بنجاح!' : 'Table deleted successfully!');
       } else {
         toast.error(lang === 'ar' ? 'حدث خطأ أثناء الحذف' : 'An error occurred while deleting the table');

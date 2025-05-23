@@ -32,6 +32,8 @@ export default function UpdateTablesForm({
 }: TablesFormProps) {
   const mainBranch = GetCookiesClient('mainBranch');
   const { closeModal } = useModal();
+  const { setPOSTableOrderId } = useUserContext();
+
   const text = {
     descriptionEn: lang === 'ar' ? 'الوصف (انجليزي)' : 'Description (English)',
     descriptionAr: lang === 'ar' ? 'الوصف (عربي)' : 'Description (Arabic)',
@@ -84,6 +86,8 @@ export default function UpdateTablesForm({
           lang === 'ar' ? 'تم تحديث الطاولة بنجاح!' : 'Table updated successfully!'
         );
         setIsSubmit(false);
+        setPOSTableOrderId('');
+        localStorage.removeItem('posTableOrderId');
         closeModal();
         setTablesData(true);
       } catch (error: any) {

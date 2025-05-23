@@ -304,6 +304,15 @@ function updateOrderWithCancelledItem(posTableOrderId: any, itemId: string): any
     return item;
   });
 
+  // Check if all items are now cancelled
+  const allItemsCancelled = updatedOrder.order.items.every((item: any) => item.cancelled === true);
+
+  if (allItemsCancelled) {
+    // Remove the order and update tableStatus
+    delete updatedOrder.order;
+    updatedOrder.tableStatus = 0;
+  }
+
   return updatedOrder;
 }
 

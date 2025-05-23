@@ -10,7 +10,7 @@ import Flag from 'react-world-flags';
 import { Button } from 'rizzui';
 import * as signalR from '@microsoft/signalr';
 import SendMessage from './SendMessage';
-import { Loader2 } from 'lucide-react';
+import { Loader, Loader2 } from 'lucide-react';
 
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
@@ -107,8 +107,8 @@ interface PageHeaderType {
   title: string;
   breadcrumb: {href?: string; name: string;}[];
 }
-function WhatsApp({ lang, checksession, pageHeader }: { lang?: string; checksession:{status:boolean, success:boolean, message:string, qrCode?:string, deviceStatus?:{connected:boolean, loggedIn:boolean, sessionExists:boolean,} }; pageHeader: PageHeaderType; }) {
-  const [session, setSession] = useState(checksession);
+function WhatsApp({ lang, pageHeader }: { lang?: string; pageHeader: PageHeaderType; }) {
+  const [session, setSession] = useState<{status:boolean, success:boolean, message:string, qrCode?:string, deviceStatus?:{connected:boolean, loggedIn:boolean, sessionExists:boolean,} }>();
 
   const text = {
     title: lang === 'ar' ? 'أدوات التسويق (واتساب)' : 'Marketing tools (WhatsApp)',
@@ -127,6 +127,7 @@ function WhatsApp({ lang, checksession, pageHeader }: { lang?: string; checksess
   const [phoneNumber, setPhoneNumber] = useState<string | null>(localStorage.getItem("phoneNumber"));
   const [isAuthenticated, setIsAuthenticated] = useState(initIsAuthenticated);
   const [loading, setLoading] = useState(false);
+  const [loadingPage, setLoadingPage] = useState(false);
   // useEffect(() => {
   //   if(localStorage.getItem("isAuthenticated") === "true"){
 
@@ -195,6 +196,27 @@ function WhatsApp({ lang, checksession, pageHeader }: { lang?: string; checksess
   //     .then(() => console.log("✅ Connected to SignalR"))
   //     .catch(err => console.error("❌ SignalR Connection Error:", err));
   // }
+  async function fetchChecksession(shopId: string, lang: string) {
+    setLoadingPage(true);
+    try {
+      const res = await axiosClient.get(`/api/Whatsapp/checksession/${shopId}`, {
+        headers: {
+          'Accept': '*/*',
+          'Accept-Language': lang,
+        },
+      });
+      setSession(res.data);
+      setLoadingPage(false);
+    } catch (error) {
+      console.error('❌ Error re-fetching checksession:', error);
+      setLoadingPage(false);
+    }
+  }
+  
+  useEffect(() => {
+    fetchChecksession(shopId, lang!)
+  }, []);  
+  
   useEffect(() => {
     const interval = setInterval(async () => {
       if (!session?.status) {
@@ -263,6 +285,14 @@ function WhatsApp({ lang, checksession, pageHeader }: { lang?: string; checksess
       {label}
     </div>
   );
+  
+  if (loadingPage) {
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <Loader className="animate-spin text-[#e11d48]" width={40} height={40} />
+      </div>
+    );
+  }
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>

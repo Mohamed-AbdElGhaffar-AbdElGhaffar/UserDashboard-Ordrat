@@ -24,7 +24,7 @@ async function fetchChecksession(shopId: string, lang: string) {
   }
 }
 
-export default async function WhatsAppPage({
+export default function WhatsAppPage({
   params: { lang },
 }: {
   params: {
@@ -33,8 +33,8 @@ export default async function WhatsAppPage({
 }) {
   const shopId = GetCookiesServer('shopId');
 
-  const checksession = await fetchChecksession(shopId as string, lang);
-  console.log("checksession: ",checksession);
+  // const checksession = await fetchChecksession(shopId as string, lang);
+  // console.log("checksession: ",checksession);
   
   const pageHeader = {
     title: lang === 'ar' ? 'الواتساب' : 'WhatsApp',
@@ -49,6 +49,6 @@ export default async function WhatsAppPage({
     ],
   };
   return <>
-    <WhatsApp lang={lang} checksession={checksession} pageHeader={pageHeader} />
+    <WhatsApp lang={lang} pageHeader={pageHeader} />
   </>;
 }
