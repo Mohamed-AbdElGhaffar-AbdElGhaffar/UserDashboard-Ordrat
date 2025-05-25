@@ -17,9 +17,9 @@ import { useUserContext } from '@/app/components/context/UserContext';
 import LocationPicker from '@/app/components/ui/map/LocationPicker';
 import { DateTimePicker } from '@/app/components/ui/DatePickerTime/dateJustTimePicker';
 import { format } from "date-fns";
-import { DateDurationPicker } from '@/app/components/ui/DatePickerTime/dateDurationPicker';
 import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookiesClient';
 import { PhoneNumber } from '@ui/phone-input';
+import { DateDurationPicker } from '@/app/components/ui/DatePickerTime/dateDurationPicker';
 
 type TableFormProps = {
   title?: string;
@@ -78,7 +78,12 @@ export default function BranchTableForm({
     phoneNumber: Yup.string().required(`${text.phoneNumber} ${requiredMessage}`).matches(/^20(1[0-2,5][0-9]{8})$/, text.wrongPhone),
     openAt: Yup.date().required(text.openAt + ' ' + requiredMessage),
     closedAt: Yup.date().required(text.closedAt + ' ' + requiredMessage),
-    deliveryTime: Yup.date().required(text.deliveryTime + ' ' + requiredMessage),
+    deliveryTime: Yup.object().shape({
+      days: Yup.number().min(0).required(),
+      hours: Yup.number().min(0).max(23).required(),
+      minutes: Yup.number().min(0).max(59).required(),
+      seconds: Yup.number().min(0).max(59).required(),
+    }).required(text.deliveryTime + ' ' + requiredMessage),
     location: Yup.string().required(text.location + ' ' + requiredMessage),
     // isFixedDelivery: Yup.boolean(),
 
@@ -116,7 +121,7 @@ export default function BranchTableForm({
       phoneNumber: '',
       openAt: null,
       closedAt: null,
-      deliveryTime: null,
+      deliveryTime: { days: 0, hours: 0, minutes: 0, seconds: 0 },
       location: '',
       lat: 30.0444,
       lng: 31.2357,
@@ -128,7 +133,7 @@ export default function BranchTableForm({
     },
     validationSchema: mainFormSchema,
     onSubmit: async (values) => {
-      setIsSubmit(true);
+      // setIsSubmit(true);
       const formatTime = (date: Date | null): string =>
         date ? format(date, "HH:mm:ss") : "";
 
@@ -136,7 +141,7 @@ export default function BranchTableForm({
       const payload = {
         openAt: formatTime(values.openAt),
         closedAt: formatTime(values.closedAt),
-        deliveryTime: formatTime(values.deliveryTime),
+        deliveryTime: `${mainFormik.values.deliveryTime.days.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.hours.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.minutes.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.seconds.toString().padStart(2, '0')}`,
         nameEn: values.nameEn,
         nameAr: values.nameAr,
         phoneNumber: values.phoneNumber,
@@ -151,6 +156,7 @@ export default function BranchTableForm({
         deliveryPerKilo: values.deliveryPerKilo,
         minimumDeliveryCharge: values.minimumDeliveryCharge,
       };
+      console.log("payload: ",payload);
       
       try {
         const response = await axiosClient.post(`/api/Branch/Create/${shopId}`, payload, {
@@ -269,13 +275,13 @@ export default function BranchTableForm({
             </div>
             {/* deliveryTime Time */}
             <div className='w-full'>
-              <DateDurationPicker 
+              <DateDurationPicker
                 lable={text.deliveryTime}
                 lang={lang}
-                selectedDate={mainFormik.values.deliveryTime}
-                onChange={(date) => mainFormik.setFieldValue('deliveryTime', date)}
+                selectedDuration={mainFormik.values.deliveryTime}
+                onChange={(val) => mainFormik.setFieldValue('deliveryTime', val)}
               />
-              {mainFormik.touched.deliveryTime && mainFormik.errors.deliveryTime && (
+              {typeof mainFormik.errors.deliveryTime === 'string'  && (
                 <div className="text-red-500 text-sm mt-1">{mainFormik.errors.deliveryTime}</div>
               )}
             </div>

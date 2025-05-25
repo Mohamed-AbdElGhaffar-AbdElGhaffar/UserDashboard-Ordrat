@@ -111,7 +111,7 @@ export function set12Hours(date: Date, value: string, period: Period) {
   return date;
 }
 
-export type TimePickerType = "minutes" | "seconds" | "hours" | "12hours";
+export type TimePickerType = "days" | "minutes" | "seconds" | "hours" | "12hours";
 export type Period = "AM" | "PM";
 
 export function setDateByType(
@@ -121,6 +121,11 @@ export function setDateByType(
   period?: Period
 ) {
   switch (type) {
+    case "days": {
+      const dayValue = parseInt(getValidNumber(value, { min: 0, max: 999 }), 10);
+      date.setDate(dayValue);
+      return date;
+    }
     case "minutes":
       return setMinutes(date, value);
     case "seconds":

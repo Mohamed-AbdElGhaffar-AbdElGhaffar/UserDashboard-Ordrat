@@ -615,7 +615,7 @@ function POSModal({
                                 return (
                                   <div key={variation.id} className="flex px-4">
                                     <div className="w-full flex flex-col gap-1">
-                                      <div className="flex items-end justify-between">
+                                      <div className="flex items-center gap-2">
                                         {/* PC Product Variation Name */}
                                         <strong>{t('choiceof')} {variation.name}</strong>
                                         {/* PC Product Variation isRequired */}
@@ -639,7 +639,7 @@ function POSModal({
                                 return <>
                                   <div key={variation.id} className="flex z-10 px-4 pt-0">
                                     <div className="w-full flex flex-col gap-1">
-                                      <div className="flex items-end justify-between mb-2">
+                                      <div className="flex items-center gap-2 mb-2">
                                         {/* PC Product Variation Name */}
                                         <strong>{t('choiceof')} {variation.name}</strong>
                                         {variation.isRequired && (
@@ -675,7 +675,7 @@ function POSModal({
                                 return (
                                   <div key={variation.id} className="flex px-4 pt-0">
                                     <div className="w-full flex flex-col gap-1">
-                                      <div className="flex items-end justify-between mb-2">
+                                      <div className="flex items-center gap-2 mb-2">
                                         <strong>{variation.name}</strong>
                                         {variation.isRequired && (
                                           <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
@@ -715,7 +715,7 @@ function POSModal({
                                 return (
                                   <div key={variation.id} className="flex px-4 pt-0">
                                     <div className="w-full flex flex-col gap-1">
-                                      <div className="flex items-end justify-between mb-2">
+                                      <div className="flex items-center gap-2 mb-2">
                                         <strong>{t('phoneNumber')}</strong>
                                         {variation.isRequired && (
                                           <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
@@ -751,7 +751,7 @@ function POSModal({
                                 return (
                                   <div key={variation.id} className="flex px-4 pt-0">
                                     <div className="w-full flex flex-col gap-1">
-                                      <div className="flex items-end justify-between mb-2">
+                                      <div className="flex items-center gap-2 mb-2">
                                         <strong>{variation.name}</strong>
                                         {variation.isRequired && (
                                           <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
@@ -941,7 +941,7 @@ function POSModal({
                               return (
                                 <div key={variation.id} className="flex">
                                   <div className="w-full flex flex-col gap-1">
-                                    <div className="flex items-end justify-between">
+                                    <div className="flex items-center gap-2">
                                       <strong>{t('choiceof')} {variation.name}</strong>
                                       {variation.isRequired && (
                                         <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
@@ -961,7 +961,7 @@ function POSModal({
                               return <>
                                 <div key={variation.id} className="flex pt-0">
                                   <div className="w-full flex flex-col gap-1">
-                                    <div className="flex items-end justify-between mb-2">
+                                    <div className="flex items-center gap-2 mb-2">
                                       {/* <strong>Your choice of: {variation.name}</strong> */}
                                       <strong>{t('choiceof')} {variation.name}</strong>
                                       {variation.isRequired && (
@@ -996,7 +996,7 @@ function POSModal({
                               return (
                                 <div key={variation.id} className="flex pt-0">
                                   <div className="w-full flex flex-col gap-1">
-                                    <div className="flex items-end justify-between mb-2">
+                                    <div className="flex items-center gap-2 mb-2">
                                       <strong>{variation.name}</strong>
                                       {variation.isRequired && (
                                         <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
@@ -1036,7 +1036,7 @@ function POSModal({
                               return (
                                 <div key={variation.id} className="flex pt-0">
                                   <div className="w-full flex flex-col gap-1">
-                                    <div className="flex items-end justify-between mb-2">
+                                    <div className="flex items-center gap-2 mb-2">
                                       <strong>{t('phoneNumber')}</strong>
                                       {variation.isRequired && (
                                         <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
@@ -1070,7 +1070,7 @@ function POSModal({
                               return (
                                 <div key={variation.id} className="flex pt-0">
                                   <div className="w-full flex flex-col gap-1">
-                                    <div className="flex items-end justify-between mb-2">
+                                    <div className="flex items-center gap-2 mb-2">
                                       <strong>{variation.name}</strong>
                                       {variation.isRequired && (
                                         <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
