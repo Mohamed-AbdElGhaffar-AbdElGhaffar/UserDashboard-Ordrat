@@ -206,7 +206,7 @@ export default function Forecast({ className }: { className?: string }) {
                   );
                 }}
               />
-              <Tooltip content={<CustomTooltip formattedNumber prefix="$" />} />
+              <Tooltip content={<CustomTooltip currency='' formattedNumber prefix="$" />} />
               <Area
                 type="monotone"
                 dataKey="target"

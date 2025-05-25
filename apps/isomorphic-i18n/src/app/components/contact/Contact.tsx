@@ -21,10 +21,16 @@ function Contact({ lang }: { lang: string }) {
     const [isDisabled, setIsDisabled] = useState(true);
     const { t, i18n } = useTranslation(lang!, "basicData");
     const [contact, setContact] = useState<ContactInfo>();
+    const [editModeStarted, setEditModeStarted] = useState(false);
+
     // const validationSchema = ContactValidation({ lang })
-    const handleEnableInputs = () => {
-        setIsDisabled(false);
-    };
+ const handleEnableInputs = (e: React.MouseEvent<HTMLButtonElement>) => {
+  e.preventDefault();           // يمنع إرسال الفورم
+  setIsDisabled(false);
+  setEditModeStarted(true);
+};
+
+
     const fetchContact = async () => {
         try {
             const { data } = await axiosClient.get(`/api/ShopContactInfo/GetByShopId/${shopId}`);
@@ -56,6 +62,7 @@ function Contact({ lang }: { lang: string }) {
         // validationSchema,
         onSubmit: async (values) => {
             console.log("values", values);
+  if (isDisabled || !editModeStarted) return; // تأكيد مزدوج
 
             const data = {
                 whatsAppNumber: values.Whatsapp,
@@ -110,10 +117,25 @@ function Contact({ lang }: { lang: string }) {
                     <div className="flex justify-between items-center">
                         <h2 className='mb-3 text-base font-semibold sm:text-lg'>{t('contact-title')}</h2>
                         <RoleExist PageRoles={['UpdateShopContactInfo', 'CreateShopContactInfo']}>
-                            <Button type='submit' onClick={handleEnableInputs} className='bg-redColor hover:bg-mainTextColor'>
-                                {t('update')}
-                            </Button>
-                        </RoleExist>
+  {isDisabled ? (
+    <Button
+      type="button"
+      onClick={handleEnableInputs}
+      className="bg-redColor hover:bg-mainTextColor"
+    >
+      {t('update')}
+    </Button>
+  ) : (
+    <Button
+      type="submit"
+      disabled={!editModeStarted} // ممنوع الحفظ لو المستخدم مفعلش التعديل
+      className="bg-redColor hover:bg-redColor"
+    >
+      {lang==='ar'? 'حفظ':'Save'}
+    </Button>
+  )}
+</RoleExist>
+
                     </div>
                     <div className="sm:space-y-6 mt-3">
                         <div className="sm:flex justify-between  gap-10">

@@ -149,7 +149,7 @@ export default function WebAnalytics({ className }: { className?: string }) {
                   return <CustomYAxisTick payload={pl} {...rest} />;
                 }}
               />
-              <Tooltip content={<CustomTooltip formattedNumber />} />
+              <Tooltip content={<CustomTooltip currency='' formattedNumber />} />
 
               {platforms.map((platform) => (
                 <Bar

@@ -46,6 +46,7 @@ interface IndexProps {
   lang?: string;
   slug?: string;
   className?: string;
+  currencyAbbreviation?: string;
   product?: CreateProductInput;
   allProducts?: any;
   languages: number;
@@ -56,6 +57,7 @@ export default function CreateEditProduct({
   product,
   className,
   lang,
+  currencyAbbreviation,
   allProducts,
   languages
 }: IndexProps) {  
@@ -223,7 +225,7 @@ export default function CreateEditProduct({
                 key={key}
                 name={formParts[key as keyof typeof formParts]}
               >
-                {<Component className="pt-7 @2xl:pt-9 @3xl:pt-11" lang={lang} allProducts={allProducts} languages={languages} />}
+                {<Component className="pt-7 @2xl:pt-9 @3xl:pt-11" lang={lang} allProducts={allProducts} languages={languages} currencyAbbreviation={currencyAbbreviation} />}
               </Element>
             ))}
           </div>

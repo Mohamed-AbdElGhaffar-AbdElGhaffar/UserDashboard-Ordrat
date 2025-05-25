@@ -8,6 +8,7 @@ import { useTranslation } from '@/app/i18n/client';
 import cn from '@utils/class-names';
 import { TopSellingProduct } from '../../statistics/page';
 import { useEffect } from 'react';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 export default function TopProductList({ lang, currency,className, topSellingProducts }: { lang?: string; currency?:string; className?: string; topSellingProducts?: TopSellingProduct[] }) {
   const { t } = useTranslation(lang!, 'common');
@@ -49,7 +50,7 @@ export default function TopProductList({ lang, currency,className, topSellingPro
                 <Text className="font-lexend text-sm font-semibold text-gray-900 dark:text-gray-700">
                   {lang === 'ar' ? product.productNameAr : product.productNameEn}
                 </Text>
-                <Text className="text-gray-500">{product.totalRevenue.toLocaleString()}{" "}{currency}</Text>
+                <Text className="text-gray-500 flex items-center gap-1 w-fit">{product.totalRevenue.toLocaleString()}{" "} {currency==='ر.س'? <Image src={sarIcon} alt="SAR" width={13} height={13} />:currency}</Text>
               </div>
               <div>
               <div>

@@ -120,7 +120,7 @@ export default function ExpenseHistory({ className }: { className?: string }) {
                 tickMargin={20}
                 tickFormatter={(label) => `$${label}k`}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip currency=''/>} />
               <Area
                 dataKey="amount"
                 stroke="#EE0000"

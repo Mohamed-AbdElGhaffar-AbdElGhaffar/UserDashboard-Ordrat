@@ -117,6 +117,7 @@ export default function Pay({ lang }: { lang: string }) {
 
 
         const rechargeInfoString = localStorage.getItem("rechargeInfo");
+        const period = localStorage.getItem("period");
         let rechargeInfo = null;
         try {
             if (rechargeInfoString && rechargeInfoString.startsWith("{")) {
@@ -134,12 +135,13 @@ export default function Pay({ lang }: { lang: string }) {
         let url = "https://testapi.ordrat.com/api/Invoice/Create";
 
        if (updateSubscriptionId && oldSubscriptionId) {
-  url += `?OldSellerPlanSubscriptionId=${oldSubscriptionId}&sellerPlanSubscriptionId=${updateSubscriptionId}&period=monthly&invoiceType=3`;
-} else if (subscriptionId) {
-  url += `?sellerPlanSubscriptionId=${subscriptionId}&period=monthly&invoiceType=1`;
-} else if (rechargeId) {
-  url += `?subscriptionWalletRechargeId=${rechargeId}&invoiceType=2`;
-}
+        url += `?OldSellerPlanSubscriptionId=${oldSubscriptionId}&sellerPlanSubscriptionId=${updateSubscriptionId}&period=${period}&invoiceType=3`;
+        } else if (subscriptionId) {
+        url += `?sellerPlanSubscriptionId=${subscriptionId}&period=monthly&invoiceType=1`;
+        }
+        else if (rechargeId) {
+        url += `?subscriptionWalletRechargeId=${rechargeId}&invoiceType=2`;
+        }
 
         const res = await fetch(url, {
             method: "POST",

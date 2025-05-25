@@ -125,7 +125,7 @@ export default function CashInBank({ className }: { className?: string }) {
               />
               <Tooltip
                 content={
-                  <CustomTooltip className="[&_.chart-tooltip-item:last-child]:hidden" />
+                  <CustomTooltip currency='' className="[&_.chart-tooltip-item:last-child]:hidden" />
                 }
                 cursor={false}
               />

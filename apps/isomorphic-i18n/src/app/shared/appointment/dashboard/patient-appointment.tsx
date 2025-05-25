@@ -170,7 +170,7 @@ export default function PatientAppointment({
                 tickMargin={20}
               />
               <YAxis axisLine={false} tickLine={false} tickMargin={20} />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip currency=''/>} />
               <Area
                 dataKey="newPatients"
                 {...(theme && {

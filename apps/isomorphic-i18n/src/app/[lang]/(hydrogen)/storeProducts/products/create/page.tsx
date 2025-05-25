@@ -109,7 +109,7 @@ export default async function CreateProductPage({
           </Link> */}
         </PageHeader>
 
-        <CreateEditProduct lang={lang} allProducts={products.entities} languages={shopData.languages}/>
+        <CreateEditProduct lang={lang} allProducts={products.entities} currencyAbbreviation={shopData.currencyAbbreviation} languages={shopData.languages}/>
       </div>
     </>
   );

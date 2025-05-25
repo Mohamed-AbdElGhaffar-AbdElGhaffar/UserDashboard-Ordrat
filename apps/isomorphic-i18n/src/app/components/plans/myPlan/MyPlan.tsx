@@ -65,6 +65,7 @@ function MyPlan({ lang }: { lang: string }) {
     const { t } = useTranslation(lang!, "pricing1");
     const [loading, setLoading] = useState(false);
     const [activePlan, setActivePlan] = useState<SellerPlanSubscription>();
+    const [lastActivePlan, setLastActivePlan] = useState<SellerPlanSubscription>();
     const [bulk, setBulk] = useState([]);
     const [plan, setPlan] = useState<string>('');
     const [SubscriptionWallet, setSubscriptionWallet] = useState<deductedBalance>();
@@ -128,26 +129,50 @@ function MyPlan({ lang }: { lang: string }) {
         localStorage.removeItem("invoiceNumber");
 
     }, []);
-    const fetchActivePlan = async () => {
-        setLoading(true);
-        try {
-            const response = await axiosClient.get(`/api/SellerPlanSubscription/GetSellerPlanActiveSubscription/${sellerId}`, {
-                headers: {
-                    "Accept-Language": lang,
-                },
-            });
-            if (response.data) {
-                setActivePlan(response.data);
-                setPlan(response.data.planName);
-            } else {
-                console.warn('No active plans found');
-            }
-        } catch (error) {
-            console.error('Error fetching active plan:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const fetchActivePlan = async () => {
+  setLoading(true);
+  try {
+    const response = await axiosClient.get(
+      `/api/SellerPlanSubscription/GetSellerPlanActiveSubscription/${sellerId}`,
+      { headers: { "Accept-Language": lang } }
+    );
+
+    if (
+      response.data &&
+      response.data.subscriptionStatus !== 'notActive'
+    ) {
+      setActivePlan(response.data);
+      setPlan(response.data.planName);
+    } else {
+      console.warn("No active plan (status = notActive), trying last active plan...");
+      await fetchLastActivePlan();
+    }
+  } catch (error) {
+    console.error("Error fetching active plan, trying fallback...", error);
+    await fetchLastActivePlan();
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+const fetchLastActivePlan = async () => {
+  try {
+    const response = await axiosClient.get(
+      `/api/SellerPlanSubscription/GetLastSellerPlanSubsciption/${sellerId}`, 
+      { headers: { "Accept-Language": lang } }
+    );
+    if (response.data) {
+      setLastActivePlan(response.data);
+      setPlan(response.data.planName);
+    } else {
+      console.warn("No last active plan found either.");
+    }
+  } catch (error) {
+    console.error("Error fetching last active plan:", error);
+  }
+};
+
     const fetchBulk = async () => {
         setLoading(true);
         try {
@@ -182,6 +207,7 @@ function MyPlan({ lang }: { lang: string }) {
         fetchActivePlan();
         fetchBulk();
         fetchSubscriptionWallet();
+        fetchLastActivePlan();
     }, []);
     const getAmountWithCurrency = (
         amount: RechargePackage,
@@ -316,8 +342,9 @@ function MyPlan({ lang }: { lang: string }) {
                 });
             if (response.status === 200) {
                 toast.success(lang === 'ar' ? 'جاري التحويل للدفع...' : 'Redirecting to payment page...');
-                localStorage.setItem("updateSubscriptionId", response.data);
-                localStorage.setItem("oldSubscriptionId", activePlan?.id as string);
+                localStorage.setItem("updateSubscriptionId", response.data.sellerPlanSubscription);
+                localStorage.setItem("period", response.data.period);
+                {lastActivePlan && localStorage.setItem("oldSubscriptionId", lastActivePlan?.id as string);}
                 localStorage.removeItem("rechargeId");
                 localStorage.removeItem("SubscriptionId");
                 router.push('/pay');
@@ -394,7 +421,7 @@ function MyPlan({ lang }: { lang: string }) {
                                     </li>
                                 </ul>
 
-                     
+
                                 <button onClick={
                                     () => update()
                                 } className='action-button  hover:-translate-y-1 duration-200 mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'>
@@ -591,10 +618,131 @@ function MyPlan({ lang }: { lang: string }) {
                     )}
                 </>
             )}
+            {lastActivePlan&& !activePlan &&
+              <div className="mb-3 bg-gradient-to-br  hover:-translate-y-1 duration-200 from-red-100 to-white border border-red-400 border-opacity-30 shadow-sm rounded-xl p-6 dashboard-card relative overflow-hidden  ">
+                            <div className="flex justify-between items-start">
+
+                                <p className='text-sm font-medium text-gray-500'>
+                                    {t('SUBSCRIPTION')}
+                                </p>
+                                {(lastActivePlan?.planName === 'خطة مميزة' || lastActivePlan?.planName === 'VIP Plan') ?
+                                    <FontAwesomeIcon icon={faCrown} className='text-red-600 text-xl' />
+                                    :
+                                    <div className="bg-red-100 p-2 rounded-lg">
+                                        <FontAwesomeIcon icon={faCircleCheck} className='text-red-600 text-lg' />
+                                    </div>
+                                }
+                            </div>
+                            <h4 className='font-semibold text-xl'>
+                                {lastActivePlan.planName}
+                            </h4>
+                            <p className='flex items-center gap-1'>
+                                <span className='text-2xl font-bold text-red-600'>
+                                    {lastActivePlan.price}
+                                </span>
+                                /
+                                {lastActivePlan.currency === 2 && lang === 'ar' ? (
+                                    <Image src={sarIcon} alt="SAR" width={30} height={30} />
+                                ) : (
+                                    <span className='text-gray-600 font-normal text-base'>
+                                        {currencyLabels[lastActivePlan.currency]?.[lang === 'ar' ? 'ar' : 'en']}
+                                    </span>
+                                )}
+
+                            </p>
+                               {(lastActivePlan?.planName === 'خطة مميزة' || lastActivePlan?.planName === 'VIP Plan') ?
+                            <>
+                                <ul className="mb-4 mt-3 text-sm text-gray-700 space-y-1.5  ">
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faCheck} className="text-red-500" />
+                                        {lang === 'ar' ? 'عدد الطلبات غير محدود' : 'Orders Unlimited'}
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faCheck} className="text-red-500" />
+                                        {lang === 'ar' ? 'أدوات تسويق عبر الواتساب غير محدود' : 'Whatsapp Marketing Tools Unlimited'}
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faCheck} className="text-red-500" />
+                                        {lang === 'ar' ? 'عدد الزيارات غير محدود' : '  Visits Unlimited '}
+                                    </li>
+                                </ul>
+                            </>
+                            :
+                            (lastActivePlan?.planName === 'خطة التوفير' || lastActivePlan?.planName === 'Saving Plan') ?
+                                <ul className="mb-4 mt-3 text-sm text-gray-700 space-y-1.5  ">
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faCheck} className="text-red-500" />
+                                        {lang === 'ar'
+                                            ? `عدد الطلبات ${lastActivePlan?.currency === 1
+                                                ? '٥٠ قرش / طلب'
+                                                : lastActivePlan?.currency === 2
+                                                    ? '10 هللة / طلب'
+                                                    : '0.02 دولار / طلب'}`
+                                            : `Orders ${lastActivePlan?.currency === 1
+                                                ? '50pt per order'
+                                                : lastActivePlan?.currency === 2
+                                                    ? '10 halala per order'
+                                                    : 'USD 0.02 per order'}`}
+                                    </li>
+
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faCheck} className="text-red-500" />
+                                        {lang === 'ar'
+                                            ? `أدوات تسويق عبر الواتساب ${lastActivePlan?.currency === 1
+                                                ? '٥ قروش / رسالة'
+                                                : lastActivePlan?.currency === 2
+                                                    ? '1 هللة / رسالة'
+                                                    : '0.002 دولار / رسالة'}`
+                                            : `Whatsapp Marketing Tools ${lastActivePlan?.currency === 1
+                                                ? '5pt per message'
+                                                : lastActivePlan?.currency === 2
+                                                    ? '1 halala per message'
+                                                    : 'USD 0.002 per message'}`}
+                                    </li>
+
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faCheck} className="text-red-500" />
+                                        {lang === 'ar'
+                                            ? `عدد الزيارات ${lastActivePlan?.currency === 1
+                                                ? '5 قروش / زيارة'
+                                                : lastActivePlan?.currency === 2
+                                                    ? 'ربع هللة / زيارة'
+                                                    : '0.0004 دولار / زيارة'}`
+                                            : `Visits ${lastActivePlan?.currency === 1
+                                                ? '5pt per visit'
+                                                : lastActivePlan?.currency === 2
+                                                    ? '0.25 halala per visit'
+                                                    : 'USD 0.0004 per visit'}`}
+                                    </li>
+
+                                </ul>
+                                : <ul className="mb-4 mt-3 text-sm text-gray-700 space-y-2">
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faCheck} className="text-red-500" />
+                                        {lang === 'ar' ? 'عدد الطلبات محدود' : 'Orders Limited'}
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faCheck} className="text-red-500" />
+                                        {lang === 'ar' ? 'أدوات التسويق عبر واتساب محدود' : 'WhatsApp Marketing Tools Limited'}
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faCheck} className="text-red-500" />
+                                        {lang === 'ar' ? 'عدد الزيارات محدود' : 'Visits Count Limited'}
+                                    </li>
+                                </ul>
+                        }
+                         <button onClick={
+                                    () => update()
+                                } className='action-button  hover:-translate-y-1 duration-200 mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'>
+                                    {lang === 'ar' ? 'تجديد' : 'Renewal'}
+                                </button>
+                        </div>
+                        
+            }
         </div>
-        <div className={` ${activePlan?.planName === 'خطة مميزة' || activePlan?.planName === 'VIP Plan' ? '' : ' pb-3  mt-8'}`}>
+        <div className={` ${(activePlan?.planName === 'خطة مميزة' || activePlan?.planName === 'VIP Plan') && lastActivePlan ? '' : ' pb-3  mt-8'}`}>
             {
-                (activePlan?.planName === 'خطة مميزة' || activePlan?.planName === 'VIP Plan') ? ''
+                (activePlan?.planName === 'خطة مميزة' || activePlan?.planName === 'VIP Plan') && lastActivePlan ? ''
                     :
                     <>
                         <h3 className='text-2xl py-3'>{lang === 'ar' ? 'المحفظة' : 'Wallet'}</h3>

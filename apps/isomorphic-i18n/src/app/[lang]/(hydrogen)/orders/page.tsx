@@ -4,6 +4,7 @@ import PageHeader from '@/app/shared/page-header';
 import { Image_BASE_URL } from '@/config/base-url';
 import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookiesServer';
 import WidgetCard from '@components/cards/widget-card';
+import { fetchShopData } from '@/app/api/shop';
 
 export const metadata = {
   ...metaObject('Orders'),
@@ -126,7 +127,7 @@ const orderData = [
 //     ],
 //   },
 // ]; 
-export default function Orders({
+ export default async function Orders({
   params: { lang },
 }: {
   params: {
@@ -134,6 +135,7 @@ export default function Orders({
   };
 }) {
   const shopId = GetCookiesServer('shopId');
+  const shopData = await fetchShopData(lang, shopId as string);
   const pageHeader = {
     title: lang === 'ar' ? 'الطلبات' : 'Orders',
     breadcrumb: [
@@ -149,7 +151,9 @@ export default function Orders({
   return <>
     <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
     <WidgetCard title={lang == 'ar'? 'جدول الطلبات':'Orders Table'} className="flex flex-col gap-4">
-      <OrdersTable shopId={shopId || ''} lang={lang} initData={orderData} />
+      <OrdersTable shopId={shopId || ''} lang={lang} initData={orderData} currencyAbbreviation={shopData?.currencyAbbreviation} />
     </WidgetCard>
   </>;
 }
+
+

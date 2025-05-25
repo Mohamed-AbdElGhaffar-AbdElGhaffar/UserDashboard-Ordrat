@@ -144,7 +144,7 @@ export default function SalesReport({ className }: { className?: string }) {
               />
               <Tooltip
                 content={
-                  <CustomTooltip className="[&_.chart-tooltip-item:last-child]:hidden" />
+                  <CustomTooltip currency='' className="[&_.chart-tooltip-item:last-child]:hidden" />
                 }
               />
               <Bar

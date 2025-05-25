@@ -8,6 +8,7 @@ import { useTranslation } from '@/app/i18n/client';
 import cn from '@utils/class-names';
 import { LowStockProduct, TopSellingProduct } from '../../statistics/page';
 import { useEffect } from 'react';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 export default function LowStockProductList({ lang, className, LowStockProducts }: { lang?: string; className?: string; LowStockProducts: LowStockProduct[] }) {
   const { t } = useTranslation(lang!, 'common');

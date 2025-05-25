@@ -163,7 +163,7 @@ export default function SalesByCategory({ className }: { className?: string }) {
                 }}
               />
               <Tooltip
-                content={<CustomTooltip formattedNumber={true} prefix="$" />}
+                content={<CustomTooltip currency='' formattedNumber={true} prefix="$" />}
               />
 
               <defs>

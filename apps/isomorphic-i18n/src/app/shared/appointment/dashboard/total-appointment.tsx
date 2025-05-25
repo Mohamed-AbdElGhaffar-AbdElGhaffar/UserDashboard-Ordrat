@@ -150,7 +150,7 @@ export default function TotalAppointment({
                 tickLine={false}
                 tickFormatter={(label) => label}
               />
-              <Tooltip content={<CustomTooltip />} cursor={false} />
+              <Tooltip content={<CustomTooltip  currency=''/>} cursor={false} />
               <Bar
                 dataKey="booking"
                 {...(theme && {

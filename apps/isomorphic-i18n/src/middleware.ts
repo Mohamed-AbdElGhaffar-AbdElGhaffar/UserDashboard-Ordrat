@@ -92,7 +92,6 @@ export async function middleware(req: any) {
   //   res.headers.set('Cache-Control', 'no-store');
   //   return res;
   // }  
-  
   // console.log("refreshToken: ",refreshToken);
   // if (!refreshToken && pathname != '/en/signin' && pathname != '/ar/signin') {
   //   console.log("refreshToken: ",refreshToken);
@@ -108,7 +107,7 @@ export async function middleware(req: any) {
 
   const refreshToken = req.cookies.get("refreshToken")?.value;
 
-  if (!refreshToken && !pathname.includes("/signin")) {
+  if (!refreshToken && !pathname.includes("/signin") && !pathname.includes("/auth/forgot-password")&& !pathname.includes("/auth/otp")&& !pathname.includes("/auth/restart-password")) {
     return NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
   }
 

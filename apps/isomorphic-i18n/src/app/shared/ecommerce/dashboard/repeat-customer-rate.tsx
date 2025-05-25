@@ -149,7 +149,7 @@ export default function RepeatCustomerRate({
                 className=" "
               />
               <YAxis axisLine={false} tickLine={false} className=" " />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip currency=''/>} />
               <Area
                 type="natural"
                 dataKey="newCustomer"
