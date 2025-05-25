@@ -32,7 +32,7 @@ export default function FilterElement({
   handleReset,
   lang = 'en',
 }: FilterElementProps) {
-  const isMediumScreen = useMedia('(max-width: 1860px)', false);
+  const isMediumScreen = useMedia('(max-width: 1024px)', false);
 
   return (
     <>
@@ -85,11 +85,15 @@ export default function FilterElement({
             renderOptionDisplayValue(option.value, lang)
           }
           displayValue={(selected: string) => renderOptionDisplayValue(selected, lang)}
-          {...(isMediumScreen && {
+          {...(isMediumScreen ? {
             label: lang === 'ar' ? 'الحالة' : 'Status',
             placeholder: lang === 'ar' ? 'اختر حالة' : 'Choose Status',
             labelClassName: 'font-medium text-gray-700',
+          }:{
+            placeholder: lang === 'ar' ? 'اختر حالة' : 'Choose Status',
           })}
+          dropdownClassName='lg:!w-40 lg:bg-white lg:!z-[9999999]'
+          className='lg:w-40'
         />
       </div>
       {isFiltered ? (

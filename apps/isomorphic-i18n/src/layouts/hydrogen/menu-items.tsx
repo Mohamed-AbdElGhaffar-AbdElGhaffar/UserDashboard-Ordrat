@@ -11,6 +11,7 @@ import {
   PiQuestionBold,
   PiTruckDuotone,
   PiUsers,
+  PiPrinter,
 } from 'react-icons/pi';
 import { BiSolidCoupon } from "react-icons/bi";
 import { MdPriceChange, MdRestaurant } from "react-icons/md";
@@ -176,6 +177,11 @@ const MenuItems = ({ lang }: { lang?: string; }, p0?: { lang: any; }) => {
 
 
       ]
+    },
+    {
+      name: 'side-printer',
+      href: `/${lang!}/printer`,
+      icon: <PiPrinter />,
     },
     // {
     //   name: 'side-marketingtools',

@@ -34,7 +34,7 @@ const cookieName = "i18next";
 
 export const routeRoles: Record<string, string[]> = {
   "/affiliate": [ "/sellerDashboard/affiliate", "sellerDashboard-affiliate", "لوحة-تحكم-التاجر-الشركاء", ],
-  // "/auth/forgot-password": [ "/sellerDashboard/auth/forgot-password", "sellerDashboard-auth-forgot-password", "لوحة-تحكم-التاجر-استرداد-حساب", ],
+  "/printer": [ "/sellerDashboard/printer", "sellerDashboard-printer", "لوحة-تحكم-التاجر-الطابعة", ],
   "/storeSetting/branches": [ "/sellerDashboard/branches", "sellerDashboard-branches", "لوحة-تحكم-التاجر-الفروع", ],
   "/marketingtools/coupon": [ "/sellerDashboard/coupon", "sellerDashboard-coupon", "لوحة-تحكم-التاجر-قسيمة", ],
   "/delivery": [ "/sellerDashboard/delivery", "sellerDashboard-delivery", "لوحة-تحكم-التاجر-التوصيل", ],
@@ -124,127 +124,140 @@ export async function middleware(req: any) {
   console.log("normalizedPathname:", normalizedPathname);
 
   const matchedPath = Object.keys(routeRoles).find((route) => normalizedPathname === route);
+  try {
+    if (matchedPath) {
+      // 🔐 Call refresh token API
+      const res = await fetch("https://testapi.ordrat.com/api/Auth/RefreshAccessToken", {
+        method: "POST",
+        headers: {
+          "Accept-Language": lang,
+          "refreshToken": refreshToken!,
+        },
+      });
 
-  if (matchedPath) {
-    // 🔐 Call refresh token API
-    const res = await fetch("https://testapi.ordrat.com/api/Auth/RefreshAccessToken", {
-      method: "POST",
-      headers: {
-        "Accept-Language": lang,
-        "refreshToken": refreshToken!,
-      },
-    });
+      if (!res.ok) {
+        const res = NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
+        res.cookies.delete("refreshToken");
+        res.cookies.delete("roles");
+        return res;
+      }
 
-    if (!res.ok) {
-      const res = NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
-      res.cookies.delete("refreshToken");
-      res.cookies.delete("roles");
-      return res;
+      const data = await res.json();
+      const userRoles: string[] = data.roles || [];
+      // const userRoles: string[] = ["Marketing", "Admin", "Seller"];
+      console.log("data: ",data);
+      
+      const requiredRoles = routeRoles[matchedPath];
+      const hasRole = requiredRoles.some((role) => userRoles.includes(role));
+
+      if (!hasRole) {
+        return NextResponse.redirect(new URL(`/${lang}/unauthorized`, req.url));
+      }
+
+      // ✅ Update cookies
+      const response = NextResponse.next();
+
+      response.cookies.set("shopId", data.shopId, {
+        path: "/",
+        // httpOnly: true,
+      });
+      response.cookies.set("accessToken", data.accessToken, {
+        path: "/",
+        // httpOnly: true,
+      });
+      response.cookies.set("refreshToken", data.refreshToken, {
+        path: "/",
+        // httpOnly: true,
+      });
+      response.cookies.set("roles", JSON.stringify(data.roles), {
+        path: "/",
+        // httpOnly: true,
+      });
+      response.cookies.set("name", `${data.firstName} ${data.lastName}`, {
+        path: "/",
+        // httpOnly: true,
+      });
+      response.cookies.set("email", data.email, {
+        path: "/",
+        // httpOnly: true,
+      });
+
+      return response;
     }
-
-    const data = await res.json();
-    const userRoles: string[] = data.roles || [];
-    // const userRoles: string[] = ["Marketing", "Admin", "Seller"];
-    console.log("data: ",data);
-    
-    const requiredRoles = routeRoles[matchedPath];
-    const hasRole = requiredRoles.some((role) => userRoles.includes(role));
-
-    if (!hasRole) {
-      return NextResponse.redirect(new URL(`/${lang}/unauthorized`, req.url));
-    }
-
-    // ✅ Update cookies
-    const response = NextResponse.next();
-
-    response.cookies.set("shopId", data.shopId, {
-      path: "/",
-      // httpOnly: true,
-    });
-    response.cookies.set("accessToken", data.accessToken, {
-      path: "/",
-      // httpOnly: true,
-    });
-    response.cookies.set("refreshToken", data.refreshToken, {
-      path: "/",
-      // httpOnly: true,
-    });
-    response.cookies.set("roles", JSON.stringify(data.roles), {
-      path: "/",
-      // httpOnly: true,
-    });
-    response.cookies.set("name", `${data.firstName} ${data.lastName}`, {
-      path: "/",
-      // httpOnly: true,
-    });
-    response.cookies.set("email", data.email, {
-      path: "/",
-      // httpOnly: true,
-    });
-
-    return response;
+  } catch (error) {
+    console.error("Error during token refresh or role validation:", error);
+    // const redirectRes = NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
+    // redirectRes.cookies.delete("refreshToken");
+    // redirectRes.cookies.delete("roles");
+    // return redirectRes;
   }
-
   const matchedPathIncludes = Object.keys(routeRolesInCludes).find((route) => pathname.includes(route));
+  try {
+    if (matchedPathIncludes) {
+      // 🔐 Call refresh token API
+      const res = await fetch("https://testapi.ordrat.com/api/Auth/RefreshAccessToken", {
+        method: "POST",
+        headers: {
+          "Accept-Language": lang,
+          "refreshToken": refreshToken!,
+        },
+      });
 
-  if (matchedPathIncludes) {
-    // 🔐 Call refresh token API
-    const res = await fetch("https://testapi.ordrat.com/api/Auth/RefreshAccessToken", {
-      method: "POST",
-      headers: {
-        "Accept-Language": lang,
-        "refreshToken": refreshToken!,
-      },
-    });
+      if (!res.ok) {
+        const res = NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
+        res.cookies.delete("refreshToken");
+        res.cookies.delete("roles");
+        return res;
+      }
 
-    if (!res.ok) {
-      const res = NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
-      res.cookies.delete("refreshToken");
-      res.cookies.delete("roles");
-      return res;
+      const data = await res.json();
+      const userRoles: string[] = data.roles || [];
+      // const userRoles: string[] = ["Marketing", "Admin", "Seller"];
+      console.log("data: ",data);
+      
+      const requiredRoles = routeRolesInCludes[matchedPathIncludes];
+      const hasRole = requiredRoles.some((role) => userRoles.includes(role));
+
+      if (!hasRole) {
+        return NextResponse.redirect(new URL(`/${lang}/unauthorized`, req.url));
+      }
+
+      // ✅ Update cookies
+      const response = NextResponse.next();
+
+      response.cookies.set("shopId", data.shopId, {
+        path: "/",
+        // httpOnly: true,
+      });
+      response.cookies.set("accessToken", data.accessToken, {
+        path: "/",
+        // httpOnly: true,
+      });
+      response.cookies.set("refreshToken", data.refreshToken, {
+        path: "/",
+        // httpOnly: true,
+      });
+      response.cookies.set("roles", JSON.stringify(data.roles), {
+        path: "/",
+        // httpOnly: true,
+      });
+      response.cookies.set("name", `${data.firstName} ${data.lastName}`, {
+        path: "/",
+        // httpOnly: true,
+      });
+      response.cookies.set("email", data.email, {
+        path: "/",
+        // httpOnly: true,
+      });
+
+      return response;
     }
-
-    const data = await res.json();
-    const userRoles: string[] = data.roles || [];
-    // const userRoles: string[] = ["Marketing", "Admin", "Seller"];
-    console.log("data: ",data);
-    
-    const requiredRoles = routeRolesInCludes[matchedPathIncludes];
-    const hasRole = requiredRoles.some((role) => userRoles.includes(role));
-
-    if (!hasRole) {
-      return NextResponse.redirect(new URL(`/${lang}/unauthorized`, req.url));
-    }
-
-    // ✅ Update cookies
-    const response = NextResponse.next();
-
-    response.cookies.set("shopId", data.shopId, {
-      path: "/",
-      // httpOnly: true,
-    });
-    response.cookies.set("accessToken", data.accessToken, {
-      path: "/",
-      // httpOnly: true,
-    });
-    response.cookies.set("refreshToken", data.refreshToken, {
-      path: "/",
-      // httpOnly: true,
-    });
-    response.cookies.set("roles", JSON.stringify(data.roles), {
-      path: "/",
-      // httpOnly: true,
-    });
-    response.cookies.set("name", `${data.firstName} ${data.lastName}`, {
-      path: "/",
-      // httpOnly: true,
-    });
-    response.cookies.set("email", data.email, {
-      path: "/",
-      // httpOnly: true,
-    });
-
-    return response;
+  } catch (error) {
+    console.error("Error during token refresh or role validation:", error);
+    // const redirectRes = NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
+    // redirectRes.cookies.delete("refreshToken");
+    // redirectRes.cookies.delete("roles");
+    // return redirectRes;
   }
 
   // Redirect '/' → '/{lang}/storeSetting/basicData'

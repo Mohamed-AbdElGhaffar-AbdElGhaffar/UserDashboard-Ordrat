@@ -2,10 +2,10 @@ import { z } from 'zod';
 import { validateEmail } from './common-rules';
 import { messages } from '@/config/messages';
 
-// Define schema for different types
-const phoneNumberSchema = z.string({ required_error: messages.variantInputIsRequired }).min(1, messages.variantInputIsRequired);
-const emailSchema = z.string({ required_error: messages.variantInputIsRequired }).email("Invalid email address").min(1, "Email is required");
-const dateSchema = z.string({ required_error: messages.variantInputIsRequired }).min(1, "Date is required");
+// Define schema for different types 
+const phoneNumberSchema = z.string({ required_error: messages.variantPhoneNumberIsRequired }).min(1, messages.variantPhoneNumberWrong);
+const emailSchema = z.string({ required_error: messages.variantEmailIsRequired }).email(messages.variantEmailInvalid).min(1, messages.variantEmailIsRequired);
+const dateSchema = z.string({ required_error: messages.variantDateIsRequired }).min(1, messages.variantDateIsRequired);
 // const imageSchema = z.instanceof(File).refine(
 //   (file) => file.size <= 5 * 1024 * 1024,
 //   { message: 'File size should be less than 5MB' }

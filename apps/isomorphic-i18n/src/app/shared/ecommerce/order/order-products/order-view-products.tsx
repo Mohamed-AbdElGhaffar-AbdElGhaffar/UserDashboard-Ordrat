@@ -13,6 +13,11 @@ import { API_BASE_URL } from '@/config/base-url';
 import ActionsCellOrders from '@/app/components/orders/actionsCellOrders/ActionsCellOrders';
 import { useUserContext } from '@/app/components/context/UserContext';
 import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+import { PiMinus, PiPlus } from 'react-icons/pi';
+import ModalCancelOrderItem from '@/app/components/ui/modals/ModalCancelOrderItem';
+import { useModal } from '@/app/shared/modal-views/use-modal';
+import ModalIncreaseOrderItem from '@/app/components/ui/modals/ModalIncreaseOrderItem';
+
 
 function getStatusBadge(status: string, lang: string) {
   console.log("status: ",status);
@@ -121,6 +126,69 @@ function getStatusBadge(status: string, lang: string) {
 //   },
 // ];
 
+
+
+function QuantityControl({ itemId, quantity, orderId, cancelled, lang = 'en' }: { itemId: any; quantity:any; orderId: string; cancelled: boolean; lang?: string; }) {
+  const { openModal } = useModal();
+  const { setPOSTableOrderId, setTablesData, setOrderDetailsTable, setOrderDetailsStatus } = useUserContext();
+
+  return (
+    <div className="inline-flex items-center gap-2.5 text-xs ">
+      <button
+        className={`grid h-7 w-7 place-content-center rounded-full bg-gray-200 ${
+          cancelled ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-300'
+        }`}
+        disabled={cancelled}
+        onClick={() => { 
+          openModal({
+            view: <ModalCancelOrderItem
+              lang={lang} 
+              orderId={orderId}
+              itemId={itemId}
+              quantity={quantity - 1}
+              onSuccess={()=>{
+                setTablesData(true);
+                setOrderDetailsTable(true);
+                setOrderDetailsStatus(true);
+                setPOSTableOrderId('');
+              }}
+            />,
+            customSize: '480px',
+          });
+        }}
+      >
+        <PiMinus className="h-3 w-3 text-gray-600" />
+      </button>
+      <span className="font-medium text-gray-900">{quantity}</span>
+      <button
+        className={`grid h-7 w-7 place-content-center rounded-full bg-gray-200 ${
+          cancelled ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-300'
+        }`}
+        disabled={cancelled}
+        onClick={() => { 
+          openModal({
+            view: <ModalIncreaseOrderItem
+              lang={lang} 
+              orderId={orderId}
+              itemId={itemId}
+              quantity={quantity + 1}
+              onSuccess={()=>{
+                setTablesData(true);
+                setOrderDetailsTable(true);
+                setOrderDetailsStatus(true);
+                setPOSTableOrderId('');
+              }}
+            />,
+            customSize: '480px',
+          });
+        }}
+      >
+        <PiPlus className="h-3 w-3 text-gray-600" />
+      </button>
+    </div>
+  );
+}
+
 export default function OrderViewProducts({lang,currencyAbbreviation}:{lang:string;currencyAbbreviation:string}) {
   const { items } = useCart();
   const { id } = useParams();
@@ -151,6 +219,15 @@ export default function OrderViewProducts({lang,currencyAbbreviation}:{lang:stri
             <Title as="h6" className="!text-sm font-medium">
               {record.product.name}
             </Title>
+            <div className='mt-2'>
+              <QuantityControl 
+                itemId={record.itemId} 
+                cancelled={record.cancelled} 
+                orderId={orderId as string}
+                quantity={record.quantity}
+                lang={lang}
+              />
+            </div>
             {record.cancelled && (
               <>
                 {getStatusBadge(`${record.cancelled}`, lang)}

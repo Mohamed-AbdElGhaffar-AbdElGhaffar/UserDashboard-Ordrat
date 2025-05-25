@@ -468,5 +468,10 @@
   "viewersHint": "ضبط عدد المشاهدين المرئيين بشكل معقول يخلق شعوراً بالثقة في منتجاتك.",
   "salesTimeHint": "اختر بعناية ساعات عرض المبيعات لتعكس النشاط الحقيقي لمتجرك.",
   "form-product-variant-radio-required": "يجب ان تختار",
-  "form-product-variant-input-required": "يجب ان تدخل البيانات"
+  "form-product-variant-input-required": "يجب ان تدخل البيانات",
+  "form-product-variant-phoneNumber-required": "يجب ان تدخل رقم الهاتف",
+  "form-product-variant-phoneNumber-wrong": "رقم الهاتف غير صالح",
+  "form-product-variant-email-required": "البريد الإلكتروني مطلوب",
+  "form-product-variant-email-invalid": "البريد الإلكتروني غير صالح",
+  "form-product-variant-date-required": "التاريخ مطلوب"
 }
