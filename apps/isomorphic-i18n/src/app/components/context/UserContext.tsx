@@ -11,6 +11,8 @@ type UserContextType = {
   setFileData: React.Dispatch<React.SetStateAction<boolean>>;
   branchesData: boolean;
   setBranchesData: React.Dispatch<React.SetStateAction<boolean>>;
+  printersData: boolean;
+  setPrintersData: React.Dispatch<React.SetStateAction<boolean>>;
   tablesData: boolean;
   setTablesData: React.Dispatch<React.SetStateAction<boolean>>;
   groupsPermissions: boolean;
@@ -52,6 +54,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children  }) =
   const [shop, setShop] = useState<ShopInfo>();
   const [fileData, setFileData] = useState<boolean>(false);
   const [branchesData, setBranchesData] = useState<boolean>(false);
+  const [printersData, setPrintersData] = useState<boolean>(false);
   const [groupsPermissions, setGroupsPermissions] = useState<boolean>(false);
   const [couponData, setCouponData] = useState<boolean>(false);
   const [bannersData, setBannersData] = useState<boolean>(false);
@@ -75,6 +78,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children  }) =
       shop,setShop , 
       fileData, setFileData,
       branchesData, setBranchesData,
+      printersData, setPrintersData,
       groupsPermissions, setGroupsPermissions,
       bannersData, setBannersData,
       whatsAppData, setWhatsAppData,

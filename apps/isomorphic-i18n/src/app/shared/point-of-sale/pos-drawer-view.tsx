@@ -155,6 +155,7 @@ export default function POSDrawerView({
 
   function handleOrder() {
     setLoading(true);
+    if(onOrderSuccess){onOrderSuccess();}
     if (shipping == 'takeaway') {
       setTimeout(() => {
         setLoading(false); 
@@ -194,6 +195,7 @@ export default function POSDrawerView({
   }
 
   function handleTables() {
+    if(onOrderSuccess){onOrderSuccess();}
     openModal({
       view: (
         <POSTablesForm

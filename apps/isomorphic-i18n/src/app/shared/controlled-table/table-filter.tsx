@@ -96,7 +96,7 @@ export default function TableFilter({
   children,
   t,
 }: TableFilterProps) {
-  const isMediumScreen = useMedia("(max-width: 1860px)", false);
+  const isMediumScreen = useMedia("(max-width: 1024px)", false);
   const [showFilters, setShowFilters] = useState(true);
   const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -116,13 +116,13 @@ export default function TableFilter({
           />
         ) : null}
 
-        {showSearchOnTheRight && enableDrawerFilter ? (
+        {showSearchOnTheRight ? (
           <>{menu ? menu : null}</>
         ) : null}
 
         {children && (
           <>
-            {isMediumScreen || enableDrawerFilter ? (
+            {isMediumScreen ? (
               <FilterDrawerView
                 isOpen={openDrawer}
                 setOpenDrawer={setOpenDrawer}
@@ -155,7 +155,7 @@ export default function TableFilter({
 
         {children ? (
           <Button
-            {...(isMediumScreen || enableDrawerFilter
+            {...(isMediumScreen
               ? {
                   onClick: () => {
                     setOpenDrawer(() => !openDrawer);
@@ -165,13 +165,13 @@ export default function TableFilter({
             variant={"outline"}
             className={cn(
               "me-2.5 h-9 pe-3 ps-2.5",
-              !(isMediumScreen || enableDrawerFilter) &&
+              !(isMediumScreen) &&
                 showFilters &&
                 "border-dashed border-gray-700"
             )}
           >
             <PiFunnel className="me-1.5 h-[18px] w-[18px]" strokeWidth={1.7} />
-            {!(isMediumScreen || enableDrawerFilter) && showFilters
+            {!(isMediumScreen) && showFilters
               ? t?.("text-hide-filters")
               : t?.("text-filters")}
           </Button>
