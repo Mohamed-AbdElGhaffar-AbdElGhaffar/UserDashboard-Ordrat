@@ -610,6 +610,8 @@ function POSModal({
                                   ),
                                   value: choice.id,
                                 }));
+                                console.log("variation: ",variation);
+                                
                                 return (
                                   <div key={variation.id} className="flex px-4">
                                     <div className="w-full flex flex-col gap-1">
@@ -618,7 +620,7 @@ function POSModal({
                                         <strong>{t('choiceof')} {variation.name}</strong>
                                         {/* PC Product Variation isRequired */}
                                         {variation.isRequired && (
-                                          <div className="text-white bg-mainColor px-2 py-1 rounded-full text-sm">
+                                          <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
                                             {t('req')}
                                           </div>
                                         )}
@@ -637,11 +639,11 @@ function POSModal({
                                 return <>
                                   <div key={variation.id} className="flex z-10 px-4 pt-0">
                                     <div className="w-full flex flex-col gap-1">
-                                      <div className="flex items-end justify-between">
+                                      <div className="flex items-end justify-between mb-2">
                                         {/* PC Product Variation Name */}
                                         <strong>{t('choiceof')} {variation.name}</strong>
                                         {variation.isRequired && (
-                                          <div className="text-white bg-mainColor px-2 py-1 rounded-full text-sm">
+                                          <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
                                             {t('req')}
                                           </div>
                                         )}
@@ -652,7 +654,7 @@ function POSModal({
                                         control={methods.control}
                                         render={({ field, fieldState }) => (
                                           <RoleSelect
-                                            label={variation.name}
+                                            // label={variation.name}
                                             options={variation.choices as { id: string; name: string }[]}
 
                                             field={{
@@ -673,12 +675,11 @@ function POSModal({
                                 return (
                                   <div key={variation.id} className="flex px-4 pt-0">
                                     <div className="w-full flex flex-col gap-1">
-                                      <div className="flex items-end justify-between">
-                                        {/* <strong>Your choice of: {variation.name}</strong> */}
+                                      <div className="flex items-end justify-between mb-2">
+                                        <strong>{variation.name}</strong>
                                         {variation.isRequired && (
-                                          <div className="text-white bg-mainColor px-2 py-1 rounded-full text-sm">
+                                          <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
                                             {t('req')}
-
                                           </div>
                                         )}
                                       </div>
@@ -686,7 +687,7 @@ function POSModal({
                                               key={variation.id}
                                               label={variation.name}
                                               placeholder={variation.name}
-                                              inputClassName="text-sm [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
+                                              inputClassName="text-sm [&.is-hover]:border-primary [&.is-focus]:border-primary [&.is-focus]:ring-primary"
                                               className="w-full"
                                               {...methods.register(variation.id)}
                                               error={String(methods.formState.errors[variation.id]?.message || '')}
@@ -696,11 +697,11 @@ function POSModal({
                                         name={variation.id}
                                         render={({ field }) => (
                                           <Input
-                                            label={variation.name}
+                                            // label={variation.name}
                                             {...register(variation.id)}
                                             {...field}
                                             placeholder={variation.name}
-                                            inputClassName="text-[16px] [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
+                                            inputClassName="text-[16px] [&.is-hover]:border-primary [&.is-focus]:border-primary [&.is-focus]:ring-primary"
                                             className="input-placeholder text-[16px] w-full"
                                             error={errorMassages.t(String(methods.formState.errors[variation.id]?.message || ''))}
                                           />
@@ -714,10 +715,10 @@ function POSModal({
                                 return (
                                   <div key={variation.id} className="flex px-4 pt-0">
                                     <div className="w-full flex flex-col gap-1">
-                                      <div className="flex items-end justify-between">
-                                        {/* <strong>Your choice of: {variation.name}</strong> */}
+                                      <div className="flex items-end justify-between mb-2">
+                                        <strong>{t('phoneNumber')}</strong>
                                         {variation.isRequired && (
-                                          <div className="text-white bg-mainColor px-2 py-1 rounded-full text-sm">
+                                          <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
                                             {t('req')}
 
                                           </div>
@@ -729,11 +730,11 @@ function POSModal({
                                         control={methods.control}
                                         render={({ field: { value, onChange } }) => (
                                           <PhoneNumber
-                                            label={t('phoneNumber')}
+                                            // label={t('phoneNumber')}
                                             country="us"
                                             value={value}
                                             labelClassName='font-medium'
-                                            inputClassName="text-[16px] hover:!border-mainColor focus:!border-mainColor focus:!ring-mainColor text-sm [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
+                                            inputClassName="text-[16px] hover:!border-primary focus:!border-primary focus:!ring-primary text-sm [&.is-hover]:border-primary [&.is-focus]:border-primary [&.is-focus]:ring-primary"
                                             className="input-placeholder text-[16px] w-full"
                                             {...methods.register(variation.id)}
                                             onChange={onChange}
@@ -750,10 +751,10 @@ function POSModal({
                                 return (
                                   <div key={variation.id} className="flex px-4 pt-0">
                                     <div className="w-full flex flex-col gap-1">
-                                      <div className="flex items-end justify-between">
-                                        {/* <strong>Your choice of: {variation.name}</strong> */}
+                                      <div className="flex items-end justify-between mb-2">
+                                        <strong>{variation.name}</strong>
                                         {variation.isRequired && (
-                                          <div className="text-white bg-mainColor px-2 py-1 rounded-full text-sm">
+                                          <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
                                             {t('req')}
                                           </div>
                                         )}
@@ -762,7 +763,7 @@ function POSModal({
                                               key={variation.id}
                                               label={variation.name}
                                               placeholder={variation.name}
-                                              inputClassName="text-sm [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
+                                              inputClassName="text-sm [&.is-hover]:border-primary [&.is-focus]:border-primary [&.is-focus]:ring-primary"
                                               className="w-full"
                                               {...methods.register(variation.id)}
                                               error={String(methods.formState.errors[variation.id]?.message || '')}
@@ -772,11 +773,11 @@ function POSModal({
                                         name={variation.id}
                                         render={({ field }) => (
                                           <Input
-                                            label={variation.name}
+                                            // label={variation.name}
                                             {...register(variation.id)}
                                             {...field}
                                             placeholder={variation.name}
-                                            inputClassName="text-[16px] [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
+                                            inputClassName="text-[16px] [&.is-hover]:border-primary [&.is-focus]:border-primary [&.is-focus]:ring-primary"
                                             className="input-placeholder text-[16px] w-full"
                                             error={errorMassages.t(String(methods.formState.errors[variation.id]?.message || ''))}
                                           />
@@ -795,7 +796,7 @@ function POSModal({
 
                     <div className="grid grid-cols-3 justify-between items-center gap-5 p-3 bg-white w-full">
                       <div className={cn('bg-white rounded-bl-lg col-span-1 secShadow rtl:rounded-br-lg h-full', { 'rtl:rounded-bl-none': hasMoreDetails })}>
-                        <QuantityHandler quantity={quantity} plusClassName={`${!(prodId?.hasStock || false) || (prodId.stockNumber - totalSoldQuantity > 0 && prodId.stockNumber - totalSoldQuantity - quantity >= 0) ? 'text-mainColor' : 'cursor-no-drop text-Color30 pointer-events-none'}`} setQuantity={setQuantity} className='w-full h-full rounded-lg' />
+                        <QuantityHandler quantity={quantity} plusClassName={`${!(prodId?.hasStock || false) || (prodId.stockNumber - totalSoldQuantity > 0 && prodId.stockNumber - totalSoldQuantity - quantity >= 0) ? 'text-primary' : 'cursor-no-drop text-Color30 pointer-events-none'}`} setQuantity={setQuantity} className='w-full h-full rounded-lg' />
                       </div>
                       <div className={'col-span-2'}>
                         <ItemPrice
@@ -943,7 +944,7 @@ function POSModal({
                                     <div className="flex items-end justify-between">
                                       <strong>{t('choiceof')} {variation.name}</strong>
                                       {variation.isRequired && (
-                                        <div className="text-white bg-mainColor px-2 py-1 rounded-full text-sm">
+                                        <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
                                           {t('req')}
                                         </div>
                                       )}
@@ -960,10 +961,11 @@ function POSModal({
                               return <>
                                 <div key={variation.id} className="flex pt-0">
                                   <div className="w-full flex flex-col gap-1">
-                                    <div className="flex items-end justify-between">
+                                    <div className="flex items-end justify-between mb-2">
                                       {/* <strong>Your choice of: {variation.name}</strong> */}
+                                      <strong>{t('choiceof')} {variation.name}</strong>
                                       {variation.isRequired && (
-                                        <div className="text-white bg-mainColor px-2 py-1 rounded-full text-sm">
+                                        <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
                                           {t('req')}
                                         </div>
                                       )}
@@ -974,7 +976,7 @@ function POSModal({
                                       control={methods.control}
                                       render={({ field, fieldState }) => (
                                         <RoleSelect
-                                          label={variation.name}
+                                          // label={variation.name}
 
                                           options={variation.choices as { id: string; name: string }[]}
                                           field={{
@@ -994,10 +996,10 @@ function POSModal({
                               return (
                                 <div key={variation.id} className="flex pt-0">
                                   <div className="w-full flex flex-col gap-1">
-                                    <div className="flex items-end justify-between">
-                                      {/* <strong>Your choice of: {variation.name}</strong> */}
+                                    <div className="flex items-end justify-between mb-2">
+                                      <strong>{variation.name}</strong>
                                       {variation.isRequired && (
-                                        <div className="text-white bg-mainColor px-2 py-1 rounded-full text-sm">
+                                        <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
                                           {t('req')}
                                         </div>
                                       )}
@@ -1006,7 +1008,7 @@ function POSModal({
                                       key={variation.id}
                                       label={variation.name}
                                       placeholder={variation.name}
-                                      inputClassName="text-sm [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
+                                      inputClassName="text-sm [&.is-hover]:border-primary [&.is-focus]:border-primary [&.is-focus]:ring-primary"
                                       className="w-full"
                                       {...methods.register(variation.id)}
                                       error={String(methods.formState.errors[variation.id]?.message || '')}
@@ -1016,11 +1018,11 @@ function POSModal({
                                       name={variation.id}
                                       render={({ field }) => (
                                         <Input
-                                          label={variation.name}
+                                          // label={variation.name}
                                           {...register(variation.id)}
                                           {...field}
                                           placeholder={variation.name}
-                                          inputClassName="text-[16px] [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
+                                          inputClassName="text-[16px] [&.is-hover]:border-primary [&.is-focus]:border-primary [&.is-focus]:ring-primary"
                                           className="input-placeholder text-[16px] w-full"
                                           error={errorMassages.t(String(methods.formState.errors[variation.id]?.message || ''))}
                                         />
@@ -1034,10 +1036,10 @@ function POSModal({
                               return (
                                 <div key={variation.id} className="flex pt-0">
                                   <div className="w-full flex flex-col gap-1">
-                                    <div className="flex items-end justify-between">
-                                      {/* <strong>Your choice of: {variation.name}</strong> */}
+                                    <div className="flex items-end justify-between mb-2">
+                                      <strong>{t('phoneNumber')}</strong>
                                       {variation.isRequired && (
-                                        <div className="text-white bg-mainColor px-2 py-1 rounded-full text-sm">
+                                        <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
                                           {t('req')}
                                         </div>
                                       )}
@@ -1048,10 +1050,10 @@ function POSModal({
                                       control={methods.control}
                                       render={({ field: { value, onChange } }) => (
                                         <PhoneNumber
-                                          label={t('phoneNumber')}
+                                          // label={t('phoneNumber')}
                                           country="us"
                                           value={value}
-                                          inputClassName="text-sm hover:!border-mainColor focus:!border-mainColor focus:!ring-mainColor text-sm [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
+                                          inputClassName="text-sm hover:!border-primary focus:!border-primary focus:!ring-primary text-sm [&.is-hover]:border-primary [&.is-focus]:border-primary [&.is-focus]:ring-primary"
                                           className="w-full"
                                           {...methods.register(variation.id)}
                                           onChange={onChange}
@@ -1068,10 +1070,10 @@ function POSModal({
                               return (
                                 <div key={variation.id} className="flex pt-0">
                                   <div className="w-full flex flex-col gap-1">
-                                    <div className="flex items-end justify-between">
-                                      {/* <strong>Your choice of: {variation.name}</strong> */}
+                                    <div className="flex items-end justify-between mb-2">
+                                      <strong>{variation.name}</strong>
                                       {variation.isRequired && (
-                                        <div className="text-white bg-mainColor px-2 py-1 rounded-full text-sm">
+                                        <div className="text-white bg-primary px-2 py-1 rounded-full text-sm">
                                           {t('req')}
                                         </div>
                                       )}
@@ -1080,7 +1082,7 @@ function POSModal({
                                       key={variation.id}
                                       label={variation.name}
                                       placeholder={variation.name}
-                                      inputClassName="text-sm [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
+                                      inputClassName="text-sm [&.is-hover]:border-primary [&.is-focus]:border-primary [&.is-focus]:ring-primary"
                                       className="w-full"
                                       {...methods.register(variation.id)}
                                       error={String(methods.formState.errors[variation.id]?.message || '')}
@@ -1090,11 +1092,11 @@ function POSModal({
                                       name={variation.id}
                                       render={({ field }) => (
                                         <Input
-                                          label={variation.name}
+                                          // label={variation.name}
                                           {...register(variation.id)}
                                           {...field}
                                           placeholder={variation.name}
-                                          inputClassName="text-[16px] [&.is-hover]:border-mainColor [&.is-focus]:border-mainColor [&.is-focus]:ring-mainColor"
+                                          inputClassName="text-[16px] [&.is-hover]:border-primary [&.is-focus]:border-primary [&.is-focus]:ring-primary"
                                           className="input-placeholder w-full text-[16px]"
                                           error={errorMassages.t(String(methods.formState.errors[variation.id]?.message || ''))}
                                         />
@@ -1122,7 +1124,7 @@ function POSModal({
                 <div className="fixed bottom-0 left-0 right-0 p-5 secShadow bg-white rounded-b-lg z-[10001]">
                   <div className="grid grid-cols-3 justify-between items-center gap-5 w-full">
                     <div className={cn('bg-white rounded-bl-lg col-span-1 secShadow rtl:rounded-br-lg h-full', { 'rtl:rounded-bl-none': hasMoreDetails })}>
-                      <QuantityHandler plusClassName={`${!(prodId?.hasStock || false) || (prodId.stockNumber - totalSoldQuantity > 0 && prodId.stockNumber - totalSoldQuantity - quantity >= 0) ? 'text-mainColor' : 'cursor-no-drop text-Color30 pointer-events-none'}`} quantity={quantity} setQuantity={setQuantity} className='w-full h-full rounded-lg' />
+                      <QuantityHandler plusClassName={`${!(prodId?.hasStock || false) || (prodId.stockNumber - totalSoldQuantity > 0 && prodId.stockNumber - totalSoldQuantity - quantity >= 0) ? 'text-primary' : 'cursor-no-drop text-Color30 pointer-events-none'}`} quantity={quantity} setQuantity={setQuantity} className='w-full h-full rounded-lg' />
                     </div>
                     <div className={'col-span-2'}>
                       <ItemPrice

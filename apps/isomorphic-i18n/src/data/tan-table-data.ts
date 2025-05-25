@@ -9,6 +9,20 @@ export type Branches = {
   deliveryTime: string,
   userName: string;
 };
+export type categoryPrinterDtos = {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+};
+export type Printer = {
+  id: any;
+  name: any;
+  totalCategories: number;
+  ip: any;
+  branch: any;
+  categoryPrinterDtos: categoryPrinterDtos[];
+  userName: any;
+};
 export type whatsApp = {
   id: string;
   name: string;

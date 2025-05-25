@@ -175,17 +175,17 @@ export const getColumns = ({
         </Text>
       ),
     },
-    {
-      title: <HeaderCell title={t.address} />,
-      dataIndex: 'address',
-      key: 'address',
-      width: 300,
-      render: (value: any) => (
-        <Text className="text-gray-700">
-          {value?.street}, {t.apt} {value?.apartmentNumber}, {t.floor} {value?.floor}
-        </Text>
-      ),
-    },
+    // {
+    //   title: <HeaderCell title={t.address} />,
+    //   dataIndex: 'address',
+    //   key: 'address',
+    //   width: 300,
+    //   render: (value: any) => (
+    //     <Text className="text-gray-700">
+    //       {value?.street}, {t.apt} {value?.apartmentNumber}, {t.floor} {value?.floor}
+    //     </Text>
+    //   ),
+    // },
     {
       title: (
         <HeaderCell

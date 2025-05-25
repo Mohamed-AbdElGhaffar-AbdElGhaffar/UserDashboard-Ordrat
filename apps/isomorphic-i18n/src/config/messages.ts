@@ -104,4 +104,9 @@ export const messages = {
 
   variantRadioIsRequired: "form-product-variant-radio-required",
   variantInputIsRequired: "form-product-variant-input-required",
+  variantPhoneNumberIsRequired: "form-product-variant-phoneNumber-required",
+  variantPhoneNumberWrong: "form-product-variant-phoneNumber-wrong",
+  variantEmailIsRequired: "form-product-variant-email-required",
+  variantEmailInvalid: "form-product-variant-email-invalid",
+  variantDateIsRequired: "form-product-variant-date-required",
 };

@@ -193,7 +193,13 @@ const PageLinks = ({ lang }: { lang: string }) => {
       href: `/storeSetting/qr-code`,
       badge: ''
     },
-
+    {
+      name: t('side-printer'),
+    },
+    {
+      name: t('side-printer'),
+      href: `/printer`,
+    },
     {
       name: t('side-term'),
     },
