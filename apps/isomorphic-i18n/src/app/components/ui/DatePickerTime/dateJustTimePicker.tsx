@@ -9,6 +9,7 @@ import {
 } from "./popover";
 import { Button } from "./button";
 import { TimePicker12Demo } from "./time-picker-12hour-demo";
+import { useState } from "react";
 
 type DateTimePickerProps = {
   selectedDate: Date | null;
@@ -18,6 +19,7 @@ type DateTimePickerProps = {
 };
 
 export function DateTimePicker({ selectedDate, onChange, lang, lable }: DateTimePickerProps) {
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleDateChange = (date: Date | Date[] | null) => {
     if (date instanceof Date) {
@@ -33,38 +35,49 @@ export function DateTimePicker({ selectedDate, onChange, lang, lable }: DateTime
 
   return (
     <div className="w-full">
-        <label htmlFor="date" className="block text-sm font-medium pb-1">
-          {lable}
-        </label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={`w-full justify-start text-left font-normal border rounded-md px-4 py-2 ${
-                !selectedDate ? "text-muted-foreground" : ""
-              }`}
-            >
-              <ClockIcon className="me-2 h-5 w-5" />
-              {selectedDate ? (
-                format(selectedDate, "hh:mm:ss a", { locale: getLocale() })
-              ) : (
-                <span>{lang === 'ar' ? `اختر ${lable?lable:'موعدًا'}` : `Pick a ${lable?lable:'date'}`}</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 z-[1000000] bg-white rounded-lg shadow-md border">
-            <div className="p-4">
-              <div className="px-3 flex flex-col justify-center gap-4">
-                <TimePicker12Demo
-                  setDate={(date) => handleDateChange(date ?? null)}
-                  date={selectedDate ?? undefined}
-                  lang={lang}
-                  lable={lang === 'ar' ? `اختر ${lable?lable:'موعدًا'}:` : `Pick a ${lable?lable:'date'}:`}
-                />
-              </div>
+      <label htmlFor="date" className="block text-sm font-medium pb-1">
+        {lable}
+      </label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={`w-full justify-start text-left font-normal border rounded-md px-4 py-2 ${
+              !selectedDate ? "text-muted-foreground" : ""
+            }`}
+          >
+            <ClockIcon className="me-2 h-5 w-5" />
+            {selectedDate ? (
+              format(selectedDate, "hh:mm:ss a", { locale: getLocale() })
+            ) : (
+              <span>{lang === 'ar' ? `اختر ${lable ? lable : 'موعدًا'}` : `Pick a ${lable ? lable : 'date'}`}</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 z-[1000000] bg-white rounded-lg  border">
+          <div className="p-4">
+            <div className=" flex justify-center gap-4">
+            <TimePicker12Demo
+              setDate={(date) => handleDateChange(date ?? null)}
+              date={selectedDate ?? undefined}
+              lang={lang}
+              onEnter={() => {
+                if (!selectedDate) {
+                  const defaultDate = new Date();
+                  defaultDate.setHours(0); 
+                  defaultDate.setMinutes(0);
+                  defaultDate.setSeconds(0);
+                  defaultDate.setMilliseconds(0);
+                  onChange(defaultDate); 
+                }
+                setIsOpen(false);
+              }}
+            />
+
             </div>
-          </PopoverContent>
-        </Popover>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }

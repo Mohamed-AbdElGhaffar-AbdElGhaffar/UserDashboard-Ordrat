@@ -7,50 +7,99 @@ import { Checkbox, Text } from 'rizzui';
 
 const columnHelper = createColumnHelper<Branches>();
 
+// const formatTime = (time: string, lang: string) => {
+//   if (!time || typeof time !== 'string' || !time.includes(':')) {
+//     return lang === 'ar' ? 'وقت غير صحيح' : 'Invalid Time';
+//   }
+//   try {
+//     const [hours, minutes, seconds] = time.split(':').map(Number);
+//     if (isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
+//       return lang === 'ar' ? 'وقت غير صحيح' : 'Invalid Time';
+//     }
+//     const period = hours >= 12 ? (lang === 'ar' ? 'م' : 'PM') : (lang === 'ar' ? 'ص' : 'AM');
+//     const formattedHours = hours % 12 || 12;
+//     const localizeNumber = (num: number) => {
+//       const padded = num.toString().padStart(2, '0');
+//       return lang === 'ar'
+//         ? padded.replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
+//         : padded;
+//     };
+//     return `${localizeNumber(formattedHours)}:${localizeNumber(minutes)}:${localizeNumber(seconds)} ${period}`;
+//   } catch (error) {
+//     return lang === 'ar' ? 'وقت غير صحيح' : 'Invalid Time';
+//   }
+// };
+
+// const formatTimeLocalized = (time: string, lang: string): string => {
+//   if (!time || typeof time !== 'string' || !time.includes(':')) {
+//     return lang === 'ar' ? 'مدة غير صحيحة' : 'Invalid Duration';
+//   }
+
+//   try {
+//     const [days, hours, minutes, seconds] = time.split(':').map(Number);
+//     if ([days, hours, minutes, seconds].some((n) => isNaN(n))) {
+//       return lang === 'ar' ? 'مدة غير صحيحة' : 'Invalid Duration';
+//     }
+
+//     const localizeNumber = (num: number) => {
+//       const padded = num.toString().padStart(2, '0');
+//       return lang === 'ar'
+//         ? padded.replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
+//         : padded;
+//     };
+
+//     const dayText = days > 0 ? `${lang === 'ar' ? localizeNumber(days) + 'ي' : `${days}d`} ` : '';
+//     const timeText = `${localizeNumber(hours)}:${localizeNumber(minutes)}:${localizeNumber(seconds)}`;
+
+//     return `${dayText}${timeText}`;
+//   } catch {
+//     return lang === 'ar' ? 'مدة غير صحيحة' : 'Invalid Duration';
+//   }
+// };
+
 const formatTime = (time: string, lang: string) => {
   if (!time || typeof time !== 'string' || !time.includes(':')) {
     return lang === 'ar' ? 'وقت غير صحيح' : 'Invalid Time';
   }
+
   try {
     const [hours, minutes, seconds] = time.split(':').map(Number);
     if (isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
       return lang === 'ar' ? 'وقت غير صحيح' : 'Invalid Time';
     }
+
     const period = hours >= 12 ? (lang === 'ar' ? 'م' : 'PM') : (lang === 'ar' ? 'ص' : 'AM');
     const formattedHours = hours % 12 || 12;
-    const localizeNumber = (num: number) => {
-      const padded = num.toString().padStart(2, '0');
-      return lang === 'ar'
-        ? padded.replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
-        : padded;
-    };
-    return `${localizeNumber(formattedHours)}:${localizeNumber(minutes)}:${localizeNumber(seconds)} ${period}`;
-  } catch (error) {
+
+    const pad = (num: number) => num.toString().padStart(2, '0');
+
+    return `${pad(formattedHours)}:${pad(minutes)}:${pad(seconds)} ${period}`;
+  } catch {
     return lang === 'ar' ? 'وقت غير صحيح' : 'Invalid Time';
   }
 };
 
-const formatTimeLocalized = (time: string, lang: string) => {
+const formatTimeLocalized = (time: string, lang: string): string => {
   if (!time || typeof time !== 'string' || !time.includes(':')) {
-    return lang === 'ar' ? 'وقت غير صحيح' : 'Invalid Time';
+    return lang === 'ar' ? 'مدة غير صحيحة' : 'Invalid Duration';
   }
+
   try {
-    const [hours, minutes, seconds] = time.split(':').map(Number);
-    if (isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
-      return lang === 'ar' ? 'وقت غير صحيح' : 'Invalid Time';
+    const [days, hours, minutes, seconds] = time.split(':').map(Number);
+    if ([days, hours, minutes, seconds].some((n) => isNaN(n))) {
+      return lang === 'ar' ? 'مدة غير صحيحة' : 'Invalid Duration';
     }
-    const localizeNumber = (num: number) => {
-      const padded = num.toString().padStart(2, '0');
-      return lang === 'ar'
-        ? padded.replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
-        : padded;
-    };
-    return `${localizeNumber(hours)}:${localizeNumber(minutes)}:${localizeNumber(seconds)}`;
-  } catch (error) {
-    return lang === 'ar' ? 'وقت غير صحيح' : 'Invalid Time';
+
+    const pad = (num: number) => num.toString().padStart(2, '0');
+
+    const dayText = days > 0 ? `${days}d ` : '';
+    const timeText = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+
+    return `${dayText}${timeText}`;
+  } catch {
+    return lang === 'ar' ? 'مدة غير صحيحة' : 'Invalid Duration';
   }
 };
-
 
 export const defaultColumns = (lang: string, languages: number) => {
   const updateStatusActivate = RoleClientExist([

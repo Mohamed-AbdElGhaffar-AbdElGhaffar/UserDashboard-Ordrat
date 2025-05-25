@@ -58,7 +58,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
         localStorage.setItem('sellerId', response.data.id);
         // Save token to cookies so middleware can access it
         Cookies.set('mainBranch', response.data.branches[0].id, {
-          expires: 1, // 1 day
+          // expires: 1, // 1 day
           secure: true,
           sameSite: 'Lax',
           path: '/',
@@ -68,7 +68,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
         
         // Save token to cookies so middleware can access it
         Cookies.set('accessToken', accessToken, {
-          expires: 1, // 1 day
+          // expires: 1, // 1 day
           secure: true,
           sameSite: 'Lax',
           path: '/',
@@ -76,7 +76,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
 
         // ShopId.
         Cookies.set('shopId', shopId, {
-          expires: 1,
+          // expires: 1,
           secure: true,
           sameSite: 'Lax',
           path: '/',
@@ -84,7 +84,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
     
         // (optional) Save refresh token
         Cookies.set('refreshToken', refreshToken, {
-          expires: 1,
+          // expires: 1,
           secure: true,
           sameSite: 'Lax',
           path: '/',
@@ -92,7 +92,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
     
         // (optional) Save roles
         Cookies.set('roles', JSON.stringify(roles), {
-          expires: 1,
+          // expires: 1,
           secure: true,
           sameSite: 'Lax',
           path: '/',
@@ -100,7 +100,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
     
         // (optional) Save roles
         Cookies.set('name', `${response.data.firstName} ${response.data.lastName}`, {
-          expires: 1,
+          // expires: 1,
           secure: true,
           sameSite: 'Lax',
           path: '/',
@@ -108,7 +108,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
     
         // (optional) Save roles
         Cookies.set('email', response.data.email, {
-          expires: 1,
+          // expires: 1,
           secure: true,
           sameSite: 'Lax',
           path: '/',
@@ -116,7 +116,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
   
         // (optional) Save branches
         Cookies.set('branches', JSON.stringify(branches), {
-          expires: 1,
+          // expires: 1,
           secure: true,
           sameSite: 'Lax',
           path: '/',
@@ -124,7 +124,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
         
         // (optional) Save sellerid
         Cookies.set('sellerId', response.data.id, {
-          expires: 1,
+          // expires: 1,
           secure: true,
           sameSite: 'Lax',
           path: '/',
@@ -132,7 +132,7 @@ export default function SignInForm({lang}:{lang?: string;}) {
         
         // (optional) Save sellerid
         Cookies.set('userType', response.data.userType, {
-          expires: 1,
+          // expires: 1,
           secure: true,
           sameSite: 'Lax',
           path: '/',

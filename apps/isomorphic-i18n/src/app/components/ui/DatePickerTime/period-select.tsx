@@ -16,6 +16,7 @@ export interface PeriodSelectorProps {
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
   onRightFocus?: () => void;
+  className:any;
   onLeftFocus?: () => void;
   lang: string;
 }
@@ -55,10 +56,11 @@ export const TimePeriodSelect = React.forwardRef<
       <Select
         value={period}
         onValueChange={(value: Period) => handleValueChange(value)}
+        
       >
         <SelectTrigger
           ref={ref}
-          className="w-[65px] focus:bg-accent focus:text-accent-foreground"
+          className="w-[65px] focus:bg-accent focus:border-red-500 focus:text-accent-foreground"
           onKeyDown={handleKeyDown}
         >
           <SelectValue />

@@ -20,6 +20,21 @@ import { DateDurationPicker } from '@/app/components/ui/DatePickerTime/dateDurat
 import UpdateLocationPicker from '@/app/components/ui/map/UpdateLocationPicker';
 import { PhoneNumber } from '@ui/phone-input';
 
+const parseDurationString = (durationStr: string): {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+} => {
+  const [days, hours, minutes, seconds] = durationStr.split(':').map(Number);
+  return {
+    days: days || 0,
+    hours: hours || 0,
+    minutes: minutes || 0,
+    seconds: seconds || 0,
+  };
+};
+
 type TableFormProps = {
   title?: string;
   onSuccess?: () => void;
@@ -82,7 +97,12 @@ export default function UpdateBranchForm({
     phoneNumber: Yup.string().required(`${text.phoneNumber} ${requiredMessage}`).matches(/^20(1[0-2,5][0-9]{8})$/, text.wrongPhone),
     openAt: Yup.date().required(text.openAt + ' ' + requiredMessage),
     closedAt: Yup.date().required(text.closedAt + ' ' + requiredMessage),
-    deliveryTime: Yup.date().required(text.deliveryTime + ' ' + requiredMessage),
+    deliveryTime: Yup.object().shape({
+      days: Yup.number().min(0).required(),
+      hours: Yup.number().min(0).max(23).required(),
+      minutes: Yup.number().min(0).max(59).required(),
+      seconds: Yup.number().min(0).max(59).required(),
+    }).required(text.deliveryTime + ' ' + requiredMessage),
     location: Yup.string().required(text.location + ' ' + requiredMessage),
     // isFixedDelivery: Yup.boolean(),
 
@@ -120,7 +140,7 @@ export default function UpdateBranchForm({
       phoneNumber: '',
       openAt: null as Date | null,
       closedAt: null as Date | null,
-      deliveryTime: null as Date | null,
+      deliveryTime: { days: 0, hours: 0, minutes: 0, seconds: 0 },
       location: '',
       lat: null,
       lng: null,
@@ -140,7 +160,7 @@ export default function UpdateBranchForm({
       const payload = {
         openAt: formatTime(values.openAt),
         closedAt: formatTime(values.closedAt),
-        deliveryTime: formatTime(values.deliveryTime),
+        deliveryTime: `${mainFormik.values.deliveryTime.days.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.hours.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.minutes.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.seconds.toString().padStart(2, '0')}`,
         nameEn: values.nameEn,
         nameAr: values.nameAr,
         phoneNumber: values.phoneNumber,
@@ -201,7 +221,7 @@ export default function UpdateBranchForm({
           phoneNumber: data.phoneNumber || '',
           openAt: mergeDateAndTime(data.createdAt, data.openAt),
           closedAt: mergeDateAndTime(data.createdAt, data.closedAt),
-          deliveryTime: mergeDateAndTime(data.createdAt, data.deliveryTime),
+          deliveryTime: parseDurationString(data.deliveryTime),
           location: data.addressText || '',
           lat: data.centerLatitude || 30.0444,
           lng: data.centerLongitude || 31.2357,
@@ -246,6 +266,7 @@ export default function UpdateBranchForm({
     mainFormik.setFieldValue('lng', lng || '');
     mainFormik.setFieldValue('radius', radius || 0);    
   };
+  console.log("mainFormik.errors: ",mainFormik.errors);
   
 
   return (
@@ -320,10 +341,10 @@ export default function UpdateBranchForm({
               <DateDurationPicker 
                 lable={text.deliveryTime}
                 lang={lang}
-                selectedDate={mainFormik.values.deliveryTime}
-                onChange={(date) => mainFormik.setFieldValue('deliveryTime', date)}
+                selectedDuration={mainFormik.values.deliveryTime}
+                onChange={(val) => mainFormik.setFieldValue('deliveryTime', val)}
               />
-              {mainFormik.touched.deliveryTime && mainFormik.errors.deliveryTime && (
+              {typeof mainFormik.errors.deliveryTime === 'string'  && (
                 <div className="text-red-500 text-sm mt-1">{mainFormik.errors.deliveryTime}</div>
               )}
             </div>
