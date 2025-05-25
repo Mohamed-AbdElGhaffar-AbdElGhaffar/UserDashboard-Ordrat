@@ -300,7 +300,7 @@ export default function TotalProfitLoss({ className }: { className?: string }) {
                   );
                 }}
               />
-              <Tooltip content={<CustomTooltip formattedNumber prefix="$" />} />
+              <Tooltip content={<CustomTooltip currency='' formattedNumber prefix="$" />} />
 
               {bars.map((bar) => (
                 <Bar

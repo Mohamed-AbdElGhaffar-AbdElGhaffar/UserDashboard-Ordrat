@@ -34,6 +34,7 @@ const cookieName = "i18next";
 
 export const routeRoles: Record<string, string[]> = {
   "/affiliate": [ "/sellerDashboard/affiliate", "sellerDashboard-affiliate", "لوحة-تحكم-التاجر-الشركاء", ],
+  // "/auth/forgot-password": [ "/sellerDashboard/auth/forgot-password", "sellerDashboard-auth-forgot-password", "لوحة-تحكم-التاجر-استرداد-حساب", ],
   "/storeSetting/branches": [ "/sellerDashboard/branches", "sellerDashboard-branches", "لوحة-تحكم-التاجر-الفروع", ],
   "/marketingtools/coupon": [ "/sellerDashboard/coupon", "sellerDashboard-coupon", "لوحة-تحكم-التاجر-قسيمة", ],
   "/delivery": [ "/sellerDashboard/delivery", "sellerDashboard-delivery", "لوحة-تحكم-التاجر-التوصيل", ],
@@ -91,7 +92,6 @@ export async function middleware(req: any) {
   //   res.headers.set('Cache-Control', 'no-store');
   //   return res;
   // }  
-  
   // console.log("refreshToken: ",refreshToken);
   // if (!refreshToken && pathname != '/en/signin' && pathname != '/ar/signin') {
   //   console.log("refreshToken: ",refreshToken);
@@ -107,7 +107,7 @@ export async function middleware(req: any) {
 
   const refreshToken = req.cookies.get("refreshToken")?.value;
 
-  if (!refreshToken && !pathname.includes("/signin")) {
+  if (!refreshToken && !pathname.includes("/signin") && !pathname.includes("/auth/forgot-password")&& !pathname.includes("/auth/otp")&& !pathname.includes("/auth/restart-password")) {
     return NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
   }
 

@@ -234,7 +234,7 @@ export default function OperatingCashFlow({
                 tickLine={false}
                 tick={<CustomYAxisTick />}
               />
-              <Tooltip content={<CustomTooltip formattedNumber prefix="$" />} />
+              <Tooltip content={<CustomTooltip currency='' formattedNumber prefix="$" />} />
 
               <defs>
                 <linearGradient

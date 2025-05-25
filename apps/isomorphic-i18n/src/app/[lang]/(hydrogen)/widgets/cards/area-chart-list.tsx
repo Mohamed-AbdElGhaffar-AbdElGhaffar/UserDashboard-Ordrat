@@ -12,6 +12,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+
 import {
   PiBankDuotone,
   PiFileTextDuotone,
@@ -23,6 +25,7 @@ import { CustomTooltip } from '@components/charts/custom-tooltip';
 import { chartData, widgetData } from '@/data/card-widgets-data';
 import { useTranslation } from '@/app/i18n/client';
 import { ChartData } from '../../statistics/page';
+import Image from 'next/image';
 
 export default function AreaChartList({ className,
   unpaidOrders,
@@ -59,7 +62,16 @@ export default function AreaChartList({ className,
     },
     {
       title: lang === 'ar' ? 'تكلفة الطلب' : 'Order Cost',
-      metric: `${avgSellingPrice} ${currency} `,
+      metric: (
+              <div className="flex items-center gap-1">
+                {avgSellingPrice}
+                {currency === 'ر.س' ? (
+                  <Image src={sarIcon} alt="SAR" width={20} height={20} />
+                ) : (
+                  currency
+                )}
+              </div>
+            ),
       bgColor: 'bg-[#D89B0D]',
       textColor: 'text-[#D89B0D]',
       icon: <PiPulseDuotone className="h-6 w-6" />,
@@ -77,54 +89,27 @@ export default function AreaChartList({ className,
 
   ];
 
-  // const chartData = [
-  //   {
-  //     day: 'Mon',
-  //     bounceRate: 40,
-  //     pageSession: 40,
-  //   },
-  //   {
-  //     day: 'Tue',
-  //     bounceRate: 90,
-  //     pageSession: 30,
-  //   },
-  //   {
-  //     day: 'Thu',
-  //     bounceRate: 64,
-  //     pageSession: 43,
-  //   },
-  //   {
-  //     day: 'Wed',
-  //     bounceRate: 99,
-  //     pageSession: 50,
-  //   },
-  //   {
-  //     day: 'Fri',
-  //     bounceRate: 50,
-  //     pageSession: 70,
-  //   },
-  //   {
-  //     day: 'sat',
-  //     bounceRate: 55,
-  //     pageSession: 80,
-  //   },
-  //   {
-  //     day: 'Sun',
-  //     bounceRate: 70,
-  //     pageSession: 80,
-  //   },
-  // ];
   const chartData = paidRevenueChart?.map(item => ({
     day: item.label,
     bounceRate: item.count,
   }))
+  
   return (
     <>
       {widgetData.map((item) => (
         <WidgetCard
           key={item.name}
           title={lang === 'ar' ? 'صافى الربح' : 'Net profit'}
-          description={`${paidRevenue?.toLocaleString()} ${currency}`}
+          description={
+            <span className="flex items-center gap-1">
+              {paidRevenue?.toLocaleString()}
+              {currency === 'ر.س' ? (
+                <Image src={sarIcon} alt="SAR" width={20} height={20} />
+              ) : (
+                currency
+              )}
+            </span>
+          }
           headerClassName='text-xl font-medium'
           rounded="lg"
           action={
@@ -147,7 +132,30 @@ export default function AreaChartList({ className,
                 >
                   <YAxis tickLine={false} axisLine={false} />
                   <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (!active || !payload || payload.length === 0) return null;
+
+                      const dataItem = payload[0];
+                      const color = dataItem.color || '#10b981'; // اللون حسب البيانات
+                      const name = dataItem.name === 'bounceRate'
+                        ? (lang === 'ar' ? 'معدل الارتداد' : 'Bounce Rate')
+                        : dataItem.name;
+
+                      return (
+                        <div className="rounded-md bg-white p-2 shadow-md text-sm text-gray-700 border">
+                          <div className="font-semibold text-center border-b pb-1 mb-1">{label}</div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="inline-block w-2 h-2 rounded-full"
+                              style={{ backgroundColor: color }}
+                            />
+                            <span>{name}: {dataItem.value}</span>
+                          </div>
+                        </div>
+                      );
+                    }}
+                  />
                   <Area
                     type="natural"
                     dataKey="bounceRate"

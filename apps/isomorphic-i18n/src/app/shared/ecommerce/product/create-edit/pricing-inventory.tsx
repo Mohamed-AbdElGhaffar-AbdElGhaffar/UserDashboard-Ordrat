@@ -8,9 +8,10 @@ interface PricingInventoryProps {
   className?: string;
   lang?: string;
   languages?: number;
+  currencyAbbreviation?: string;
 }
 
-export default function PricingInventory({ className, lang='en', languages }: PricingInventoryProps) {
+export default function PricingInventory({ className, lang='en', languages, currencyAbbreviation }: PricingInventoryProps) {
   const text = {
     sectionTitle: lang === 'ar' ? "التسعير" : "Pricing",
     sectionDescription: lang === 'ar' ? "أضف تسعير المنتج هنا" : "Add your product pricing here",
@@ -22,7 +23,7 @@ export default function PricingInventory({ className, lang='en', languages }: Pr
         description={text.sectionDescription}
         className={cn(className)}
       >
-        <ProductPricing lang={lang} />
+        <ProductPricing lang={lang} currencyAbbreviation={currencyAbbreviation}/>
       </FormGroup>
       {/* <FormGroup
         title="Inventory Tracking"

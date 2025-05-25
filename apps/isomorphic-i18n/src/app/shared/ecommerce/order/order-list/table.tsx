@@ -13,6 +13,8 @@ import ExpandedOrderRow from '@/app/shared/ecommerce/order/order-list/expanded-r
 import axiosClient from '@/app/components/context/api';
 import { useTranslation } from '@/app/i18n/client';
 import { useUserContext } from '@/app/components/context/UserContext';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+
 // dynamic import
 const FilterElement = dynamic(
   () => import('@/app/shared/ecommerce/order/order-list/order-filter-element'),
@@ -67,12 +69,14 @@ export default function OrderTable({
   initData = [],
   variant = 'modern',
   className,
+  currencyAbbreviation,
 }: {
   shopId: string;
   lang?: string;
   initData: any[];
   variant?: 'modern' | 'minimal' | 'classic' | 'elegant' | 'retro';
   className?: string;
+  currencyAbbreviation?: string;
 }) {
   // const [pageSize, setPageSize] = useState(1);
 
@@ -153,7 +157,7 @@ export default function OrderTable({
           PageSize: pageSize, 
           OrderNumber: searchTerm?searchTerm:null,
           OrderStatus: filters.status || null,
-          branchId: mainBranch
+          branchId: mainBranch,
         },
         headers: { 'Accept-Language': lang },
       });
@@ -208,7 +212,7 @@ export default function OrderTable({
 
   // ✅ Generate table columns dynamically (Fixed)
   const columns = useMemo(() => {
-    return getColumns({ sortConfig, onHeaderCellClick: handleSort, onDeleteItem, lang });
+    return getColumns({ sortConfig, onHeaderCellClick: handleSort, onDeleteItem, lang ,currencyAbbreviation});
   }, [sortConfig, handleSort, onDeleteItem, lang]);
 
   const { visibleColumns, checkedColumns, setCheckedColumns } =
@@ -229,7 +233,7 @@ export default function OrderTable({
         columns={columns}
         expandable={{
           expandIcon: CustomExpandIcon,
-          expandedRowRender: (record) => <ExpandedOrderRow record={record} lang={lang} />,
+          expandedRowRender: (record) => <ExpandedOrderRow  record={record} lang={lang} />,
         }}
         paginatorOptions={{
           pageSize,

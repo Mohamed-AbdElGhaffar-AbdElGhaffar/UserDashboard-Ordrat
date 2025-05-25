@@ -8,6 +8,8 @@ import DeletePopover from '@/app/shared/delete-popover';
 import { createColumnHelper } from '@tanstack/react-table';
 import { ActionIcon, Badge, Checkbox, Text, Tooltip } from 'rizzui';
 import { PhoneNumberOrder } from '@/data/tan-table-data';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+import Image from 'next/image';
 
 const columnHelper = createColumnHelper<PhoneNumberOrder>();
 const formatDate = (dateString: string): string => {
@@ -15,7 +17,7 @@ const formatDate = (dateString: string): string => {
   return date ? date.toLocaleDateString("en-GB") : "Invalid Date";
 };
 
-export const defaultColumns = (lang: string) => {
+export const defaultColumns = (lang: string,currencyAbbreviation:string) => {
 
   const columns = [
     columnHelper.accessor('phoneNumber', {
@@ -33,8 +35,13 @@ export const defaultColumns = (lang: string) => {
       size: 240,
       header: lang === 'ar' ? 'تكلفة الطلب' : 'orderCost',
       cell: ({ row }) => (
-        <Text className="font-lexend text-sm font-medium text-gray-900 dark:text-gray-700">
+          <Text className="font-lexend text-sm font-medium text-gray-900 dark:text-gray-700 flex items-center gap-1">
           {row.original.orderCost}
+          {row.original.currencyAbbreviation === "ر.س" ? (
+            <Image src={sarIcon} alt="SAR" width={16} height={16} />
+          ) : (
+            <span>{row.original.currencyAbbreviation}</span>
+          )}
         </Text>
       ),
       enableSorting: false,

@@ -56,7 +56,7 @@ export default function ProfileVisits({
               <YAxis 
                 orientation={lang === 'ar' ? 'right' : 'left'}
                 dataKey="visitsCount" axisLine={false} tickLine={false}  />
-              <Tooltip content={<CustomTooltip formattedNumber />} />
+              <Tooltip content={<CustomTooltip formattedNumber currency='' />} />
               <Bar
                 barSize={24}
                 fill={'#10B880'}

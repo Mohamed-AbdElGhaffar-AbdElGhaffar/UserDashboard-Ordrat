@@ -11,6 +11,8 @@ import DateCell from '@ui/date-cell';
 import DeletePopover from '@/app/shared/delete-popover';
 import { RoleClientExist } from '@/app/components/ui/roleClientExist/RoleClientExist';
 import { toCurrency } from '@utils/to-currency';
+import Image from 'next/image';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 function getStatusBadge(lang:string , status: string) {
   switch (status.toLowerCase()) {
@@ -55,6 +57,7 @@ function getStatusBadge(lang:string , status: string) {
 type Columns = {
   lang:string;
   sortConfig?: any;
+  currencyAbbreviation?: any;
   onDeleteItem: (id: string) => void;
   onHeaderCellClick: (value: string) => void;
   onChecked?: (event: React.ChangeEvent<HTMLInputElement>, id: string) => void;
@@ -65,6 +68,7 @@ export const getColumns = ({
   sortConfig,
   onDeleteItem,
   onHeaderCellClick,
+  currencyAbbreviation
 }: Columns) => {
   // Translation object
   const translations = {
@@ -161,7 +165,11 @@ export const getColumns = ({
       key: 'totalPrice',
       width: 120,
       render: (value: number) => (
-        <Text className="font-medium text-gray-700">{toCurrency(`${value.toFixed(2)}`,lang)}</Text>
+        <Text className="font-medium text-gray-700 flex items-center gap-1">{value}{currencyAbbreviation === "ر.س" ? (
+                    <Image src={sarIcon} alt="SAR" width={12} height={12} />
+                  ) : (
+                    <span>{currencyAbbreviation}</span>
+                  )}</Text>
       ),
     },
     {

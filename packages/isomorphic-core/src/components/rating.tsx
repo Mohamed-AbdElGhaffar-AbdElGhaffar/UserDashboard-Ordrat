@@ -30,9 +30,9 @@ export default function Rating({ rating }: RatingProps) {
           );
         })}{' '}
       </div>
-      <span className="mt-1 shrink-0 text-gray-500">
+      {/* <span className="mt-1 shrink-0 text-gray-500">
         {totalRating} {totalRating > 1 ? 'reviews' : 'review'}
-      </span>
+      </span> */}
     </div>
   );
 }

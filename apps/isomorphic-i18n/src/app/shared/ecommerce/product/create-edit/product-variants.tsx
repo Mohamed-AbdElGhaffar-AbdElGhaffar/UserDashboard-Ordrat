@@ -11,7 +11,7 @@ import SelectLoader from '@components/loader/select-loader';
 import { PiPlusBold, PiTrashBold, PiUploadSimple } from 'react-icons/pi';
 import Image from 'next/image';
 import ButtonTypeSelector from '@/app/components/ui/buttonTypeSelector/ButtonTypeSelector';
-
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 const Select = dynamic(() => import('rizzui').then((mod) => mod.Select), {
   ssr: false,
   loading: () => <SelectLoader />,
@@ -29,7 +29,7 @@ const buttonTypeOptions = [
   // { label: 'Image', value: 7 },
 ];
 
-export default function ProductVariants({ className, lang = 'en', languages }: { className?: string; lang?: string; languages?: number; }) {
+export default function ProductVariants({ className, lang = 'en', languages,currencyAbbreviation }: { className?: string; currencyAbbreviation?: string; lang?: string; languages?: number; }) {
   const text = {
     sectionTitle: lang === 'ar' ? "خيارات المتغيرات" : "Variant Options",
     sectionDescription: lang === 'ar' ? "أضف متغيرات المنتج هنا" : "Add your product variants here",
@@ -169,7 +169,7 @@ export default function ProductVariants({ className, lang = 'en', languages }: {
             {(buttonType?.value === 0 || buttonType?.value === 1 || buttonType?.value === 2) && (
               <div className="mt-4 border-t pt-4">
                 <h3 className="text-lg font-medium">{text.choicesLabel}</h3>
-                <ChoicesField control={control} index={index} text={text} register={register} getValues={getValues} setValue={setValue} languages={languages} />
+                <ChoicesField currencyAbbreviation={currencyAbbreviation} control={control} index={index} text={text} register={register} getValues={getValues} setValue={setValue} languages={languages} />
               </div>
             )}
 
@@ -196,7 +196,7 @@ export default function ProductVariants({ className, lang = 'en', languages }: {
 }
 
 // Component for Managing Choices
-function ChoicesField({ control, index, text, register, getValues, setValue, languages }: any) {
+function ChoicesField({ control, index, text, register, getValues, setValue, languages, currencyAbbreviation }: any) {
   const [images, setImages] = useState<Record<number, File | null>>({});
 
   const { fields, append, remove } = useFieldArray({
@@ -257,6 +257,11 @@ function ChoicesField({ control, index, text, register, getValues, setValue, lan
               type="number"
               label={text.choicePrice}
               placeholder="0"
+               prefix={currencyAbbreviation === 'ر.س' ? (
+                <Image src={sarIcon} alt="SAR" width={10} height={10} />
+              ) : (
+                currencyAbbreviation
+              )}
               {...register(`productVariants.${index}.choices.${choiceIndex}.price`)}
             />
 

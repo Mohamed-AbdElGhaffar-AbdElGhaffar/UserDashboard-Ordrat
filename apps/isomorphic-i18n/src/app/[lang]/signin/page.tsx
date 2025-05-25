@@ -29,17 +29,17 @@ const translations = {
     continue: "continue.",
     description:
       "By signing up, you will gain access to exclusive content, special offers, and be the first to hear about exciting news and updates.",
-    bannerTitle: "The simplest way to manage your workspace.",
+    bannerTitle: "The simplest way to manage your Store.",
     bannerDescription:
       "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint velit officia consequat duis.",
   },
   ar: {
     welcome: "أهلاً بك من جديد! من فضلك ",
-    signinTitle: "قم بتسجيل الدخول إليها",
+    signinTitle: "قم بتسجيل الدخول",
     continue: "للمتابعة.",
     description:
       "من خلال التسجيل، ستحصل على محتوى حصري وعروض خاصة وستكون أول من يعرف الأخبار والتحديثات المثيرة.",
-    bannerTitle: "أسهل طريقة لإدارة مساحتك.",
+    bannerTitle: "أسهل طريقة لإدارة متجرك.",
     bannerDescription:
       "أميت مينيوم موليت نون ديزورنت ألامكو إيست سيت ألايكا دولور دو أميت سينت فيليت أوفيسيا كونسكات دويس.",
   },

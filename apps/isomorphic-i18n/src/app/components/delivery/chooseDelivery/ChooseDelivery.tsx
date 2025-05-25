@@ -20,6 +20,7 @@ import { API_BASE_URL, Image_BASE_URL } from '@/config/base-url';
 import { useNegotiator } from '../../context/useNegotiator';
 import { Button, Empty, SearchNotFoundIcon, Text } from 'rizzui';
 import PageHeader from '@/app/shared/page-header';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 interface DeliveryOption {
   id: string;
@@ -48,10 +49,11 @@ type ChooseDeliveryFormProps = {
   lang: string;
   branches: DeliveryOption[];
   orderId: string;
+  currencyAbbreviation: string;
   pageHeader: PageHeaderType;
 };
 
-export default function ChooseDelivery({ lang = 'en', branches, orderId, pageHeader }: ChooseDeliveryFormProps) {
+export default function ChooseDelivery({ lang = 'en', currencyAbbreviation,branches, orderId, pageHeader }: ChooseDeliveryFormProps) {
   const { closeModal } = useModal();
   const accessToken = GetCookiesClient('accessToken');
   // const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
@@ -254,7 +256,7 @@ export default function ChooseDelivery({ lang = 'en', branches, orderId, pageHea
                             <span className="font-medium text-gray-700">{text.proposedPrice}:</span>
                           </div>
                           <span className="font-bold text-green-600 text-md">
-                            {offer.proposedPrice || 0} {lang === 'ar' ? 'جنيه' : 'EGP'}
+                            {offer.proposedPrice || 0} {currencyAbbreviation === "ر.س" ? (<Image src={sarIcon} alt="SAR" width={16} height={16} />) : (<span>{currencyAbbreviation}</span>)}
                           </span>
                         </div>
                       </div>

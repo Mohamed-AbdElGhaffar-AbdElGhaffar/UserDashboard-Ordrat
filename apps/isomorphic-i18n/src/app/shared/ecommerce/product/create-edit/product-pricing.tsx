@@ -2,8 +2,10 @@ import { useTranslation } from '@/app/i18n/client';
 import { useEffect } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { Input, Select, Switch } from 'rizzui';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+import Image from 'next/image';
 
-export default function ProductPricing({ lang }:{ lang?:string; }) {
+export default function ProductPricing({ lang, currencyAbbreviation }: { lang?: string; currencyAbbreviation?: string; }) {
   const text = {
     inputPrice: lang === 'ar' ? "السعر الحالي" : "Price",
     inputOldPrice: lang === 'ar' ? "السعر القديم" : "Old Price",
@@ -27,11 +29,11 @@ export default function ProductPricing({ lang }:{ lang?:string; }) {
   const categoryOption = [
     {
       value: '0',
-      label: lang=='ar'?'نسبة مئوية':'Percentage',
+      label: lang == 'ar' ? 'نسبة مئوية' : 'Percentage',
     },
     {
       value: '1',
-      label: lang=='ar'?'سعر ثابت':'Fixed Price',
+      label: lang == 'ar' ? 'سعر ثابت' : 'Fixed Price',
     },
   ];
   const IsDiscountActive = useWatch({ name: 'IsDiscountActive' });
@@ -51,7 +53,11 @@ export default function ProductPricing({ lang }:{ lang?:string; }) {
         placeholder="10"
         {...register('price')}
         error={t(errors.price?.message as string)}
-        prefix={text.currency}
+        prefix={currencyAbbreviation === 'ر.س' ? (
+          <Image src={sarIcon} alt="SAR" width={10} height={10} />
+        ) : (
+          currencyAbbreviation
+        )}
         type="number"
       />
       {/* <Input
@@ -67,7 +73,11 @@ export default function ProductPricing({ lang }:{ lang?:string; }) {
         placeholder="10"
         {...register('BuyingPrice')}
         error={t(errors.BuyingPrice?.message as string)}
-        prefix={text.currency}
+        prefix={currencyAbbreviation === 'ر.س' ? (
+          <Image src={sarIcon} alt="SAR" width={10} height={10} />
+        ) : (
+          currencyAbbreviation
+        )}
         type="number"
       />
       <div className='col-span-full'>
@@ -89,7 +99,7 @@ export default function ProductPricing({ lang }:{ lang?:string; }) {
             )}
           />
         </div>
-        {IsDiscountActive &&(
+        {IsDiscountActive && (
           <div className='w-full col-span-full grid gap-4 @2xl:grid-cols-2 @4xl:col-span-8 @4xl:gap-5 xl:gap-7'>
             <Controller
               name="DiscountType"

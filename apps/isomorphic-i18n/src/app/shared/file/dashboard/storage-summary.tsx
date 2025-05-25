@@ -5,6 +5,8 @@ import WidgetCard from '@components/cards/widget-card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Label } from 'recharts';
 import { useTranslation } from '@/app/i18n/client';
 import { PaymentStatusSummary } from '@/app/[lang]/(hydrogen)/statistics/page';
+import Image from 'next/image';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 const COLORS = ['#63C3A5', '#FBE3E4'];
 
@@ -38,7 +40,6 @@ function CustomLabel(props: any) {
   );
 }
 
-// دالة لتحويل القيم إلى نسب متساوية
 const makeEqualData = (data: PaymentStatusSummary[]): { name: string; value: number }[] => {
   if (data?.length === 2) {
     return [
@@ -55,7 +56,6 @@ const makeEqualData = (data: PaymentStatusSummary[]): { name: string; value: num
 export default function StorageSummary({ className, lang, currency ,paymentStatusSummaries, totalOrder }: {currency?:string; className?: string; lang?: string; paymentStatusSummaries?: PaymentStatusSummary[]; totalOrder?: number; }) {
   const { t } = useTranslation(lang!, 'common');
 
-  // تحويل البيانات إلى نسب متساوية
   const transformedData = makeEqualData(paymentStatusSummaries as any);
   const totalOrders = transformedData?.reduce((acc, item) => acc + item.value, 0);
 
@@ -121,7 +121,7 @@ export default function StorageSummary({ className, lang, currency ,paymentStatu
               <Text as="span" className={`${index === 0 ? 'bg-green-50' : 'bg-red-50'} px-2 py-1 rounded-xl font-medium text-center`}>{item.percentage}%</Text>
             </div>
             <div className="flex items-center gap-1">
-              <Text as="span" className='bg-slate-50 px-2 py-1 font-medium rounded-xl text-center'>{item.totalRevenue.toLocaleString()}{" "}{currency}</Text>
+              <Text as="span" className='bg-slate-50 px-2 py-1 font-medium rounded-xl text-center flex items-center gap-1'>{item.totalRevenue.toLocaleString()}{" "} {currency==='ر.س'? <Image src={sarIcon} alt="SAR" width={10} height={10} />:currency}</Text>
             </div>
           </div>
         ))}

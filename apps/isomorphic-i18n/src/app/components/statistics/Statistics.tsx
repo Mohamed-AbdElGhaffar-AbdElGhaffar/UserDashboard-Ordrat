@@ -307,6 +307,8 @@ function Statistics({
 
 
     async function fetchShopStatistics(from?: string, to?: string) {
+        if (!mainBranch || !shopId) return;
+
         try {
             let url = `https://testapi.ordrat.com/api/ShopStatistics/dashboard?shopId=${shopId}&branchId=${mainBranch}`;
 
@@ -327,6 +329,7 @@ function Statistics({
     }
     const [viewType, setViewType] = useState<string>('');
     useEffect(() => {
+        if (!mainBranch) return;
         let from = '';
         let to = '';
 
@@ -341,7 +344,7 @@ function Statistics({
         }
         setIsDateFiltered(true);
         fetchShopStatistics(from, to);
-    }, [mainBranch, starDate, viewType]);
+    }, [mainBranch, starDate, viewType, lang]);
 
     const viewOptions = [
         { value: 'Daily', label: lang === 'ar' ? 'يومي' : 'Daily' },
@@ -376,8 +379,8 @@ function Statistics({
     };
     const handleViewTypeChange = (type: string) => {
         setViewType(type);
-          setAnimateFilter(false); // أوقف الأنيميشن القديمة
-  setTimeout(() => setAnimateFilter(true), 50)
+        setAnimateFilter(false); // أوقف الأنيميشن القديمة
+        setTimeout(() => setAnimateFilter(true), 50)
         const [from, to] = getDateRange(type);
         setIsDateFiltered(true);
         setStartDate([null, null]);
@@ -436,9 +439,8 @@ function Statistics({
                 </button>
             </div>
         </div>
-      
         <StatsCards
-         viewType={viewType}
+            viewType={viewType}
             lang={lang}
             currency={lang === 'ar' ? statistics?.currencyAbbreviationAr : statistics?.currencyAbbreviationEn}
             periodStart={statistics?.periodStart}
@@ -494,7 +496,6 @@ function Statistics({
             avgOrderValueGrowthPct={statistics?.avgOrderValueGrowthPct ?? 0}
             avgOrderValueChart={statistics?.avgOrderValueChart ?? []}
         />
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 4xl:grid-cols-4 gap-6">
             <Spending
                 lang={lang!}

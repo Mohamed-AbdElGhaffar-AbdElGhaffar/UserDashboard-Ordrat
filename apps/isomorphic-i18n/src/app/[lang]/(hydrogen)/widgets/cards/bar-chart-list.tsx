@@ -69,7 +69,7 @@ export default function BarChartList({ className, lang }: { className?: string; 
                 >
                   <YAxis tickLine={false} axisLine={false} />
                   <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={<CustomTooltip currency='' />} />
                   <Bar
                     type="natural"
                     dataKey="bounceRate"

@@ -21,6 +21,8 @@ import { CustomTooltip } from '@components/charts/custom-tooltip';
 import { BranchSummary } from '../[lang]/(hydrogen)/statistics/page';
 import { formatNumber } from '@utils/format-number';
 import { addSpacesToCamelCase } from '@utils/add-spaces-to-camel-case';
+import Image from 'next/image';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 export default function TotalProfitLoss({ className, lang, branchSummaries, currency }: { currency: string; className?: string; lang: string, branchSummaries: BranchSummary[] }) {
 
@@ -38,7 +40,6 @@ export default function TotalProfitLoss({ className, lang, branchSummaries, curr
     avgOrderValue: item.avgOrderValue,
   }));
 
-  // دالة لتجهيز الأعمدة بناءً على اللغة
   const getBars = (lang: string) => [
     {
       name: lang === 'ar' ? 'إجمالي الإيرادات' : 'Total Revenue',
@@ -68,11 +69,9 @@ export default function TotalProfitLoss({ className, lang, branchSummaries, curr
   ];
 
 
-  // استدعاء الدالة لتجهيز الأعمدة
   const bars = getBars(lang);
   const totalRevenue = branchSummaries.reduce((sum, item) => sum + item.totalRevenue, 0);
   const translateDataKey = (key: string, lang: string): string => {
-    // تعريف الكائن بطريقة أكثر أمانًا
     const translations: { [key: string]: string } = {
       totalRevenue: lang === 'ar' ? 'إجمالي الإيرادات' : 'Total Revenue',
       paidRevenue: lang === 'ar' ? 'الإيرادات المدفوعة' : 'Paid Revenue',
@@ -87,12 +86,9 @@ export default function TotalProfitLoss({ className, lang, branchSummaries, curr
       avgOrderValue: lang === 'ar' ? 'متوسط قيمة الطلب' : 'Avg Order Value',
     };
 
-    // التحقق من وجود المفتاح بطريقة آمنة
     if (key in translations) {
       return translations[key];
     }
-
-    // إذا لم يتم العثور على المفتاح، نستخدم دالة addSpacesToCamelCase
     return addSpacesToCamelCase(key);
   };
 
@@ -105,8 +101,8 @@ export default function TotalProfitLoss({ className, lang, branchSummaries, curr
       className={cn('min-h-[28rem]', className)}
       description={
         <div className="flex items-center justify-start">
-          <Title as="h2" className="me-2 font-semibold">
-            {totalRevenue.toLocaleString()} {currency}
+          <Title as="h2" className="me-2 font-semibold flex items-center w-fit gap-1 ">
+            {totalRevenue.toLocaleString()} {currency==='ر.س'? <Image src={sarIcon} alt="SAR" width={30} height={30} />:currency}
           </Title>
         </div>
       }
@@ -128,32 +124,66 @@ export default function TotalProfitLoss({ className, lang, branchSummaries, curr
                dataKey={'branchName'} axisLine={false} tickLine={false} />
               <YAxis
                 orientation={lang === 'ar' ? 'right' : 'left'}
-
                 axisLine={false}
                 tickLine={false}
                 dataKey="totalRevenue"
                 tick={({ payload, ...rest }) => {
                   const pl = {
                     ...payload,
-                    value: (Number(payload.value)),
+                    value: Number(payload.value),
                   };
+
                   return (
-                    <CustomYAxisTick prefix={currency} payload={pl} {...rest} />
+                    <CustomYAxisTick
+                      payload={pl}
+                      {...rest}
+                      prefix={
+                        currency === 'ر.س' ? (
+                          <Image
+                            src={sarIcon}
+                            alt="SAR"
+                            width={14}
+                            height={14}
+                            style={{ display: 'inline-block' }}
+                          />
+                        ) : (
+                          currency
+                        )
+                      }
+                    />
                   );
                 }}
               />
+           <Tooltip
+            content={
+              <CustomTooltip
+                lang={lang!}
+                translateKey={(key: string) => translateDataKey(key, lang)}
+                prefix={
+                  currency === 'ر.س' ? (
+                    <Image
+                      src="/assets/Saudi_Riyal_Symbol.svg.png"
+                      alt="SAR"
+                      width={14}
+                      height={14}
+                      style={{ display: 'inline-block' }}
+                    />
+                  ) : (
+                    currency
+                  )
+                }
+                currency={currency} // 👈 مهم نمرره عشان نعرف العملة داخل التولتيب
+              />
+            }
+          />
 
-              <Tooltip
-                content={<CustomTooltip lang={lang!}
-                  translateKey={(key: string) => translateDataKey(key, lang)}
-                  prefix={currency} />}
-              // labelFormatter={(label) => (lang === 'ar' ? 'الفرع: ' : 'Branch: ') + label}
+              {/* // labelFormatter={(label) => (lang === 'ar' ? 'الفرع: ' : 'Branch: ') + label}
               // formatter={(value, name) => {
               //   // استخدام الاسم المترجم من الأعمدة
               //   const translatedName = bars.find(bar => bar.value === name)?.name || name;
               //   return [`${value} ${currency}`, translatedName];
               // }}
-              />
+              /> */}
               {bars.map((bar) => (
                 <Bar
                   key={bar.value}
@@ -162,7 +192,6 @@ export default function TotalProfitLoss({ className, lang, branchSummaries, curr
                   barSize={28}
                   radius={[4, 4, 0, 0]}
                   name={bar.name}
-
                 />
               ))}
               <Line
