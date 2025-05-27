@@ -44,14 +44,14 @@ export function AffiliateLevel({ lang, affiliateStats }: AffiliateLevelProps) {
   ];
 
   const currentLevel = levels.find((lvl) =>
-    affiliateStats?.totalReferrals >= lvl.min && affiliateStats?.totalReferrals <= lvl.max
+    affiliateStats?.successfulSubscriptions >= lvl.min && affiliateStats?.successfulSubscriptions <= lvl.max
   ) || levels[0];
 
   const nextLevel = levels.find((lvl) => lvl.level > currentLevel.level);
 
   const progressToNext =
     nextLevel && nextLevel.max !== Infinity
-      ? Math.min(100, ((affiliateStats?.totalReferrals - currentLevel.min + 1) / (nextLevel.min - currentLevel.min)) * 100)
+      ? Math.min(100, ((affiliateStats?.successfulSubscriptions - currentLevel.min + 1) / (nextLevel.min - currentLevel.min)) * 100)
       : 100;
 
   return (
@@ -80,10 +80,10 @@ export function AffiliateLevel({ lang, affiliateStats }: AffiliateLevelProps) {
           <div className="h-2 bg-rose-500 rounded-full" style={{ width: `${progressToNext}%` }}></div>
         </div>
         <div className="flex justify-between text-sm text-gray-500 mb-6">
-          <span>{affiliateStats?.totalReferrals} {text.referrals}</span>
+          <span>{affiliateStats?.successfulSubscriptions} {text.referrals}</span>
           {nextLevel && (
             <span>
-              {nextLevel.min - affiliateStats?.totalReferrals} {text.needed} {nextLevel.level}
+              {nextLevel.min - affiliateStats?.successfulSubscriptions} {text.needed} {nextLevel.level}
             </span>
           )}
         </div>

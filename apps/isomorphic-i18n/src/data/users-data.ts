@@ -26,6 +26,7 @@ export type Affiliate = {
 };
 export type Referrals = {
   userName: string;
+  referredPhoneNo: string;
   referralDate: Date;
   subscribed: boolean;
   planStatus: boolean;

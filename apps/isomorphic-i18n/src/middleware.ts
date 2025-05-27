@@ -187,10 +187,10 @@ export async function middleware(req: any) {
     }
   } catch (error) {
     console.error("Error during token refresh or role validation:", error);
-    // const redirectRes = NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
-    // redirectRes.cookies.delete("refreshToken");
-    // redirectRes.cookies.delete("roles");
-    // return redirectRes;
+    const redirectRes = NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
+    redirectRes.cookies.delete("refreshToken");
+    redirectRes.cookies.delete("roles");
+    return redirectRes;
   }
   const matchedPathIncludes = Object.keys(routeRolesInCludes).find((route) => pathname.includes(route));
   try {
@@ -255,10 +255,10 @@ export async function middleware(req: any) {
     }
   } catch (error) {
     console.error("Error during token refresh or role validation:", error);
-    // const redirectRes = NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
-    // redirectRes.cookies.delete("refreshToken");
-    // redirectRes.cookies.delete("roles");
-    // return redirectRes;
+    const redirectRes = NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
+    redirectRes.cookies.delete("refreshToken");
+    redirectRes.cookies.delete("roles");
+    return redirectRes;
   }
 
   // Redirect '/' → '/{lang}/storeSetting/basicData'

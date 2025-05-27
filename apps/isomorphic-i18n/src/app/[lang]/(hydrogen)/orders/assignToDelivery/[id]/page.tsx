@@ -55,6 +55,25 @@ async function getBranches(lang: string, shopId:string) {
     return [];
   }
 }
+async function fetchDeliveryById(driverId?: string) {
+  if (driverId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Delivery/GetDeliverById/${driverId}`, {
+        headers: {
+          // 'Accept-Language': lang || 'en',
+        },
+        cache: 'no-store',
+      });
+  
+      if (!response.ok) throw new Error('Failed to fetch Branches');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching details:', error);
+      return null;
+    }
+  }
+}
 
 export default async function AssignOrderToDelivery({
   params: { lang, id },
@@ -84,6 +103,9 @@ export default async function AssignOrderToDelivery({
     ],
   };
   
+  const deliveryInfo = order.type === 2 && (order.status === 3 || order.status === 4)
+    ? await fetchDeliveryById(order.deliveryId)
+    : null;
   return (
     <>
       {order?
@@ -98,7 +120,7 @@ export default async function AssignOrderToDelivery({
               </p>
             </div>
           :
-          <ChooseDelivery lang={lang} branches={branches} orderId={id} pageHeader={pageHeader}/>
+          <ChooseDelivery lang={lang} branches={branches} orderId={id} pageHeader={pageHeader} deliveryInfo={deliveryInfo} order={order}/>
           }
           {/* <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} /> */}
         </>

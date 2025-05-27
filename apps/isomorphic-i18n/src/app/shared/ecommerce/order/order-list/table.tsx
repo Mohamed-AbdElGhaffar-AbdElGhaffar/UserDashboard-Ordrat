@@ -226,7 +226,7 @@ export default function OrderTable({
         showLoadingText={true}
         data={data}
         // @ts-ignore
-        columns={columns}
+        columns={visibleColumns}
         expandable={{
           expandIcon: CustomExpandIcon,
           expandedRowRender: (record) => <ExpandedOrderRow record={record} lang={lang} />,

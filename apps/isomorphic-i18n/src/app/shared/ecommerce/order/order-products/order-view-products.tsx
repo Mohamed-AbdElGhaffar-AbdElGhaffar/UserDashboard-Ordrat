@@ -125,7 +125,7 @@ function getStatusBadge(status: string, lang: string) {
 // ];
 
 
-function QuantityControl({ itemId, quantity, orderId, cancelled, lang = 'en' }: { itemId: any; quantity:any; orderId: string; cancelled: boolean; lang?: string; }) {
+function QuantityControl({ itemId, quantity, orderId, cancelled, order, lang = 'en' }: { itemId: any; quantity:any; orderId: string; cancelled: boolean; order: Order | null; lang?: string; }) {
   const { openModal } = useModal();
   const { setPOSTableOrderId, setTablesData, setOrderDetailsTable, setOrderDetailsStatus } = useUserContext();
 
@@ -133,9 +133,9 @@ function QuantityControl({ itemId, quantity, orderId, cancelled, lang = 'en' }: 
     <div className="inline-flex items-center gap-2.5 text-xs ">
       <button
         className={`grid h-7 w-7 place-content-center rounded-full bg-gray-200 ${
-          cancelled ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-300'
+          (cancelled || order?.status==4 || order?.status==3) ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-300'
         }`}
-        disabled={cancelled}
+        disabled={cancelled || order?.status==4 || order?.status==3}
         onClick={() => { 
           openModal({
             view: <ModalCancelOrderItem
@@ -159,9 +159,9 @@ function QuantityControl({ itemId, quantity, orderId, cancelled, lang = 'en' }: 
       <span className="font-medium text-gray-900">{quantity}</span>
       <button
         className={`grid h-7 w-7 place-content-center rounded-full bg-gray-200 ${
-          cancelled ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-300'
+          (cancelled || order?.status==4 || order?.status==3) ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-300'
         }`}
-        disabled={cancelled}
+        disabled={cancelled || order?.status==4 || order?.status==3}
         onClick={() => { 
           openModal({
             view: <ModalIncreaseOrderItem
@@ -204,12 +204,10 @@ export default function OrderViewProducts({lang}:{lang:string}) {
       render: (_: any, record: any) => (
         <div className="flex items-center">
           <div className="relative aspect-square w-12 overflow-hidden rounded-lg">
-            <Image
-              alt={record.product.name}
+            <img
               src={record.product.images[0]?.imageUrl || ''}
-              fill
-              sizes="(max-width: 768px) 100vw"
-              className="object-cover"
+              alt={record.product.name}
+              className="h-full w-full object-cover"
             />
           </div>
           <div className="ms-4">
@@ -222,6 +220,7 @@ export default function OrderViewProducts({lang}:{lang:string}) {
                 cancelled={record.cancelled} 
                 orderId={orderId as string}
                 quantity={record.quantity}
+                order={order}
                 lang={lang}
               />
             </div>

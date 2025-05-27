@@ -26,6 +26,8 @@ interface AffiliateComponentProps {
     id: string;
     userId: string;
     balance: number;
+    pendingBalance: number;
+    withdrawedBalance: number;
     transactions: {
       id: string;
       amount: number;
@@ -40,6 +42,7 @@ export default function AffiliateComponent({ lang, affiliateLink, affiliateStats
   const text = {
     currency: lang === 'ar' ? "ج.م" : "EGP",
   }
+  
   const stats = [
     {
       icon: FaUsers,
@@ -68,10 +71,11 @@ export default function AffiliateComponent({ lang, affiliateLink, affiliateStats
     {
       icon: FaWallet,
       value: `${affiliateStats?.walletBalance.toFixed(2)}${text.currency}`,
-      title: lang === 'ar' ? 'رصيد المحفظة' : 'Wallet Balance',
-      subtitle: lang === 'ar'
-        ? `0.00${text.currency} معلق`
-        : `0.00${text.currency} pending`,
+      title: lang === 'ar' ? 'اجمالى المكتسب' : 'Total Earned',
+      // subtitle: lang === 'ar'
+      //   ? `0.00${text.currency} معلق`
+      //   : `0.00${text.currency} pending`,
+      subtitle: '',
     },
   ];
 
