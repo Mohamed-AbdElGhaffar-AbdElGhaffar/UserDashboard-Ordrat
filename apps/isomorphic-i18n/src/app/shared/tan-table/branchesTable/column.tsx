@@ -148,16 +148,6 @@ export const defaultColumns = (lang: string, languages: number) => {
       ),
       enableSorting: false,
     }),
-    columnHelper.accessor('totalSales', {
-      id: 'totalSales',
-      size: 240,
-      header: lang === 'ar' ? 'اجمالي المبيعات' : 'Total Sales',
-      cell: ({ row }) => (
-        <Text className="font-lexend text-sm font-medium text-gray-900 dark:text-gray-700">
-          {row.original.totalSales}
-        </Text>
-      ),
-    }),
     columnHelper.accessor('status', {
       id: 'status',
       size: 240,

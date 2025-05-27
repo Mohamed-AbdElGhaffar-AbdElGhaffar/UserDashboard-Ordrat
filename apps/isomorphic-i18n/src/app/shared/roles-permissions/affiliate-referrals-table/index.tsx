@@ -139,12 +139,14 @@ export default function ReferralsTable({ usersData = [], lang }: { usersData: an
       const apiData = response.data;
 
       const transformedUsers: Referrals[] = apiData.map((user: any) => ({
-        userName: user.referralCode  || '--------',
+        userName: user.referredUserName  || '--------',
+        referredPhoneNo: user.referredPhoneNo  || '--------',
         referralDate: new Date(user.referralDate),
         subscribed: user.isSubscribed || false,
         planStatus: user.isPlanActive || false,
         payments: user.paymentCount || 0,
       }));
+      
       const pages = Math.ceil(transformedUsers.length / pageSize);
       const start = (currentPage - 1) * pageSize;
       const paginatedUsers = transformedUsers.slice(start, start + pageSize);

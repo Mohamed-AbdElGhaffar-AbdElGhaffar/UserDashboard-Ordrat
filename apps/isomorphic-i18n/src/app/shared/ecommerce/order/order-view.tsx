@@ -6,6 +6,7 @@ import isEmpty from 'lodash/isEmpty';
 import { PiArrowsClockwiseBold, PiCheckBold, PiPlusBold, PiPrinterBold } from 'react-icons/pi';
 import { FaTimes } from 'react-icons/fa';
 import { useParams } from 'next/navigation'; 
+import { BriefcaseBusiness, Building, Home } from 'lucide-react';
 import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 import {
@@ -20,7 +21,7 @@ import cn from '@utils/class-names';
 import { toCurrency } from '@utils/to-currency';
 import { formatDate } from '@utils/format-date';
 import usePrice from '@hooks/use-price';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Order } from '@/types';
 import { BadgeCent } from 'lucide-react';
 import { useTranslation } from '@/app/i18n/client';
@@ -34,7 +35,6 @@ import { useUserContext } from '@/app/components/context/UserContext';
 import ModalAssignDriver from '@/app/components/ui/modals/ModalAssignDriver';
 import PrintInvoice from '../../print-invoice';
 import { printOrderReceipt } from '@/app/components/pos/printOrderReceipt ';
-
 
 interface DeliveryOption {
   id: string;
@@ -74,7 +74,16 @@ function WidgetCard({
   );
 }
 
-export default function OrderView({ lang, initialOrder, currencyAbbreviation,orderPrint, userData, phone, branches }: { lang: string; currencyAbbreviation:string; initialOrder: Order | null; orderPrint: any; userData: any; phone:string; branches: DeliveryOption[]; }) {
+export default function OrderView({ lang, initialOrder, currencyAbbreviation, orderPrint, userData, phone, branches, delivery }: { lang: string; initialOrder: Order | null; orderPrint: any; userData: any; phone:string; branches: DeliveryOption[]; delivery: any; }) {
+  console.log("deliveryInfo: ",delivery);
+  
+  const text = {
+    apartment: lang === 'ar' ? "شقة" : 'apartment',
+    home: lang === 'ar' ? "المنزل" : 'Home',
+    office: lang === 'ar' ? "المكتب" : 'Office',
+
+    deliveryInfo: lang === 'ar' ? "معلومات سائق التوصيل" : 'Delivery Information',
+  };
   const { items, total, totalItems } = useCart();
   const { price: subtotal } = usePrice(
     items && {
@@ -94,34 +103,46 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation,ord
   const [currentOrderStatus, setCurrentOrderStatus] = useState<number | undefined>(initialOrder?.status);
   // const currentOrderStatus = order?.status;
   const { id } = useParams();
-  const transitions = [
-    {
-      id: 1,
-      paymentMethod: {
-        name: `${t('cash-on-delivery')}`,
-        image:<BadgeCent className="text-mainColor" />
+  // const transitions = [
+  //   {
+  //     id: 1,
+  //     paymentMethod: {
+  //       name: `${t('cash-on-delivery')}`,
+  //       image:<BadgeCent className="text-mainColor" />
+  //     },
+  //     // price: '$1575.00',
+  //   },
+  //   // {
+  //   //   id: 2,
+  //   //   paymentMethod: {
+  //   //     name: 'PayPal',
+  //   //     image:
+  //   //       'https://isomorphic-furyroad.s3.amazonaws.com/public/payment/paypal.png',
+  //   //   },
+  //   //   price: '$75.00',
+  //   // },
+  //   // {
+  //   //   id: 2,
+  //   //   paymentMethod: {
+  //   //     name: 'Stripe',
+  //   //     image:
+  //   //       'https://isomorphic-furyroad.s3.amazonaws.com/public/payment/stripe.png',
+  //   //   },
+  //   //   price: '$375.00',
+  //   // },
+  // ];
+  const transitions = useMemo(() => {
+    const isDelivery = order?.type === 2;
+    return [
+      {
+        id: 1,
+        paymentMethod: {
+          name: isDelivery ? t('cash-on-delivery') : t('cash-on-branch'),
+          image: <BadgeCent className="text-mainColor" />,
+        },
       },
-      // price: '$1575.00',
-    },
-    // {
-    //   id: 2,
-    //   paymentMethod: {
-    //     name: 'PayPal',
-    //     image:
-    //       'https://isomorphic-furyroad.s3.amazonaws.com/public/payment/paypal.png',
-    //   },
-    //   price: '$75.00',
-    // },
-    // {
-    //   id: 2,
-    //   paymentMethod: {
-    //     name: 'Stripe',
-    //     image:
-    //       'https://isomorphic-furyroad.s3.amazonaws.com/public/payment/stripe.png',
-    //   },
-    //   price: '$375.00',
-    // },
-  ];
+    ];
+  }, [order?.type, t]);
   const orderStatus = [
     { id: 0, label: `${t('cancel')}` },
     { id: 1, label: `${t('Pending')}` },
@@ -130,6 +151,21 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation,ord
     { id: 4, label: `${t('delivered')}` },
   ];
   const [loading, setLoading] = useState(!initialOrder);
+  const [deliveryInfo, setDeliveryInfoState] = useState<any>(delivery);
+  
+  async function fetchDeliveryById(driverId?: string) {
+    if (!driverId) return null;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/Delivery/GetDeliverById/${driverId}`, {
+        cache: 'no-store',
+      });
+      if (!res.ok) throw new Error('Failed to fetch delivery info');
+      return await res.json();
+    } catch (error) {
+      console.error('Error fetching delivery info:', error);
+      return null;
+    }
+  }
   const fetchOrder = async () => {
     try {
       const response = await fetch(
@@ -149,12 +185,19 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation,ord
       setCurrentOrderStatus(data?.status); 
 
       setOrder(data);
+      if (data?.type === 2 && (data.status === 3 || data.status === 4)) {
+        const delivery = await fetchDeliveryById(data.deliveryId);
+        setDeliveryInfoState(delivery);
+      } else {
+        setDeliveryInfoState(null);
+      }
     } catch (error) {
       console.error('Error fetching order:', error);
     } finally {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     if (orderDetailsStatus) {
       fetchOrder();
@@ -199,6 +242,29 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation,ord
   const setDriver = [0,3,4].includes(order?.status as number);
   const printOrder = [0].includes(order?.status as number);
   console.log("order?.type: ",order?.type);
+
+  const addressTypes = [
+    {
+      name: text.apartment,
+      icon: Building,
+      value: 0
+    },
+    {
+      name: text.home,
+      icon: Home,
+      value: 1
+    },
+    {
+      name: text.office,
+      icon: BriefcaseBusiness,
+      value: 2
+    }
+  ];
+
+  const branchLocation = {
+    lat: 30.793573,
+    lng: 30.999190,
+  };
   
   return (
     <div className="@container mb-5">
@@ -342,7 +408,7 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation,ord
                   key={item.paymentMethod.name}
                   className="flex items-center border-dashed border-mainColor justify-between rounded-lg border px-5 py-5 font-medium shadow-sm transition-shadow @5xl:px-7"
                 >
-                  <div className="flex w-1/3 items-center">
+                  <div className="flex w-full items-center">
                     <div className="shrink-0">
                       {/* <Image
                         src={item.paymentMethod.image}
@@ -367,6 +433,45 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation,ord
               ))}
             </div>
           </div>
+          {deliveryInfo && (currentOrderStatus == 3 || currentOrderStatus == 4) && (
+            <div className="">
+              <Title
+                as="h3"
+                className="mb-3.5 text-base font-semibold @5xl:mb-5 4xl:text-lg"
+              >
+                {text.deliveryInfo}
+              </Title>
+
+              {deliveryInfo ? (
+                <div className="flex gap-5 items-center border border-dashed border-mainColor rounded-lg p-5 shadow-sm">
+                  <div className="shrink-0">
+                    <img
+                      src={deliveryInfo[0].personalPhotoUrl}
+                      alt="delivery"
+                      className="h-20 w-20 rounded-full object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <div className="font-semibold text-gray-900">
+                      {deliveryInfo[0].firstName} {deliveryInfo[0].lastName}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {t('Phone')} {deliveryInfo[0].phoneNumber}
+                    </div>
+                    {deliveryInfo[0].zone?.name && (
+                      <div className="text-sm text-gray-600">
+                        {t('Zone')}: {deliveryInfo[0].zone.name}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <Text className="text-gray-500 text-sm">
+                  {lang === 'ar' ? 'لا توجد معلومات متاحة' : 'No delivery information available'}
+                </Text>
+              )}
+            </div>
+          )}
 
           <div className="">
             {/* <div className="mb-3.5 @5xl:mb-5">
@@ -482,16 +587,27 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation,ord
             >
             {order?.address && (
                 <div key={order.address.id}>
-                  <Title as="h3" className="mb-2.5 text-base font-semibold @7xl:text-lg">
+                  <Title as="h3" className="mb-2 text-base font-semibold @7xl:text-lg">
                     {t('Apartment')} {order.address.apartmentNumber}
                     <br/>
                     {t('Floor')} {order.address.floor}
                     <br/>
-                    {t('Street')} {order.address.street}, 
+                    {t('Street')} {order.address.street}
                   </Title>
-                  <Text as="p" className="mb-2 leading-loose last:mb-0">
+                  <Text as="p" className="mb-0 leading-loose">
                     {order.address.additionalDirections}
                   </Text>
+                  {(() => {
+                    const type = addressTypes.find((a) => a.value === order.address.buildingType);
+                    return type ? (
+                      <p className='w-full'>
+                        <span className="flex items-center gap-1 sm:gap-2 w-full capitalize rounded-sm transition duration-150 bg-transparent text-primary-dark">
+                          <type.icon className="w-4 xs:w-auto" />
+                          {type.name}
+                        </span>
+                      </p>
+                    ) : null;
+                  })()}
                 </div>
               )}
             </WidgetCard>

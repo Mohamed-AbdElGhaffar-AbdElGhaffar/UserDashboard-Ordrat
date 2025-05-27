@@ -23,10 +23,11 @@ export const getColumns = ({
 }: Columns) => {
   const text = {
     userName: lang === 'ar' ? 'اسم المستخدم' : 'User Name',
+    referredPhoneNo: lang === 'ar' ? 'رقم الهاتف' : 'Phone Number',
     referralDate: lang === 'ar' ? 'تاريخ الإحالة' : 'Referral Date',
     subscribed: lang === 'ar' ? 'مشترك' : 'Subscribed',
     planStatus: lang === 'ar' ? 'حالة الخطة' : 'Plan Status',
-    payments: lang === 'ar' ? 'المدفوعات' : 'Payments',
+    payments: lang === 'ar' ? 'مرات الدفع' : 'Payment Count',
     active: lang === 'ar' ? 'مفعل' : 'Active',
     notActive: lang === 'ar' ? 'غير مفعل' : 'Unactive',
     currency: lang === 'ar' ? "ج.م" : "EGP",
@@ -41,6 +42,17 @@ export const getColumns = ({
       render: (_: string, user: Referrals) => (
         <Text className="font-medium text-gray-900 truncate max-w-[250px]">
           {user.userName}
+        </Text>
+      ),
+    },
+    {
+      title: <HeaderCell title={text.referredPhoneNo} />,
+      dataIndex: 'referredPhoneNo',
+      key: 'referredPhoneNo',
+      width: 100,
+      render: (_: string, user: Referrals) => (
+        <Text className="font-medium text-gray-900 truncate max-w-[250px]">
+          {user.referredPhoneNo}
         </Text>
       ),
     },
@@ -138,12 +150,17 @@ export const getColumns = ({
       title: <HeaderCell title={text.payments} />,
       dataIndex: 'payments',
       key: 'payments',
-      width: 100,
+      width: 50,
       render: (_: string, user: Referrals) => (
+        // <Text
+        //   className={`font-semibold ${user.payments >= 0 ? 'text-green-600' : 'text-red-600'}`}
+        // >
+        //   {user.payments >= 0 ? `+${user.payments.toFixed(2)}${text.currency}` : `-${Math.abs(user.payments).toFixed(2)}${text.currency}`}
+        // </Text>
         <Text
-          className={`font-semibold ${user.payments >= 0 ? 'text-green-600' : 'text-red-600'}`}
+          className={`font-semibold ${user.payments > 0 ? 'text-green-600' : 'text-red-600'}`}
         >
-          {user.payments >= 0 ? `+${user.payments.toFixed(2)}${text.currency}` : `-${Math.abs(user.payments).toFixed(2)}${text.currency}`}
+          {user.payments > 0 ? `${user.payments}` : `${user.payments}`}
         </Text>
       ),
     },

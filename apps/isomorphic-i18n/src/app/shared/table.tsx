@@ -196,6 +196,8 @@ export function ToggleColumns<T>({
   hideIndex,
   lang='en',
 }: ToggleColumnsTypes<T>) {
+  console.log("columns: ",columns);
+  
   return (
     <div>
       <Popover shadow="sm" placement="bottom-end">
@@ -218,7 +220,8 @@ export function ToggleColumns<T>({
                 <Checkbox
                   key={column.dataIndex}
                   value={column.dataIndex}
-                  label={addSpacesToCamelCase(column.dataIndex)}
+                  // label={addSpacesToCamelCase(column.dataIndex)}
+                  label={column.title.props.title}
                   labelClassName="ml-2 rtl:mr-2 text-[13px] font-medium"
                   className={cn(
                     hideIndex && index === hideIndex ? "hidden" : ""

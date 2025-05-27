@@ -339,6 +339,7 @@ export type Order = {
   shippingFees: number;
   createdAt: string;
   branchName: string;
+  deliveryId?: string;
   status: number;
   type: number;
   totalChoicePrices: number;

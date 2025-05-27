@@ -41,7 +41,6 @@ async function getEndUserById(id: string, lang: string) {
     return null;
   }
 }
-
 async function getBranches(lang: string, shopId:string) {
   try {
     const res = await fetch(`${API_BASE_URL}/api/Branch/GetByShopId/${shopId}`, {
@@ -65,6 +64,25 @@ async function getBranches(lang: string, shopId:string) {
     return [];
   }
 }
+async function fetchDeliveryById(driverId?: string) {
+  if (driverId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Delivery/GetDeliverById/${driverId}`, {
+        headers: {
+          // 'Accept-Language': lang || 'en',
+        },
+        cache: 'no-store',
+      });
+  
+      if (!response.ok) throw new Error('Failed to fetch Branches');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching details:', error);
+      return null;
+    }
+  }
+}
 
 export default async function OrderId({
   params: { lang, id },
@@ -75,9 +93,6 @@ export default async function OrderId({
   };
 })  {
   const order = await getOrderById(id, lang);
-    
-  console.log("order: ",order);
-  
   const pageHeader = {
     title: lang === 'ar' ? 'الطلبات' : 'Orders',
     breadcrumb: [
@@ -106,15 +121,26 @@ export default async function OrderId({
     name: lang == 'ar'? branch.nameAr : branch.nameEn,
     value: lang == 'ar'? branch.nameAr.toLowerCase().replace(/\s+/g, '-') : branch.nameEn.toLowerCase().replace(/\s+/g, '-'),
     icon: ''
-  }))
-  console.log("endUser: ",endUser);
-  console.log("branches: ",branches);
+  }));
+  const deliveryInfo = order.type === 2 && (order.status === 3 || order.status === 4)
+    ? await fetchDeliveryById(order.deliveryId)
+    : null;
+
   return <>
   {order?
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
       <CartProvider>
-        <OrderView lang={lang} initialOrder={order} orderPrint={order} userData={endUser} phone={endUser?.phoneNumber || ''} branches={branches} currencyAbbreviation={shopData?.currencyAbbreviation} />
+        <OrderView 
+          lang={lang} 
+          initialOrder={order} 
+          orderPrint={order} 
+          userData={endUser} 
+          phone={endUser?.phoneNumber || ''} 
+          branches={branches} 
+          delivery={deliveryInfo} 
+          currencyAbbreviation={shopData?.currencyAbbreviation}
+        />
       </CartProvider>
     </>
   :
