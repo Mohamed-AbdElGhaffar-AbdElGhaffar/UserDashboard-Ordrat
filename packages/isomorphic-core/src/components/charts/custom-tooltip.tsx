@@ -14,10 +14,11 @@ function isValidHexColor(colorCode: string) {
 }
 
 export interface CustomTooltipProps extends TooltipProps<ValueType, NameType> {
-  prefix?: string;
+  prefix?: any;
   postfix?: string;
   className?: string;
   lang?: string;
+  currency: string; 
   formattedNumber?: boolean;
   translateKey?: (key: string) => string; 
 }
@@ -32,6 +33,7 @@ export function CustomTooltip({
   className,
   translateKey ,
   formattedNumber,
+  currency,
 }: CustomTooltipProps) {
   if (!active) return null;
 
@@ -61,19 +63,34 @@ export function CustomTooltip({
                   : item.stroke,
               }}
             />
-            <Text>
-              <Text as="span" className="capitalize">
-              {translateKey ? translateKey(item.dataKey) : item.dataKey}:
-              </Text>{' '}
-              <Text
-                as="span"
-                className="font-medium text-gray-900 dark:text-gray-700"
-              >
-                {prefix && prefix}
-                {formattedNumber ? formatNumber(item.value) : item.value}
-                {postfix && postfix}
-              </Text>
-            </Text>
+         <Text className="flex items-center gap-1">
+  <Text as="span" className="capitalize">
+    {translateKey ? translateKey(item.dataKey) : item.dataKey}:
+  </Text>{' '}
+  <Text
+    as="span"
+    className="font-medium text-gray-900 dark:text-gray-700 flex items-center gap-1"
+  >
+    {currency === 'ر.س' ? (
+      <>
+        {formattedNumber ? formatNumber(item.value) : item.value}
+        {prefix}
+      </>
+    ) : lang === 'ar' ? (
+      <>
+        {prefix}
+        {formattedNumber ? formatNumber(item.value) : item.value}
+      </>
+    ) : (
+      <>
+        {formattedNumber ? formatNumber(item.value) : item.value}
+        {prefix}
+      </>
+    )}
+    {postfix && postfix}
+  </Text>
+</Text>
+
           </div>
         ))}
       </div>

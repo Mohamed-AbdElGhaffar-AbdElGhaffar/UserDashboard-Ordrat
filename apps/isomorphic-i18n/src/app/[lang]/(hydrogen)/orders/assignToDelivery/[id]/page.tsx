@@ -9,6 +9,7 @@ import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookie
 import { API_BASE_URL } from '@/config/base-url';
 import ChooseDelivery from '@/app/components/delivery/chooseDelivery/ChooseDelivery';
 import NotFound from '@/app/not-found';
+import { fetchShopData } from '@/app/api/shop';
 
 export const metadata = {
   ...metaObject('FAQ Details'),
@@ -81,6 +82,7 @@ export default async function AssignOrderToDelivery({
   params: { lang: string; id: string };
 }) {
   const shopId = GetCookiesServer('shopId');
+  const shopData = await fetchShopData(lang, shopId as string);
   const order = await getOrderById(id, lang);
   const branches = await getBranches(lang, shopId as string);
   const pageHeader = {
@@ -120,7 +122,7 @@ export default async function AssignOrderToDelivery({
               </p>
             </div>
           :
-          <ChooseDelivery lang={lang} branches={branches} orderId={id} pageHeader={pageHeader} deliveryInfo={deliveryInfo} order={order}/>
+          <ChooseDelivery lang={lang} branches={branches} orderId={id} pageHeader={pageHeader} deliveryInfo={deliveryInfo} order={order} currencyAbbreviation={shopData?.currencyAbbreviation}/>
           }
           {/* <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} /> */}
         </>

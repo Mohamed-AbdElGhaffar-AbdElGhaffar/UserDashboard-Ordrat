@@ -134,7 +134,7 @@ export default function CustomizedDotLineChart({
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip  currency=''/>} />
             <Legend />
             <Line
               type="monotone"

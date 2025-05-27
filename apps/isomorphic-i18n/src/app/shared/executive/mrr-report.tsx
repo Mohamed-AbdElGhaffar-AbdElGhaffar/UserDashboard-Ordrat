@@ -124,7 +124,7 @@ export default function MRRReport({ className }: { className?: string }) {
               strokeOpacity={0.5}
               vertical={false}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip  currency=''/>} />
 
             <YAxis
               axisLine={false}

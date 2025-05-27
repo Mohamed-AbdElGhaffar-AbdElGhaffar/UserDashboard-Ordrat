@@ -91,7 +91,7 @@ export default function ProfitWidget({ className }: { className?: string }) {
                 strokeOpacity={0.5}
                 vertical={false}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip currency=''/>} />
               <Area
                 type="bump"
                 dataKey="totalSales"

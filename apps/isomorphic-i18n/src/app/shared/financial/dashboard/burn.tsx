@@ -115,7 +115,7 @@ export default function Burn({ className }: { className?: string }) {
                 className="[&_.recharts-tooltip-cursor]:fill-opacity-20 dark:[&_.recharts-tooltip-cursor]:fill-opacity-10 [&_.recharts-cartesian-axis-tick-value]:fill-gray-300 dark:[&_.recharts-cartesian-axis-tick-value]:fill-gray-500 [&_.recharts-cartesian-axis.xAxis]:translate-y-2 [&_.recharts-cartesian-axis.yAxis]:-translate-y-3 rtl:[&_.recharts-cartesian-axis.yAxis]:-translate-x-12 [&_.recharts-label-list]:-translate-y-1 [&_path.recharts-rectangle]:!stroke-none"
               >
                 <XAxis dataKey="label" axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={false} />
+                <Tooltip content={<CustomTooltip  currency=''/>} cursor={false} />
                 <Bar
                   dataKey="amount"
                   fill="#F88B11"

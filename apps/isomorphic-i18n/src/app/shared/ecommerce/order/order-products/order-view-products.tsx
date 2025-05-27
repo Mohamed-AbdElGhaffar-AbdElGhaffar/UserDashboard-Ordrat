@@ -12,10 +12,12 @@ import { useTranslation } from '@/app/i18n/client';
 import { API_BASE_URL } from '@/config/base-url';
 import ActionsCellOrders from '@/app/components/orders/actionsCellOrders/ActionsCellOrders';
 import { useUserContext } from '@/app/components/context/UserContext';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 import { PiMinus, PiPlus } from 'react-icons/pi';
 import ModalCancelOrderItem from '@/app/components/ui/modals/ModalCancelOrderItem';
 import { useModal } from '@/app/shared/modal-views/use-modal';
 import ModalIncreaseOrderItem from '@/app/components/ui/modals/ModalIncreaseOrderItem';
+
 
 function getStatusBadge(status: string, lang: string) {
   console.log("status: ",status);
@@ -186,7 +188,7 @@ function QuantityControl({ itemId, quantity, orderId, cancelled, order, lang = '
   );
 }
 
-export default function OrderViewProducts({lang}:{lang:string}) {
+export default function OrderViewProducts({lang,currencyAbbreviation}:{lang:string;currencyAbbreviation:string}) {
   const { items } = useCart();
   const { id } = useParams();
   const orderId = id;   
@@ -275,7 +277,11 @@ export default function OrderViewProducts({lang}:{lang:string}) {
       key: 'itemPrice',
       width: 200,
       render: (_: any, record: any) => (
-        <Text className={`text-end text-sm ${record.cancelled ? 'line-through text-muted':''}`}>{toCurrency(record.itemPrice, lang)}</Text>
+        <Text className={`text-end text-sm flex items-center justify-center gap-1 ${record.cancelled ? 'line-through text-muted':''}`}>{record.itemPrice}{currencyAbbreviation === "ر.س" ? (
+            <Image src={sarIcon} alt="SAR" width={16} height={16} />
+          ) : (
+            <span>{currencyAbbreviation}</span>
+          )}</Text>
       ),
     },
     // {
@@ -302,7 +308,11 @@ export default function OrderViewProducts({lang}:{lang:string}) {
       key: 'totalChoicesPrice',
       width: 200,
       render: (_: any, record: any) => (
-        <Text className={`text-center text-sm ${record.cancelled ? 'line-through text-muted':''}`}>{toCurrency(record.totalChoicesPrice, lang)}</Text>
+        <Text className={`text-center text-sm flex items-center justify-center gap-1 ${record.cancelled ? 'line-through text-muted':''}`}>{record.totalChoicesPrice} {currencyAbbreviation === "ر.س" ? (
+            <Image src={sarIcon} alt="SAR" width={16} height={16} />
+          ) : (
+            <span>{currencyAbbreviation}</span>
+          )}</Text>
       ),
     },
     {
@@ -311,7 +321,11 @@ export default function OrderViewProducts({lang}:{lang:string}) {
       key: 'totalPrice',
       width: 200,
       render: (_: any, record: any) => (
-        <Text className={`text-end text-sm ${record.cancelled ? 'line-through text-muted':''}`}>{toCurrency(`${(record.itemPrice * record.quantity) + record.totalChoicesPrice}`, lang)}</Text>
+        <Text className={`text-center text-sm flex justify-center items-center gap-1 ${record.cancelled ? 'line-through text-muted':''}`}>{`${(record.itemPrice * record.quantity) + record.totalChoicesPrice}`} {currencyAbbreviation === "ر.س" ? (
+            <Image src={sarIcon} alt="SAR" width={16} height={16} />
+          ) : (
+            <span>{currencyAbbreviation}</span>
+          )}</Text>
       ),
     },
     {

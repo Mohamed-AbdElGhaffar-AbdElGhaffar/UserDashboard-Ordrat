@@ -188,7 +188,7 @@ export default function StorageReport({
                 tickLine={false}
                 tick={<CustomYAxisTick />}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip  currency=''/>} />
               <Bar dataKey="image" fill="#282ECA" stackId="a" />
               <Bar dataKey="video" stackId="a" fill="#4052F6" />
               <Bar dataKey="document" stackId="a" fill="#96C0FF" />

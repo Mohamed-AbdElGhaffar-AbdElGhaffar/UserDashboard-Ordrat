@@ -175,7 +175,7 @@ export default function CashFlow({ className }: Props) {
                   tickLine={false}
                   tickFormatter={(label) => `$${label}k`}
                 />
-                <Tooltip content={<CustomTooltip />} cursor={false} />
+                <Tooltip content={<CustomTooltip currency='' />} cursor={false} />
                 <Bar
                   dataKey="income"
                   fill={COLORS[0]}

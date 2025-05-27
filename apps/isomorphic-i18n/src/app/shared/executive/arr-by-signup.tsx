@@ -150,7 +150,7 @@ export default function ArrBySignUp({ className }: { className?: string }) {
                   );
                 }}
               />
-              <Tooltip content={<CustomTooltip formattedNumber prefix="$" />} />
+              <Tooltip content={<CustomTooltip currency='' formattedNumber prefix="$" />} />
 
               <defs>
                 <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="100%">

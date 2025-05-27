@@ -91,7 +91,7 @@ export default function SimpleAreaChart({
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip  currency=''/>} />
             <Area
               type="monotone"
               dataKey="uv"

@@ -84,7 +84,7 @@ export default function MixBarChart({
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis tickLine={false} dataKey="name" />
             <YAxis tickLine={false} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip  currency=''/>} />
             <Legend />
             <Bar dataKey="pv" stackId="a" fill="#5a5fd7" />
             <Bar

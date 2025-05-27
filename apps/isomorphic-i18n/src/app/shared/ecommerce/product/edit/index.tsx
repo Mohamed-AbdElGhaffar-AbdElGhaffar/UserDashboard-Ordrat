@@ -45,6 +45,7 @@ const MAP_STEP_TO_COMPONENT = {
 interface IndexProps {
   lang?: string;
   className?: string;
+  currencyAbbreviation?: string;
   product: any;
   allProducts?: any;
   languages: number;
@@ -66,6 +67,7 @@ export default function EditProduct({
   lang = 'en',
   product,
   className,
+  currencyAbbreviation,
   allProducts,
   languages,
 }: IndexProps) {
@@ -449,7 +451,7 @@ export default function EditProduct({
                 key={key}
                 name={formParts[key as keyof typeof formParts]}
               >
-                {<Component className="pt-7 @2xl:pt-9 @3xl:pt-11" lang={lang} allProducts={allProducts} languages={languages} />}
+                {<Component className="pt-7 @2xl:pt-9 @3xl:pt-11" lang={lang} allProducts={allProducts} languages={languages} currencyAbbreviation={currencyAbbreviation} />}
               </Element>
             ))}
           </div>

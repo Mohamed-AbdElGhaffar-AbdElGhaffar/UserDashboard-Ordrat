@@ -146,7 +146,7 @@ export default function ActivityReport({ className, lang }: { className?: string
                 className=" "
               />
               <YAxis tickLine={false} className=" " />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip  currency=''/>} />
               <Area
                 type="monotone"
                 dataKey="downloads"

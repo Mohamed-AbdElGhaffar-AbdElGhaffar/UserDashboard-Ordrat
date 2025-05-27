@@ -1,3 +1,4 @@
+import { fetchShopData } from '@/app/api/shop';
 import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookiesServer';
 import NotFound from '@/app/not-found';
 import OrderView from '@/app/shared/ecommerce/order/order-view'
@@ -112,6 +113,7 @@ export default async function OrderId({
   const endUser = await getEndUserById(order?.endUserId, lang);
   const shopId = GetCookiesServer('shopId');
   // const branches = await getBranches(lang, shopId as string);
+  const shopData = await fetchShopData(lang, shopId as string);
   const cookiebranches = GetCookiesServer('branches') as string;
   const cookiesBranches = JSON.parse(cookiebranches);
   const branches = cookiesBranches?.map((branch: any) => ({
@@ -137,6 +139,7 @@ export default async function OrderId({
           phone={endUser?.phoneNumber || ''} 
           branches={branches} 
           delivery={deliveryInfo} 
+          currencyAbbreviation={shopData?.currencyAbbreviation}
         />
       </CartProvider>
     </>

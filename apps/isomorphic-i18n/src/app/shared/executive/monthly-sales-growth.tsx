@@ -126,7 +126,7 @@ export default function MonthlySalesGrowth({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip content={<CustomTooltip postfix="%" />} cursor={false} />
+              <Tooltip content={<CustomTooltip currency='' postfix="%" />} cursor={false} />
               <defs>
                 <linearGradient
                   id="horizontalGradient"

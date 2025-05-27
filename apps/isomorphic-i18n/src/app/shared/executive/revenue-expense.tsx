@@ -238,7 +238,7 @@ export default function RevenueExpense({ className }: { className?: string }) {
                   );
                 }}
               />
-              <Tooltip content={<CustomTooltip formattedNumber prefix="$" />} />
+              <Tooltip content={<CustomTooltip currency='' formattedNumber prefix="$" />} />
 
               <Bar
                 dataKey="revenue"

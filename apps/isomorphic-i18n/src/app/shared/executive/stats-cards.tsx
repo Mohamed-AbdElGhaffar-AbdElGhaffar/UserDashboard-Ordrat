@@ -10,10 +10,12 @@ import SimpleBar from '@ui/simplebar';
 import { getChartColorByEngagementRate } from '@/app/shared/analytics-dashboard/website-metrics/columns';
 import { ChartData } from '@/app/[lang]/(hydrogen)/statistics/page';
 import { useUserContext } from '@/app/components/context/UserContext';
+import Image from 'next/image';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 interface StatsCardsProps {
   className?: string;
-  currency?: string;
+  currency?: any | React.ReactNode;
   lang?: string;
   visitsCount?: number;
   visitsGrowthPct?: number;
@@ -62,7 +64,7 @@ interface StatsCardsProps {
   cancelledOrdersChart?: ChartData[];
   paidRevenueChart?: ChartData[];
   unpaidRevenueChart?: ChartData[];
-   periodStart?: string;
+  periodStart?: string;
   periodEnd?: string;
   prevPeriodStart?: string;
   prevPeriodEnd?: string;
@@ -70,7 +72,7 @@ interface StatsCardsProps {
   viewType?: any;
 }
 
-export default function StatsCards({ className,periodLabel ,viewType ,periodStart,periodEnd,prevPeriodEnd,prevPeriodStart, avgSellingPrice, avgOrderValueChart, avgOrderValueGrowthPct, unpaidRevenueChart, unpaidRevenue, unpaidRevenueGrowthPct, activeOrders, paidRevenueChart, paidRevenue, cancelledOrders, paidRevenueGrowthPct, cancelledOrdersChart, cancelledOrdersGrowthPct, unpaidOrdersChart, unpaidOrdersGrowthPct, unpaidOrders, paidOrdersChart, activeOrdersGrowthPct, paidOrders, paidOrdersGrowthPct, activeOrdersChart, cvrRate, cvrRateChart, timesReachCheckout, timesReachCheckoutPct, timesSuccessOrder, successOrderChart, timesSuccessOrderPct, reachedCheckoutChart, abandonedCheckouts, addToCartChart, timesAddToCart, timesAddToCartPct, abandonedCheckoutsChart, abandonedCheckoutsPct, grossProfitChart, grossProfit, grossProfitGrowthPct, currency, visitsCount, totalRevenue, totalRevenueGrowthPct, totalRevenueChart, visitsGrowthPct, visitsChart, totalOrders, totalOrdersChart, totalOrdersGrowthPct, lang }: StatsCardsProps) {
+export default function StatsCards({ className, periodLabel, viewType, periodStart, periodEnd, prevPeriodEnd, prevPeriodStart, avgSellingPrice, avgOrderValueChart, avgOrderValueGrowthPct, unpaidRevenueChart, unpaidRevenue, unpaidRevenueGrowthPct, activeOrders, paidRevenueChart, paidRevenue, cancelledOrders, paidRevenueGrowthPct, cancelledOrdersChart, cancelledOrdersGrowthPct, unpaidOrdersChart, unpaidOrdersGrowthPct, unpaidOrders, paidOrdersChart, activeOrdersGrowthPct, paidOrders, paidOrdersGrowthPct, activeOrdersChart, cvrRate, cvrRateChart, timesReachCheckout, timesReachCheckoutPct, timesSuccessOrder, successOrderChart, timesSuccessOrderPct, reachedCheckoutChart, abandonedCheckouts, addToCartChart, timesAddToCart, timesAddToCartPct, abandonedCheckoutsChart, abandonedCheckoutsPct, grossProfitChart, grossProfit, grossProfitGrowthPct, currency, visitsCount, totalRevenue, totalRevenueGrowthPct, totalRevenueChart, visitsGrowthPct, visitsChart, totalOrders, totalOrdersChart, totalOrdersGrowthPct, lang }: StatsCardsProps) {
   const filesStatData = [
     {
       id: 1,
@@ -89,7 +91,7 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
     },
     {
       id: 2,
-      title: lang === 'ar' ? ' عدد الطلبات'  : 'Orders Number',
+      title: lang === 'ar' ? ' عدد الطلبات' : 'Orders Number',
       metric: totalOrders,
       fill: '#3872FA',
       percentage: 48,
@@ -105,7 +107,16 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
     {
       id: 3,
       title: lang === 'ar' ? 'اجمالى المبيعات' : 'Total sales',
-      metric: `${totalRevenue} ${currency}`,
+      metric: (
+        <div className="flex items-center gap-1">
+          {totalRevenue}
+          {currency === 'ر.س' ? (
+            <Image src={sarIcon} alt="SAR" width={20} height={20} />
+          ) : (
+            currency
+          )}
+        </div>
+      ),
       fill: '#3872FA',
       percentage: 54,
       increased: Number(totalRevenueGrowthPct) > 0,
@@ -120,7 +131,16 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
     {
       id: 4,
       title: lang === 'ar' ? 'صافي الربح' : 'Gross Profit',
-      metric: `${grossProfit} ${currency}`,
+      metric: (
+        <div className="flex items-center gap-1">
+          {grossProfit}
+          {currency === 'ر.س' ? (
+            <Image src={sarIcon} alt="SAR" width={20} height={20} />
+          ) : (
+            currency
+          )}
+        </div>
+      ),
       fill: '#3872FA',
       percentage: 54,
       increased: Number(grossProfitGrowthPct) > 0,
@@ -135,7 +155,16 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
     {
       id: 5,
       title: lang === 'ar' ? 'الإيرادات المدفوعة' : 'Paid Revenue',
-      metric: `${paidRevenue} ${currency}`,
+      metric: (
+        <div className="flex items-center gap-1">
+          {paidRevenue}
+          {currency === 'ر.س' ? (
+            <Image src={sarIcon} alt="SAR" width={20} height={20} />
+          ) : (
+            currency
+          )}
+        </div>
+      ),
       fill: '#3872FA',
       percentage: 54,
       increased: Number(paidRevenueGrowthPct) > 0,
@@ -150,7 +179,16 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
     {
       id: 6,
       title: lang === 'ar' ? 'الإيرادات غير المدفوعة' : 'Unpaid Revenue',
-      metric: `${unpaidRevenue} ${currency}`,
+      metric: (
+        <div className="flex items-center gap-1">
+          {unpaidRevenue}
+          {currency === 'ر.س' ? (
+            <Image src={sarIcon} alt="SAR" width={20} height={20} />
+          ) : (
+            currency
+          )}
+        </div>
+      ),
       fill: '#3872FA',
       percentage: 54,
       increased: Number(unpaidRevenueGrowthPct) > 0,
@@ -165,7 +203,16 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
     {
       id: 7,
       title: lang === 'ar' ? 'متوسط قيمة الطلب' : 'Average Order Value',
-      metric: `${avgSellingPrice} ${currency}`,
+      metric: (
+        <div className="flex items-center gap-1">
+          {avgSellingPrice}
+          {currency === 'ر.س' ? (
+            <Image src={sarIcon} alt="SAR" width={20} height={20} />
+          ) : (
+            currency
+          )}
+        </div>
+      ),
       fill: '#3872FA',
       percentage: 54,
       increased: Number(avgOrderValueGrowthPct) > 0,
@@ -237,7 +284,7 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
         count: item.count,
       })),
     },
-      {
+    {
       id: 12,
       title: lang === 'ar' ? 'معدل التحويل' : 'Conversion Rate',
       metric: `${cvrRate} `,
@@ -251,8 +298,8 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
         label: item.label,
         count: item.count,
       })),
-    }, 
-    
+    },
+
     {
       id: 13,
       title: lang === 'ar' ? 'الوصول لاتمام الطلب' : 'Reach Complete Order',
@@ -267,7 +314,7 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
         label: item.label,
         count: item.count,
       })),
-    },    
+    },
     {
       id: 14,
       title: lang === 'ar' ? 'الإضافات إلى السلة' : 'Add to Cart',
@@ -321,7 +368,7 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
         {filesStatData?.map((stat: any) => {
           return (
             <MetricCard
-              key={`${stat.id}-${stat.metric}-${viewType}`} 
+              key={`${stat.id}-${stat.metric}-${viewType}`}
               title={stat.title}
               metric={stat.metric}
               titleClassName='font-bold mb-2'
@@ -376,24 +423,21 @@ export default function StatsCards({ className,periodLabel ,viewType ,periodStar
                 </div>
               }
             >
-             
-          <Text className="mt-52 bottom-3 absolute flex items-center leading-none text-gray-500">
-  <Text
-    as="span"
-    className={cn(
-      'me-2 inline-flex items-center font-medium',
-      String(stat.value).includes('-') ? 'text-red' : 'text-green'
-    )}
-  >
-    {String(stat.value).includes('-')
-      ? (<TrendingDownIcon className="me-1 h-4 w-4" />)
-      : (<TrendingUpIcon className="me-1 h-4 w-4" />)}
-    {stat.value}%
-  </Text>
-  {periodLabel}
-</Text>
-
-
+              <Text className="mt-52 bottom-3 absolute flex items-center leading-none text-gray-500">
+                <Text
+                  as="span"
+                  className={cn(
+                    'me-2 inline-flex items-center font-medium',
+                    String(stat.value).includes('-') ? 'text-red' : 'text-green'
+                  )}
+                >
+                  {String(stat.value).includes('-')
+                    ? (<TrendingDownIcon className="me-1 h-4 w-4" />)
+                    : (<TrendingUpIcon className="me-1 h-4 w-4" />)}
+                  {stat.value}%
+                </Text>
+                {periodLabel}
+              </Text>
             </MetricCard>
           );
         })}

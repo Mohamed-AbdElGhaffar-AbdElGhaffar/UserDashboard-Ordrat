@@ -105,6 +105,7 @@ export type AbandonedOrdersResponse = {
 
 export type PhoneNumberOrder = {
   phoneNumber: string;
+  currencyAbbreviation: string;
   orderCost: number;
   visitTime: any;
 };

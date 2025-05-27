@@ -7,6 +7,7 @@ import { PiArrowsClockwiseBold, PiCheckBold, PiPlusBold, PiPrinterBold } from 'r
 import { FaTimes } from 'react-icons/fa';
 import { useParams } from 'next/navigation'; 
 import { BriefcaseBusiness, Building, Home } from 'lucide-react';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 import {
   billingAddressAtom,
@@ -73,7 +74,7 @@ function WidgetCard({
   );
 }
 
-export default function OrderView({ lang, initialOrder, orderPrint, userData, phone, branches, delivery }: { lang: string; initialOrder: Order | null; orderPrint: any; userData: any; phone:string; branches: DeliveryOption[]; delivery: any; }) {
+export default function OrderView({ lang, initialOrder, currencyAbbreviation, orderPrint, userData, phone, branches, delivery }: { lang: string; initialOrder: Order | null; orderPrint: any; userData: any; phone:string; branches: DeliveryOption[]; delivery: any; }) {
   console.log("deliveryInfo: ",delivery);
   
   const text = {
@@ -358,20 +359,36 @@ export default function OrderView({ lang, initialOrder, orderPrint, userData, ph
           )}
 
           <div className="pb-5">
-            <OrderViewProducts lang={lang} />
+            <OrderViewProducts lang={lang}  currencyAbbreviation={currencyAbbreviation}/>
             <div className="border-t border-muted pt-7 @5xl:mt-3">
             <div className="ms-auto max-w-lg space-y-6">
                 <div className="flex justify-between font-medium">
-                  {t('Subtotal')} <span>{order?.price}</span>
+                  {t('Subtotal')} <span className='flex items-center gap-1'>{order?.price} {currencyAbbreviation === "ر.س" ? (
+            <Image src={sarIcon} alt="SAR" width={12} height={12} />
+          ) : (
+            <span>{currencyAbbreviation}</span>
+          )}</span>
                 </div>
                 <div className="flex justify-between font-medium">
-                  {t('Shipping-Fees')} <span>{order?.shippingFees}</span>
+                  {t('Shipping-Fees')} <span className='flex items-center gap-1'>{order?.shippingFees} {currencyAbbreviation === "ر.س" ? (
+            <Image src={sarIcon} alt="SAR" width={12} height={12} />
+          ) : (
+            <span>{currencyAbbreviation}</span>
+          )}</span>
                 </div>
                 <div className="flex justify-between font-medium">
-                  {t('Vat')} <span>{order?.totalVat}</span>
+                  {t('Vat')} <span className='flex items-center gap-1'>{order?.totalVat} {currencyAbbreviation === "ر.س" ? (
+            <Image src={sarIcon} alt="SAR" width={12} height={12} />
+          ) : (
+            <span>{currencyAbbreviation}</span>
+          )}</span>
                 </div>
                 <div className="flex justify-between border-t border-muted pt-5 text-base font-semibold">
-                  {t('Total')} <span>{toCurrency((order?.price || 0) + (order?.shippingFees || 0) + (order?.totalVat || 0) , lang)}</span>
+                  {t('Total')} <span className='flex items-center gap-1'> {(order?.price || 0) + (order?.shippingFees || 0) + (order?.totalVat || 0)}{currencyAbbreviation === "ر.س" ? (
+            <Image src={sarIcon} alt="SAR" width={12} height={12} />
+          ) : (
+            <span> {currencyAbbreviation}</span>
+          )}</span>
                 </div>
               </div>
             </div>
@@ -516,9 +533,9 @@ export default function OrderView({ lang, initialOrder, orderPrint, userData, ph
                       className={cn(
                         "relative ps-6 text-sm font-medium before:absolute before:-start-[11px] before:top-px before:h-5 before:w-5 before:-translate-x-px before:rounded-full before:bg-gray-100 before:content-[''] after:absolute after:-start-px after:top-5 after:h-10 after:w-0.5 after:bg-gray-100 last:after:hidden",
                         (currentOrderStatus ?? 1) >= item.id
-                          ? 'before:bg-teal-500 after:bg-teal-500' // باقي الحالات
-                          : 'after:hidden', // إخفاء after للحالات الأخرى
-                        currentOrderStatus === item.id && 'before:bg-teal-500 after:hidden' // الحالة الحالية
+                          ? 'before:bg-teal-500 after:bg-teal-500' 
+                          : 'after:hidden', 
+                        currentOrderStatus === item.id && 'before:bg-teal-500 after:hidden' 
                       )}
                     >
                       {(currentOrderStatus ?? 0) >= item.id && item.id !== 0 ? (

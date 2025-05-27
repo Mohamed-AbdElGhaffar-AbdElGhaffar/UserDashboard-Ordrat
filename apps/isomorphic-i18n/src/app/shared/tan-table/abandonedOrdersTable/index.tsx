@@ -15,8 +15,9 @@ import { API_BASE_URL } from '@/config/base-url';
 import { PhoneNumberOrder } from '@/data/tan-table-data';
 import { useUserContext } from '@/app/components/context/UserContext';
 import TableToolbarFilterAbandonedOrders from '../table-toolbar-filter-AbandonedOrders';
+import Link from 'next/link';
 
-export default function AbandonedOrdersTable1({ lang = "en",shopId}: { lang?: string;shopId:string }) {
+export default function AbandonedOrdersTable1({ lang = "en",shopId,currencyAbbreviation}: { lang?: string;shopId:string;currencyAbbreviation:string }) {
 
   const [inputFromTo, setInputFromTo] = useState<string[]>(['', '']);
   const [accountIdSelectedValue, setAccountIdSelectedValue] = useState<string>('');
@@ -51,7 +52,7 @@ export default function AbandonedOrdersTable1({ lang = "en",shopId}: { lang?: st
     
   const { table, setData } = useTanStackTable<PhoneNumberOrder>({
     tableData: defaultData,
-    columnConfig: defaultColumns(lang),
+  columnConfig: defaultColumns(lang, currencyAbbreviation),
     options: {
       initialState: {
         pagination: {
@@ -98,10 +99,10 @@ function formatToEgyptTimeString(date: Date, type: 'start' | 'end') {
   const target = new Date(date);
 
   if (type === 'start') {
-    target.setDate(target.getDate() - 1); // اليوم السابق
+    target.setDate(target.getDate() - 1); 
     target.setHours(23, 59, 0, 0);
   } else if (type === 'end') {
-    target.setHours(23, 59, 59, 999); // نهاية اليوم الحالي
+    target.setHours(23, 59, 59, 999);
   }
 
   // توليد التاريخ بصيغة YYYY-MM-DDTHH:mm:ss بدون UTC
@@ -142,8 +143,10 @@ const queryParams = new URLSearchParams();
           visitTime: phone.visitTime,
           startDate: phone.startDate,
           endDate: phone.endDate,
+          currencyAbbreviation,
           userName:''
         }));
+  console.log('currencyAbbreviation',currencyAbbreviation);
   
         setDefaultData(transformedData);
         setData(transformedData);
@@ -175,11 +178,13 @@ const queryParams = new URLSearchParams();
     <>
       <WidgetCard title={lang === 'ar' ? 'جدول الطلبات المهجورة' : 'Abandoned Orders Table'} className="flex flex-col gap-4">
         <div className="flex justify-end items-center">
-            {/* <Button onClick={handleRefreshData} className="w-auto me-6">
-              <PiArrowsClockwiseBold className="me-1.5 h-[17px] w-[17px]" />
-              {lang == "en"?"Update Data":'تحديث البيانات'}
-            </Button> */}
             {/* <AddAccountsButton lang={lang} title={lang == "en"?"Add Admin Assistant":' اضافة مساعد ادمن'} buttonLabel={lang == "en"?"Add Admin Assistant":' اضافة مساعد ادمن'} modalBtnLabel={lang == "en"?"Add Admin Assistant":' اضافة مساعد ادمن'} onSuccess={handleRefreshData} /> */}
+          <Link href={`/${lang}/marketingtools/whatsapp`}>
+            <Button onClick={handleRefreshData} className="w-auto">
+              {/* <PiArrowsClockwiseBold className="me-1.5 h-[17px] w-[17px]" /> */}
+              {lang == "en"?"Launch Your WhatsApp Ad Campaign":'أطلق حملتك الإعلانية على واتساب'}
+            </Button>
+          </Link>
         </div>
         <TableToolbarFilterAbandonedOrders 
           nameEN="Phone Number" 

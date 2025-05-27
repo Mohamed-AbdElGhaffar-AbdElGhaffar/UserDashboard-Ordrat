@@ -166,7 +166,7 @@ export default function CustomizedMixChart({
                 tickLine={false}
                 tick={<CustomYAxisTick />}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip currency='' />} />
               <Area
                 type="step"
                 dataKey="sessions"

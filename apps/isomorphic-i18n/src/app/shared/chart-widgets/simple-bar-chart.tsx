@@ -85,7 +85,7 @@ export default function SimpleBarChart({
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis tickLine={false} dataKey="name" />
             <YAxis tickLine={false} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip currency=''/>} />
             <Legend />
             <Bar dataKey="pv" fill="#5a5fd7" radius={[4, 4, 0, 0]} />
             <Bar dataKey="uv" fill="#10b981" radius={[4, 4, 0, 0]} />
