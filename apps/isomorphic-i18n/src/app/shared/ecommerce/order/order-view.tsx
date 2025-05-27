@@ -74,13 +74,63 @@ function WidgetCard({
   );
 }
 
-export default function OrderView({ lang, initialOrder, currencyAbbreviation, orderPrint, userData, phone, branches, delivery }: { lang: string; initialOrder: Order | null; orderPrint: any; userData: any; phone:string; branches: DeliveryOption[]; delivery: any; currencyAbbreviation: string; }) {
+async function fetchLocationDirection(id: string, lang: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/Order/GetLocationDirectionForOrder/${id}`, {
+      headers: {
+        'Accept-Language': lang,
+      },
+      cache: 'no-store',
+    });
+    if (!response.ok) throw new Error('Failed to fetch order');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    return null;
+  }
+}
+
+function formatDuration(seconds: number, lang: string = 'en'): string | null {
+  const days = Math.floor(seconds / (3600 * 24));
+  const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  const parts = [];
+
+  if (days > 0) {
+    parts.push(`${days}d`);
+  }
+  if (hours > 0 || days > 0) {
+    parts.push(`${hours}h`);
+  }
+  if (minutes > 0 || hours > 0 || days > 0) {
+    parts.push(`${minutes}m`);
+  }
+  if (remainingSeconds > 0 || (days === 0 && hours === 0 && minutes === 0 && seconds > 0)) {
+    parts.push(`${remainingSeconds}s`);
+  }
+
+  if (parts.length === 0) return null;
+
+  return parts.join(':');
+}
+
+function calculateTotalDistance(distanceToBranch: string, distanceToUser: string): number {
+  const num1 = parseFloat(distanceToBranch.replace(/[^\d.]/g, ''));
+  const num2 = parseFloat(distanceToUser.replace(/[^\d.]/g, ''));
+  return num1 + num2;
+}
+export default function OrderView({ lang, initialOrder, currencyAbbreviation, orderPrint, userData, phone, branches, delivery, initialLocationDirection }: { lang: string; initialOrder: Order | null; orderPrint: any; userData: any; phone:string; branches: DeliveryOption[]; delivery: any; currencyAbbreviation: string; initialLocationDirection: any; }) {
   console.log("deliveryInfo: ",delivery);
   
   const text = {
     apartment: lang === 'ar' ? "شقة" : 'apartment',
     home: lang === 'ar' ? "المنزل" : 'Home',
     office: lang === 'ar' ? "المكتب" : 'Office',
+    km: lang === 'ar' ? 'كم' : 'KM',
+    remainingTime: lang === 'ar' ? 'الوقت المتبقي' : 'Remaining Time',
+    away: lang === 'ar' ? 'علي بعد' : 'Away',
 
     deliveryInfo: lang === 'ar' ? "معلومات سائق التوصيل" : 'Delivery Information',
   };
@@ -99,7 +149,7 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
   const [order, setOrder] = useState<Order | null>(initialOrder);
   const { orderDetailsStatus, setOrderDetailsStatus } = useUserContext();  
 	const { t } = useTranslation(lang! ,'order');
-  
+  const [LocationDirection, setLocationDirection] = useState(initialLocationDirection);
   const [currentOrderStatus, setCurrentOrderStatus] = useState<number | undefined>(initialOrder?.status);
   // const currentOrderStatus = order?.status;
   const { id } = useParams();
@@ -191,6 +241,12 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
       } else {
         setDeliveryInfoState(null);
       }
+      if (data?.type === 2 && (data.status === 3)) {
+        const fetchLocDir = await fetchLocationDirection(id as string, lang);
+        setLocationDirection(fetchLocDir);
+      } else {
+        setLocationDirection(null);
+      }
     } catch (error) {
       console.error('Error fetching order:', error);
     } finally {
@@ -204,6 +260,19 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
       setOrderDetailsStatus(false);
     }
   }, [orderDetailsStatus]);
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (order?.type === 2 && order.status === 3) {
+        const fetchLocDir = await fetchLocationDirection(id as string, lang);
+        setLocationDirection(fetchLocDir);
+      } else {
+        setLocationDirection(null);
+      }
+    }, 15000);
+  
+    return () => clearInterval(interval);
+  }, [order?.type, order?.status, id, lang]);
+  
   const { openModal } = useModal();
   
   const handleDeleteOrders = async () => {
@@ -261,11 +330,6 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
     }
   ];
 
-  const branchLocation = {
-    lat: 30.793573,
-    lng: 30.999190,
-  };
-  
   return (
     <div className="@container mb-5">
       <div className="flex flex-wrap justify-center border-b border-t border-gray-300 py-4 font-medium text-gray-700 @5xl:justify-start">
@@ -463,6 +527,18 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
                         {t('Zone')}: {deliveryInfo[0].zone.name}
                       </div>
                     )}
+                    {LocationDirection && (<>
+                      {calculateTotalDistance(LocationDirection.routeDistanceToBranch, LocationDirection.routeDistanceToUser) && (
+                        <div className="text-sm text-gray-600">
+                          {text.away} : <span>{calculateTotalDistance(LocationDirection.routeDistanceToBranch, LocationDirection.routeDistanceToUser)} {text.km}</span>
+                        </div>
+                      )}
+                      {formatDuration(LocationDirection.routeDurationToBranch + LocationDirection.routeDurationToUser, lang) && (
+                        <div className="text-sm text-gray-600">
+                          {text.remainingTime} : <span>{formatDuration(LocationDirection.routeDurationToBranch + LocationDirection.routeDurationToUser, lang)}</span>
+                        </div>
+                      )}
+                    </>)}
                   </div>
                 </div>
               ) : (

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { API_BASE_URL } from '@/config/base-url';
 import { GetCookiesClient } from '../ui/getCookiesClient/GetCookiesClient';
+import Cookies from 'js-cookie';
 
 interface DeliveryOffer {
   deliveryId: string;
@@ -46,8 +47,10 @@ export function useNegotiator(orderId?: string) {
     try {
       const res = await fetch(`${API_BASE_URL}/api/Auth/RefreshAccessToken`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
+        headers: { 
+          'refreshToken': refreshToken,
+          'Content-Type': 'application/json' 
+        },
       });
 
       if (!res.ok) throw new Error('Token refresh failed');
@@ -57,8 +60,20 @@ export function useNegotiator(orderId?: string) {
       setAccessToken(data.accessToken);
       return data.accessToken;
     } catch (error) {
-      console.error('Token refresh error:', error);
-      // window.location.href = '/signin';
+      console.error('Token refresh error:', error);  
+      Cookies.remove('shopId');
+      Cookies.remove('accessToken');
+      Cookies.remove('refreshToken');
+      Cookies.remove('roles');
+      Cookies.remove('branches');
+      Cookies.remove('mainBranch');
+      Cookies.remove('name');
+      Cookies.remove('email');
+      Cookies.remove('sellerId');
+      Cookies.remove('userType');
+      localStorage.clear();
+          
+      window.location.href = '/signin';
       return null;
     }
   }

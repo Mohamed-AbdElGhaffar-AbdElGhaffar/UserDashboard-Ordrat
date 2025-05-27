@@ -57,6 +57,54 @@ async function fetchOrderById(id: string, lang: string) {
   }
 }
 
+async function fetchLocationDirection(id: string, lang: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/Order/GetLocationDirectionForOrder/${id}`, {
+      headers: {
+        'Accept-Language': lang,
+      },
+      cache: 'no-store',
+    });
+    if (!response.ok) throw new Error('Failed to fetch order');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    return null;
+  }
+}
+
+function formatDuration(seconds: number, lang: string = 'en'): string | null {
+  const days = Math.floor(seconds / (3600 * 24));
+  const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  const parts = [];
+
+  if (days > 0) {
+    parts.push(`${days}d`);
+  }
+  if (hours > 0 || days > 0) {
+    parts.push(`${hours}h`);
+  }
+  if (minutes > 0 || hours > 0 || days > 0) {
+    parts.push(`${minutes}m`);
+  }
+  if (remainingSeconds > 0 || (days === 0 && hours === 0 && minutes === 0 && seconds > 0)) {
+    parts.push(`${remainingSeconds}s`);
+  }
+
+  if (parts.length === 0) return null;
+
+  return parts.join(':');
+}
+
+function calculateTotalDistance(distanceToBranch: string, distanceToUser: string): number {
+  const num1 = parseFloat(distanceToBranch.replace(/[^\d.]/g, ''));
+  const num2 = parseFloat(distanceToUser.replace(/[^\d.]/g, ''));
+  return num1 + num2;
+}
+
 interface DeliveryOption {
   id: string;
   name: string;
@@ -88,9 +136,10 @@ type ChooseDeliveryFormProps = {
   pageHeader: PageHeaderType;
   initialDeliveryInfo: any;
   initialOrder: any;
+  initialLocationDirection: any;
 };
 
-export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviation,branches, orderId, pageHeader, initialDeliveryInfo, initialOrder }: ChooseDeliveryFormProps) {
+export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviation,branches, orderId, pageHeader, initialDeliveryInfo, initialOrder, initialLocationDirection }: ChooseDeliveryFormProps) {
   const { closeModal } = useModal();
   const accessToken = GetCookiesClient('accessToken');
   const shopId = GetCookiesClient('shopId');
@@ -119,8 +168,11 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
     away: lang === 'ar' ? 'علي بعد' : 'Away',
     proposedPrice: lang === 'ar' ? 'السعر المقترح' : 'Proposed Price',
     shippingFees: lang === 'ar' ? 'سعر التوصيل' : 'Shipping Price',
+    km: lang === 'ar' ? 'كم' : 'KM',
+    remainingTime: lang === 'ar' ? 'الوقت المتبقي' : 'Remaining Time',
   };
   const [deliveryInfo, setDeliveryInfo] = useState(initialDeliveryInfo);
+  const [LocationDirection, setLocationDirection] = useState(initialLocationDirection);
   const [order, setOrder] = useState(initialOrder);
   const [currencyAbbreviation, setCurrencyAbbreviation] = useState(initialCurrencyAbbreviation);
   const [selectedBranch, setSelectedBranch] = useState(branches[0]?.id || '');
@@ -207,13 +259,17 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
         const info = await fetchDeliveryById(fetchedOrder.deliveryId);
         setDeliveryInfo(info);
       }
+      if (fetchedOrder?.type === 2 && (fetchedOrder.status === 3)) {
+        const fetchLocDir = await fetchLocationDirection(orderId, lang);
+        setLocationDirection(fetchLocDir);
+      }
     }
   }
   useEffect(() => {
     fetchDrivers(selectedBranch, 1);
     getOrderAndDelivery();
     setPage(1);
-  }, [selectedBranch]);
+  }, [selectedBranch, offers]);
   useEffect(() => {
     const handleScroll = () => {
       const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.body.offsetHeight;
@@ -227,8 +283,19 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [page, maxPage, selectedBranch]);
-
+  }, [page, maxPage, selectedBranch, offers]);
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (order?.type === 2 && order.status === 3) {
+        const fetchLocDir = await fetchLocationDirection(orderId, lang);
+        setLocationDirection(fetchLocDir);
+      } else {
+        setLocationDirection(null);
+      }
+    }, 15000);
+  
+    return () => clearInterval(interval);
+  }, [order?.type, order?.status, orderId, lang]);
   return (
     <>
       <PageHeader className='py-2' title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} >
@@ -271,9 +338,18 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
                         {/* ({offer.numberOfOrders} {text.trip}) */}
                       </p>
                     </div>
-                    <p className="font-semibold text-[14px] capitalize text-[#979797]">
-                      {text.away} : <span>{50} KM</span>
-                    </p>
+                    {LocationDirection && (<>
+                      {calculateTotalDistance(LocationDirection.routeDistanceToBranch, LocationDirection.routeDistanceToUser) && (
+                        <p className="font-semibold text-[14px] capitalize text-[#979797]">
+                          {text.away} : <span>{calculateTotalDistance(LocationDirection.routeDistanceToBranch, LocationDirection.routeDistanceToUser)} {text.km}</span>
+                        </p>
+                      )}
+                      {formatDuration(LocationDirection.routeDurationToBranch + LocationDirection.routeDurationToUser, lang) && (
+                        <p className="font-semibold text-[14px] capitalize text-[#979797]">
+                          {text.remainingTime} : <span>{formatDuration(LocationDirection.routeDurationToBranch + LocationDirection.routeDurationToUser, lang)}</span>
+                        </p>
+                      )}
+                    </>)}
                   </div>
                 </div>
                 <Image
@@ -355,7 +431,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
                             </p>
                           </div>
                           <p className="font-semibold text-[14px] capitalize text-[#979797]">
-                            {text.away} : <span>{offer.RouteDistanceToBranch || 50} KM</span>
+                            {text.away} : <span>{offer.RouteDistanceToBranch || 50} {text.km}</span>
                           </p>
                         </div>
                       </div>

@@ -75,6 +75,25 @@ async function fetchDeliveryById(driverId?: string) {
     }
   }
 }
+async function fetchOrderLocationDirection(lang: string, orderId?: string) {
+  if (orderId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Order/GetLocationDirectionForOrder/${orderId}`, {
+        headers: {
+          'Accept-Language': lang || 'en',
+        },
+        cache: 'no-store',
+      });
+  
+      if (!response.ok) throw new Error('Failed to fetch Location&Direction');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching Location&Direction:', error);
+      return null;
+    }
+  }
+}
 
 export default async function AssignOrderToDelivery({
   params: { lang, id },
@@ -108,6 +127,9 @@ export default async function AssignOrderToDelivery({
   const deliveryInfo = order.type === 2 && (order.status === 3 || order.status === 4)
     ? await fetchDeliveryById(order.deliveryId)
     : null;
+  const LocationDirection = order.type === 2 && order.status === 3
+    ? await fetchOrderLocationDirection(lang ,order.id)
+    : null;
   return (
     <>
       {order?
@@ -122,7 +144,16 @@ export default async function AssignOrderToDelivery({
               </p>
             </div>
           :
-          <ChooseDelivery lang={lang} branches={branches} orderId={id} pageHeader={pageHeader} initialDeliveryInfo={deliveryInfo} initialOrder={order} initialCurrencyAbbreviation={shopData?.currencyAbbreviation}/>
+          <ChooseDelivery 
+            lang={lang} 
+            branches={branches} 
+            orderId={id} 
+            pageHeader={pageHeader} 
+            initialDeliveryInfo={deliveryInfo} 
+            initialOrder={order} 
+            initialCurrencyAbbreviation={shopData?.currencyAbbreviation}
+            initialLocationDirection={LocationDirection}
+          />
           }
           {/* <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} /> */}
         </>
