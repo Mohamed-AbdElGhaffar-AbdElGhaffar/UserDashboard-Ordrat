@@ -242,7 +242,7 @@ export default function ChooseDelivery({ lang = 'en', currencyAbbreviation,branc
                       </svg>
                       <span className="font-medium text-gray-700">{text.shippingFees}:</span>
                     </div>
-                    <span className="font-bold text-green-600 text-md">
+                    <span className="font-bold text-green-600 text-md flex gap-2">
                       {order.shippingFees || 0} {currencyAbbreviation === "ر.س" ? (<Image src={sarIcon} alt="SAR" width={16} height={16} />) : (<span>{currencyAbbreviation}</span>)}
                     </span>
                   </div>
@@ -326,7 +326,7 @@ export default function ChooseDelivery({ lang = 'en', currencyAbbreviation,branc
                               </svg>
                               <span className="font-medium text-gray-700">{text.proposedPrice}:</span>
                             </div>
-                            <span className="font-bold text-green-600 text-md">
+                            <span className="font-bold text-green-600 text-md flex gap-2">
                               {offer.proposedPrice || 0} {currencyAbbreviation === "ر.س" ? (<Image src={sarIcon} alt="SAR" width={16} height={16} />) : (<span>{currencyAbbreviation}</span>)}
                             </span>
                           </div>
