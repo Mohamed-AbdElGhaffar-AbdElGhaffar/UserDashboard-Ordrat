@@ -1,364 +1,209 @@
 import { API_BASE_URL } from '@/config/base-url';
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
 
 /**
- * Types and Interfaces
+ * Refresh access token function
  */
-interface TokenData {
-  accessToken: string;
-  refreshToken: string;
-  shopId?: string;
-  roles?: string[];
-  branches?: any[];
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-}
+const refreshAuthToken = async (): Promise<string> => {
+  const refreshToken = Cookies.get('refreshToken');
+  if (!refreshToken) {
+    throw new Error('Refresh token not found');
+  }
 
-interface QueuedRequest {
-  resolve: (value: any) => void;
-  reject: (reason: any) => void;
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/api/Auth/RefreshAccessToken`,
+      {},
+      {
+        headers: {
+          'refreshToken': refreshToken,
+          'Content-Type': 'application/json'
+        },
+      }
+    );
+
+    if (response.data && response.data.accessToken) {
+      // Save new tokens
+      Cookies.set('accessToken', response.data.accessToken, { expires: 1, secure: true, sameSite: 'Lax', path: '/' });
+      Cookies.set('refreshToken', response.data.refreshToken, { expires: 1, secure: true, sameSite: 'Lax', path: '/' });
+      
+      // Save other user data
+      if (response.data.shopId) {
+        Cookies.set('shopId', response.data.shopId, { expires: 1, secure: true, sameSite: 'Lax', path: '/' });
+      }
+      if (response.data.roles) {
+        Cookies.set('roles', JSON.stringify(response.data.roles), { expires: 1, secure: true, sameSite: 'Lax', path: '/' });
+      }
+      if (response.data.branches) {
+        Cookies.set('branches', JSON.stringify(response.data.branches), { expires: 1, secure: true, sameSite: 'Lax', path: '/' });
+      }
+      if (response.data.firstName && response.data.lastName) {
+        Cookies.set('name', `${response.data.firstName} ${response.data.lastName}`, { expires: 1, secure: true, sameSite: 'Lax', path: '/' });
+      }
+      if (response.data.email) {
+        Cookies.set('email', response.data.email, { expires: 1, secure: true, sameSite: 'Lax', path: '/' });
+      }
+      
+      return response.data.accessToken;
+    }
+    
+    throw new Error('Failed to refresh token: Invalid response format');
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    throw new Error('Failed to refresh token');
+  }
+};
+
+/**
+ * Clear auth data and redirect
+ */
+const clearAuthAndRedirect = (): void => {
+  localStorage.clear();
+  const cookiesToRemove = [
+    'shopId', 'accessToken', 'refreshToken', 'roles', 'branches', 
+    'mainBranch', 'name', 'email', 'sellerId', 'userType'
+  ];
+  
+  cookiesToRemove.forEach(cookie => {
+    Cookies.remove(cookie, { path: '/' });
+  });
+  
+  if (!window.location.pathname.includes('/signin')) {
+    window.location.href = '/signin';
+  }
+};
+
+/**
+ * Type guard for error messages
+ */
+const hasErrorMessage = (data: any): data is { message: string } => {
+  return data && typeof data === 'object' && 'message' in data && typeof data.message === 'string';
+};
+
+/**
+ * Create axios client
+ */
+const axiosClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000,
+});
+
+/**
+ * Token refresh state management
+ */
+let isRefreshing = false;
+
+interface QueueItem {
+  resolve: (value: unknown) => void;
+  reject: (reason?: any) => void;
   config: AxiosRequestConfig;
 }
 
-interface ApiError {
-  message?: string;
-  errors?: Record<string, string[]>;
-  statusCode?: number;
-}
+let failedRequestsQueue: QueueItem[] = [];
 
 /**
- * Cookie Management Utility
+ * Process queued requests
  */
-class CookieManager {
-  private static readonly COOKIE_OPTIONS = {
-    expires: 1,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Lax' as const,
-    path: '/'
-  };
-
-  static set(key: string, value: string): void {
-    Cookies.set(key, value, this.COOKIE_OPTIONS);
-  }
-
-  static get(key: string): string | undefined {
-    return Cookies.get(key);
-  }
-
-  static remove(key: string): void {
-    Cookies.remove(key, { path: '/' });
-  }
-
-  static clearAll(): void {
-    const cookiesToClear = [
-      'accessToken', 'refreshToken', 'shopId', 'roles', 'branches',
-      'name', 'email', 'sellerId', 'userType', 'mainBranch'
-    ];
-    
-    cookiesToClear.forEach(cookie => this.remove(cookie));
-  }
-
-  static saveTokenData(data: TokenData): void {
-    this.set('accessToken', data.accessToken);
-    this.set('refreshToken', data.refreshToken);
-    
-    if (data.shopId) this.set('shopId', data.shopId);
-    if (data.roles) this.set('roles', JSON.stringify(data.roles));
-    if (data.branches) this.set('branches', JSON.stringify(data.branches));
-    if (data.firstName && data.lastName) {
-      this.set('name', `${data.firstName} ${data.lastName}`);
+const processQueue = (error: Error | null, token: string | null = null): void => {
+  failedRequestsQueue.forEach(request => {
+    if (error) {
+      request.reject(error);
+    } else {
+      if (token && request.config.headers) {
+        request.config.headers.Authorization = `Bearer ${token}`;
+      }
+      request.resolve(axiosClient(request.config));
     }
-    if (data.email) this.set('email', data.email);
-  }
-}
+  });
+  
+  failedRequestsQueue = [];
+};
 
 /**
- * Token Refresh Manager
+ * Request interceptor
  */
-class TokenRefreshManager {
-  private isRefreshing = false;
-  private requestQueue: QueuedRequest[] = [];
-  private client: AxiosInstance;
-
-  constructor(client: AxiosInstance) {
-    this.client = client;
-  }
-
-  async refreshToken(): Promise<string> {
-    const refreshToken = CookieManager.get('refreshToken');
+axiosClient.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const accessToken = Cookies.get('accessToken');    
+    if (accessToken && config.headers) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
     
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
-    try {
-      const response = await axios.post<TokenData>(
-        `${API_BASE_URL}/api/Auth/RefreshAccessToken`,
-        {},
-        {
-          headers: {
-            'refreshToken': refreshToken,
-            'Content-Type': 'application/json'
-          },
-          timeout: 10000 // 10 second timeout
-        }
-      );
-
-      if (!response.data?.accessToken) {
-        throw new Error('Invalid token response format');
-      }
-
-      // Save new token data
-      CookieManager.saveTokenData(response.data);
-      
-      return response.data.accessToken;
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      throw new Error('Failed to refresh access token');
-    }
+    console.log(`🚀 ${config.method?.toUpperCase()} ${config.url}`);
+    return config;
+  },
+  (error: AxiosError) => {
+    console.error('❌ Request error:', error);
+    return Promise.reject(error);
   }
+);
 
-  async handleTokenRefresh(originalRequest: AxiosRequestConfig): Promise<any> {
-    // If already refreshing, queue the request
-    if (this.isRefreshing) {
-      return new Promise((resolve, reject) => {
-        this.requestQueue.push({ resolve, reject, config: originalRequest });
-      });
-    }
-
-    this.isRefreshing = true;
-
-    try {
-      // Refresh the token
-      const newAccessToken = await this.refreshToken();
-      
-      // Process queued requests with new token
-      this.processQueue(null, newAccessToken);
-      
-      // Retry original request with new token
-      return this.retryRequestWithNewToken(originalRequest, newAccessToken);
-      
-    } catch (error) {
-      // Process queue with error
-      this.processQueue(error as Error);
-      
-      // Clear auth data and redirect
-      this.handleAuthFailure();
-      
-      throw error;
-    } finally {
-      this.isRefreshing = false;
-    }
-  }
-
-  private processQueue(error: Error | null, token?: string): void {
-    this.requestQueue.forEach(({ resolve, reject, config }) => {
-      if (error) {
-        reject(error);
-      } else if (token) {
-        // Add new token to request headers
-        config.headers = {
-          ...config.headers,
-          Authorization: `Bearer ${token}`
-        };
-        resolve(this.retryRequestWithNewToken(config, token));
-      }
+/**
+ * Response interceptor
+ */
+axiosClient.interceptors.response.use(
+  (response: AxiosResponse) => {
+    console.log(`✅ ${response.config.method?.toUpperCase()} ${response.config.url}`);
+    return response;
+  },
+  async (error: any) => {
+    const originalConfig = error.config as AxiosRequestConfig;
+    
+    console.error(`❌ ${originalConfig?.method?.toUpperCase()} ${originalConfig?.url}`, {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message
     });
-
-    this.requestQueue = [];
-  }
-
-  private async retryRequestWithNewToken(config: AxiosRequestConfig, token: string): Promise<any> {
-    const newConfig = {
-      ...config,
-      headers: {
-        ...config.headers,
-        Authorization: `Bearer ${token}`
-      }
-    };
-
-    return this.client.request(newConfig);
-  }
-
-  private handleAuthFailure(): void {
-    CookieManager.clearAll();
-    localStorage.clear();
     
-    // Prevent redirect loops
-    if (!window.location.pathname.includes('/signin')) {
-      window.location.href = '/signin';
+    if (!originalConfig) {
+      return Promise.reject(error);
     }
-  }
-}
 
-/**
- * Enhanced Axios Client
- */
-class ApiClient {
-  private client: AxiosInstance;
-  private tokenManager: TokenRefreshManager;
-
-  constructor() {
-    this.client = this.createAxiosInstance();
-    this.tokenManager = new TokenRefreshManager(this.client);
-    this.setupInterceptors();
-  }
-
-  private createAxiosInstance(): AxiosInstance {
-    return axios.create({
-      baseURL: API_BASE_URL,
-      timeout: 30000, // 30 second timeout
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-  }
-
-  private setupInterceptors(): void {
-    // Request interceptor
-    this.client.interceptors.request.use(
-      (config) => {
-        const accessToken = CookieManager.get('accessToken');
-        
-        if (accessToken && config.headers) {
-          config.headers.Authorization = `Bearer ${accessToken}`;
-        }
-
-        // Add request timestamp for debugging
-        config.metadata = { startTime: new Date() };
-        
-        console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
-        
-        return config;
-      },
-      (error) => {
-        console.error('❌ Request interceptor error:', error);
-        return Promise.reject(error);
-      }
-    );
-
-    // Response interceptor
-    this.client.interceptors.response.use(
-      (response) => {
-        // Log successful responses
-        // const duration = new Date().getTime() - response.config.metadata?.startTime?.getTime();
-        console.log(`✅ API Success: ${response.config.method?.toUpperCase()} ${response.config.url}`);
-        
-        return response;
-      },
-      async (error: AxiosError<ApiError>) => {
-        const originalRequest = error.config;
-        
-        // Log error details
-        console.error(`❌ API Error: ${originalRequest?.method?.toUpperCase()} ${originalRequest?.url}`, {
-          status: error.response?.status,
-          message: error.response?.data?.message || error.message
+    // Check if token is expired
+    const isTokenExpired = 
+      (error.response?.status === 401) || 
+      (error.response?.status === 403) ||
+      (error.response?.status === 500 && 
+       hasErrorMessage(error.response?.data) && 
+       error.response.data.message === 'Access token is invalid');
+    
+    // Handle token refresh
+    if (isTokenExpired && originalConfig && !(originalConfig as any)._retry) {
+      (originalConfig as any)._retry = true;
+      
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedRequestsQueue.push({
+            resolve, 
+            reject,
+            config: originalConfig
+          });
         });
-
-        // Handle authentication errors
-        if (this.isAuthenticationError(error) && originalRequest && !originalRequest._isRetry) {
-          originalRequest._isRetry = true;
-          
-          try {
-            return await this.tokenManager.handleTokenRefresh(originalRequest);
-          } catch (refreshError) {
-            return Promise.reject(refreshError);
-          }
+      }
+      
+      isRefreshing = true;
+      
+      try {
+        const newToken = await refreshAuthToken();
+        processQueue(null, newToken);
+        
+        const newRequestConfig = { ...originalConfig };
+        if (newRequestConfig.headers) {
+          newRequestConfig.headers.Authorization = `Bearer ${newToken}`;
         }
-
-        // Transform error for better handling
-        return Promise.reject(this.transformError(error));
+        
+        return axiosClient(newRequestConfig);
+      } catch (refreshError) {
+        processQueue(refreshError as Error);
+        clearAuthAndRedirect();
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
-    );
-  }
-
-  private isAuthenticationError(error: AxiosError<ApiError>): boolean {
-    const status = error.response?.status;
-    const message = error.response?.data?.message;
+    }
     
-    return (
-      status === 401 ||
-      status === 403 ||
-      (status === 500 && message === 'Access token is invalid')
-    );
-  }
-
-  private transformError(error: AxiosError<ApiError>): Error {
-    const status = error.response?.status;
-    const data = error.response?.data;
-    const message = data?.message || error.message || 'An unexpected error occurred';
-
-    const transformedError = new Error(message) as any;
-    transformedError.status = status;
-    transformedError.data = data;
-    transformedError.originalError = error;
-
-    return transformedError;
-  }
-
-  // Public API methods
-  async request<T = any>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.request<T>(config);
-  }
-
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.get<T>(url, config);
-  }
-
-  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.post<T>(url, data, config);
-  }
-
-  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.put<T>(url, data, config);
-  }
-
-  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.patch<T>(url, data, config);
-  }
-
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.delete<T>(url, config);
-  }
-
-  // Utility method for form data requests
-  async postFormData<T = any>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.post<T>(url, formData, {
-      ...config,
-      headers: {
-        ...config?.headers,
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-  }
-
-  async putFormData<T = any>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.put<T>(url, formData, {
-      ...config,
-      headers: {
-        ...config?.headers,
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-  }
-}
-
-// Export singleton instance
-const axiosClient = new ApiClient();
-
-// Type augmentation for axios config
-declare module 'axios' {
-  interface AxiosRequestConfig {
-    _isRetry?: boolean;
-    metadata?: {
-      startTime: Date;
-    };
-  }
-}
+    return Promise.reject(error);
+  } 
+);
 
 export default axiosClient;
-
-// Export utilities for advanced usage
-export { CookieManager, TokenRefreshManager };
