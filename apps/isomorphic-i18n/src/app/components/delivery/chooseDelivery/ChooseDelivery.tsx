@@ -20,7 +20,42 @@ import { API_BASE_URL, Image_BASE_URL } from '@/config/base-url';
 import { useNegotiator } from '../../context/useNegotiator';
 import { Button, Empty, SearchNotFoundIcon, Text } from 'rizzui';
 import PageHeader from '@/app/shared/page-header';
-import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png';
+import { fetchShopData } from '@/app/api/shop';
+
+async function fetchDeliveryById(driverId?: string) {
+  if (driverId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Delivery/GetDeliverById/${driverId}`, {
+        cache: 'no-store',
+      });
+      if (!response.ok) throw new Error('Failed to fetch Branches');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching details:', error);
+      return null;
+    }
+  }
+  return null;
+}
+
+async function fetchOrderById(id: string, lang: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/Order/GetById/GetById/${id}`, {
+      headers: {
+        'Accept-Language': lang,
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+    });
+    if (!response.ok) throw new Error('Failed to fetch order');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    return null;
+  }
+}
 
 interface DeliveryOption {
   id: string;
@@ -49,15 +84,16 @@ type ChooseDeliveryFormProps = {
   lang: string;
   branches: DeliveryOption[];
   orderId: string;
-  currencyAbbreviation: string;
+  initialCurrencyAbbreviation: string;
   pageHeader: PageHeaderType;
-  deliveryInfo: any;
-  order: any;
+  initialDeliveryInfo: any;
+  initialOrder: any;
 };
 
-export default function ChooseDelivery({ lang = 'en', currencyAbbreviation,branches, orderId, pageHeader, deliveryInfo, order }: ChooseDeliveryFormProps) {
+export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviation,branches, orderId, pageHeader, initialDeliveryInfo, initialOrder }: ChooseDeliveryFormProps) {
   const { closeModal } = useModal();
   const accessToken = GetCookiesClient('accessToken');
+  const shopId = GetCookiesClient('shopId');
   // const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
   const {
     offers,
@@ -84,7 +120,9 @@ export default function ChooseDelivery({ lang = 'en', currencyAbbreviation,branc
     proposedPrice: lang === 'ar' ? 'السعر المقترح' : 'Proposed Price',
     shippingFees: lang === 'ar' ? 'سعر التوصيل' : 'Shipping Price',
   };
-
+  const [deliveryInfo, setDeliveryInfo] = useState(initialDeliveryInfo);
+  const [order, setOrder] = useState(initialOrder);
+  const [currencyAbbreviation, setCurrencyAbbreviation] = useState(initialCurrencyAbbreviation);
   const [selectedBranch, setSelectedBranch] = useState(branches[0]?.id || '');
   const [drivers, setDrivers] = useState<DriverType[]>([]);
   const [page, setPage] = useState(1);
@@ -159,11 +197,23 @@ export default function ChooseDelivery({ lang = 'en', currencyAbbreviation,branc
   //     .catch((err) => console.error('SignalR connection error:', err));
   // }, [orderId]);
   
+  async function getOrderAndDelivery() {
+    const fetchedOrder = await fetchOrderById(orderId, lang);
+    const shopData = await fetchShopData(lang, shopId as string);
+    if (fetchedOrder) {
+      setOrder(fetchedOrder);
+      setCurrencyAbbreviation(shopData?.currencyAbbreviation);
+      if (fetchedOrder?.type === 2 && (fetchedOrder.status === 3 || fetchedOrder.status === 4)) {
+        const info = await fetchDeliveryById(fetchedOrder.deliveryId);
+        setDeliveryInfo(info);
+      }
+    }
+  }
   useEffect(() => {
     fetchDrivers(selectedBranch, 1);
+    getOrderAndDelivery();
     setPage(1);
   }, [selectedBranch]);
-
   useEffect(() => {
     const handleScroll = () => {
       const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.body.offsetHeight;
@@ -171,6 +221,7 @@ export default function ChooseDelivery({ lang = 'en', currencyAbbreviation,branc
         const nextPage = page + 1;
         setPage(nextPage);
         fetchDrivers(selectedBranch, nextPage);
+        getOrderAndDelivery();
       }
     };
 

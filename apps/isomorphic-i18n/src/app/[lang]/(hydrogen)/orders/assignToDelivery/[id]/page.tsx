@@ -122,7 +122,7 @@ export default async function AssignOrderToDelivery({
               </p>
             </div>
           :
-          <ChooseDelivery lang={lang} branches={branches} orderId={id} pageHeader={pageHeader} deliveryInfo={deliveryInfo} order={order} currencyAbbreviation={shopData?.currencyAbbreviation}/>
+          <ChooseDelivery lang={lang} branches={branches} orderId={id} pageHeader={pageHeader} initialDeliveryInfo={deliveryInfo} initialOrder={order} initialCurrencyAbbreviation={shopData?.currencyAbbreviation}/>
           }
           {/* <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} /> */}
         </>
