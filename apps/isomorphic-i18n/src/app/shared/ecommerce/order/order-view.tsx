@@ -74,7 +74,7 @@ function WidgetCard({
   );
 }
 
-export default function OrderView({ lang, initialOrder, currencyAbbreviation, orderPrint, userData, phone, branches, delivery }: { lang: string; initialOrder: Order | null; orderPrint: any; userData: any; phone:string; branches: DeliveryOption[]; delivery: any; }) {
+export default function OrderView({ lang, initialOrder, currencyAbbreviation, orderPrint, userData, phone, branches, delivery }: { lang: string; initialOrder: Order | null; orderPrint: any; userData: any; phone:string; branches: DeliveryOption[]; delivery: any; currencyAbbreviation: string; }) {
   console.log("deliveryInfo: ",delivery);
   
   const text = {
