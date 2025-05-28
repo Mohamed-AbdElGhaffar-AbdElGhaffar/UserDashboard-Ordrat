@@ -7,7 +7,7 @@ import Image from 'next/image';
 
 export default function ProductPricing({ lang, currencyAbbreviation }: { lang?: string; currencyAbbreviation?: string; }) {
   const text = {
-    inputPrice: lang === 'ar' ? "السعر الحالي" : "Price",
+    inputPrice: lang === 'ar' ? "سعر البيع" : "Selling Price",
     inputOldPrice: lang === 'ar' ? "السعر القديم" : "Old Price",
     BuyingPrice: lang === 'ar' ? "سعر شراء المنتج" : "Buying Price",
     inputDiscount: lang === 'ar' ? "الخصم" : "Discount",
@@ -24,6 +24,8 @@ export default function ProductPricing({ lang, currencyAbbreviation }: { lang?: 
     control,
     formState: { errors },
     setValue,
+    setError,
+    clearErrors,
   } = useFormContext();
   const { t } = useTranslation(lang!, 'form');
   const categoryOption = [
@@ -39,6 +41,7 @@ export default function ProductPricing({ lang, currencyAbbreviation }: { lang?: 
   const IsDiscountActive = useWatch({ name: 'IsDiscountActive' });
   const DiscountType = useWatch({ name: 'DiscountType' });
   const Discount = useWatch({ name: 'Discount' });
+  const watchPrice = useWatch({ name: 'price' });
   // console.log("IsDiscountActive: ",IsDiscountActive);
   useEffect(() => {
     if (!IsDiscountActive && (Discount || DiscountType)) {
@@ -46,6 +49,31 @@ export default function ProductPricing({ lang, currencyAbbreviation }: { lang?: 
       setValue('Discount', null, { shouldValidate: true, shouldDirty: true });
     }
   }, [IsDiscountActive]);
+  useEffect(() => {
+    if (!IsDiscountActive) return;
+  
+    if (DiscountType === '0' && Discount > 100) {
+      setError('Discount', {
+        type: 'manual',
+        message: lang === 'ar' ? 'لا يمكن أن يتجاوز الخصم 100%' : 'Discount cannot exceed 100%',
+      });
+    } else if (DiscountType === '1') {
+      const price = Number(watchPrice);
+      if (Discount > price) {
+        setError('Discount', {
+          type: 'manual',
+          message: lang === 'ar'
+            ? 'الخصم لا يمكن أن يكون أكبر من السعر'
+            : 'Discount cannot exceed price',
+        });
+      } else {
+        clearErrors('Discount');
+      }
+    } else {
+      clearErrors('Discount');
+    }
+  }, [Discount, DiscountType, IsDiscountActive]);
+  
   return (
     <>
       <Input
@@ -101,30 +129,34 @@ export default function ProductPricing({ lang, currencyAbbreviation }: { lang?: 
         </div>
         {IsDiscountActive && (
           <div className='w-full col-span-full grid gap-4 @2xl:grid-cols-2 @4xl:col-span-8 @4xl:gap-5 xl:gap-7'>
-            <Controller
-              name="DiscountType"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Select
-                  options={categoryOption}
-                  value={categoryOption.find((option: any) => option.value === value)}
-                  onChange={onChange}
-                  label={text.inputDiscountType}
-                  placeholder={text.placeholderDiscountType}
-                  // className="col-span-full"
-                  error={t(errors?.DiscountType?.message as string)}
-                  getOptionValue={(option) => option.value}
-                  inPortal={false}
-                />
-              )}
-            />
-            <Input
-              label={text.inputDiscount}
-              placeholder="0"
-              {...register('Discount')}
-              error={t(errors.Discount?.message as string)}
-              type="number"
-            />
+            <div>
+              <Controller
+                name="DiscountType"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    options={categoryOption}
+                    value={categoryOption.find((option: any) => option.value === value)}
+                    onChange={onChange}
+                    label={text.inputDiscountType}
+                    placeholder={text.placeholderDiscountType}
+                    // className="col-span-full"
+                    error={t(errors?.DiscountType?.message as string)}
+                    getOptionValue={(option) => option.value}
+                    inPortal={false}
+                  />
+                )}
+              />
+            </div>
+            <div>
+              <Input
+                label={text.inputDiscount}
+                placeholder="0"
+                {...register('Discount')}
+                error={t(errors.Discount?.message as string)}
+                type="number"
+              />
+            </div>
           </div>
         )}
       </div>

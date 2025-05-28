@@ -108,19 +108,19 @@ export default function AddFaqForm({
     onSubmit: async (values) => {
       try {
         const requestBody = {
-          nameAr: values.nameAr,
-          nameEn: values.nameEn,
-          titleAr: values.nameAr,
-          titleEn: values.nameEn,
-          metaDescriptionAr: values.nameAr,
-          metaDescriptionEn: values.nameEn,
+          nameAr: languages === 1 ? values.nameEn : values.nameAr,
+          nameEn: languages === 0 ? values.nameAr : values.nameEn,
+          titleAr: languages === 1 ? values.nameEn : values.nameAr,
+          titleEn: languages === 0 ? values.nameAr : values.nameEn,
+          metaDescriptionAr: languages === 1 ? values.nameEn : values.nameAr,
+          metaDescriptionEn: languages === 0 ? values.nameAr : values.nameEn,
           imageId: values.imageId,
           shopId: shopId,
           faQs: faqs.map((faq) => ({
-            questionAr: faq.questionAr,
-            questionEn: faq.question,
-            answerAr: faq.answerAr,
-            answerEn: faq.answer,
+            questionAr: languages === 1 ? faq.question : faq.questionAr,
+            questionEn: languages === 0 ? faq.questionAr : faq.question,
+            answerAr: languages === 1 ? faq.answer : faq.answerAr,
+            answerEn: languages === 0 ? faq.answerAr : faq.answer,
           })),
         };
 

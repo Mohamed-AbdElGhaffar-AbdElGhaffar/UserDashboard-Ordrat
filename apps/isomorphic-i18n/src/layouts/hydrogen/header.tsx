@@ -21,7 +21,7 @@ export default function Header({ lang }: { lang?: string }) {
           view={<Sidebar className="static w-full 2xl:w-full" lang={lang} />}
         />
         <Link
-          href={"/"}
+          href={`/${lang}`}
           aria-label="Site Logo"
           className="me-4 w-9 shrink-0 text-gray-800 hover:text-gray-900 lg:me-5 xl:hidden"
         >

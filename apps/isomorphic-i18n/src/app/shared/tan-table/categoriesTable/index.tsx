@@ -101,9 +101,9 @@ export default function CategoriesTable({lang = "en", languages, categories}:{la
     }
   };
 
-  // useEffect(() => {
-  //   fetchCategoriesData();
-  // }, [setData, lang]); 
+  useEffect(() => {
+    fetchCategoriesData();
+  }, [setData, lang]); 
 
   useEffect(() => {
     if (categoriesData == true) {

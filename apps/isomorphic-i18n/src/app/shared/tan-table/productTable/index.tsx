@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { defaultColumns } from './column';
 import MainTable from '@/app/shared/table/main-table';
 import WidgetCard from '@components/cards/widget-card';
-import { Product } from '@/data/tan-table-data';
+import { Product, Categories } from '@/data/tan-table-data';
 import TablePagination from '@/app/shared/table/table-pagination';
 import { useTanStackTable } from '@/app/shared/tan-table/custom-table-components/use-TanStack-Table';
 
@@ -18,10 +18,13 @@ import Link from 'next/link';
 import toast from 'react-hot-toast';
 import RoleExist from '@/app/components/ui/roleExist/RoleExist';
 import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookiesClient';
+import { useModal } from '@/app/shared/modal-views/use-modal';
+import ModalNoCategory from '@/app/components/ui/modals/ModalNoCategory';
+
 const shopId = GetCookiesClient('shopId');
 
-export default function ProductTable({lang = "en", products}:{lang?:string; products: Product[];}) {
-
+export default function ProductTable({lang = "en", products, categories}:{lang?:string; products: Product[]; categories: Categories[];}) {
+  const { openModal } = useModal();
   const [inputName, setInputName] = useState('');
 
   const [pageIndex, setPageIndex] = useState(0);
@@ -34,7 +37,7 @@ export default function ProductTable({lang = "en", products}:{lang?:string; prod
     { value: 15, label: '15' },
     { value: 20, label: '20' },
   ];
-
+  const [categoriesData, setCategoriesData] = useState<Categories[]>(categories);
   const [defaultData, setDefaultData] = useState<Product[]>(products);
   const { productData, setProductData } = useUserContext();
   
@@ -152,10 +155,45 @@ export default function ProductTable({lang = "en", products}:{lang?:string; prod
       console.error('Error fetching:', error);
     }
   };  
+  const fetchCategoriesData = async () => {
+    try {
+      const response = await axiosClient.get(`api/Category/GetAll/${shopId}`, {
+        headers: {
+          'Accept-Language': lang,
+        },
+      });
+      const data = await response.data;
 
-  // useEffect(() => {
-  //   fetchProduct();
-  // }, [setData, lang]); 
+      const transformedData = data.map((category: any) => ({
+        id: category.id,
+        name: category.name,
+        userName: category.name,
+        bannerUrl: category.bannerUrl,
+        status:
+          category.isActive? lang === 'ar'
+            ? `نشط`
+            : `Active`:lang === 'ar'
+            ? `غير نشط`
+            : `Not Active`,
+        isActive: category.isActive? `Active`:`Inactive`,
+        priority: category.priority,
+        numberOfColumns: lang === 'ar'? `الشكل ${ category.numberOfColumns}`
+        : `Design ${ category.numberOfColumns}`,
+        numberOfProducts: category.numberOfProducts,
+      }));
+
+      setCategoriesData(transformedData);
+    } catch (error) {
+      localStorage.clear();
+      window.location.href = '/signin';
+      console.error('Error fetching plans:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProduct();
+    fetchCategoriesData();
+  }, [setData, lang]); 
 
   useEffect(() => {
     if (productData == true) {
@@ -177,12 +215,29 @@ export default function ProductTable({lang = "en", products}:{lang?:string; prod
               <span className='hidden sm:block'>{lang == "en"?"Update Data":'تحديث البيانات'}</span>
             </Button>
             <RoleExist PageRoles={['sellerDashboard-storeProducts-products-create']}>
-              <Button className="p-0">
-                <Link href={`/${lang}/storeProducts/products/create`} className='flex py-2 px-4' >
+              {categoriesData.length == 0 ?
+                <Button 
+                  onClick={()=>{
+                    openModal({
+                      view: <ModalNoCategory
+                        lang={lang}
+                      />,
+                      customSize: '480px',
+                    });
+                  }} 
+                  className=""
+                >
                   <PiPlusBold className="me-0 sm:me-1.5 h-[17px] w-[17px]" />
                   <span className='hidden sm:block'>{lang === 'ar' ? "إضافة المنتج" : "Add Product"}</span>
-                </Link>
-              </Button>
+                </Button>
+                :
+                <Button className="p-0">
+                  <Link href={`/${lang}/storeProducts/products/create`} className='flex py-2 px-4' >
+                    <PiPlusBold className="me-0 sm:me-1.5 h-[17px] w-[17px]" />
+                    <span className='hidden sm:block'>{lang === 'ar' ? "إضافة المنتج" : "Add Product"}</span>
+                  </Link>
+                </Button>
+              }
             </RoleExist>
             {/* <ProductAddButton lang={lang} buttonLabel={lang === 'ar' ? "إضافة المنتج" : "Add Product"}  onSuccess={handleRefreshData} />  */}
         </div>

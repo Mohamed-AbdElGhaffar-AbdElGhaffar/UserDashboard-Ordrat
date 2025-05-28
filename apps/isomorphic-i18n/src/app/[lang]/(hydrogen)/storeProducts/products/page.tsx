@@ -71,6 +71,41 @@ async function getProducts(lang: string, shopId:string) {
   }
 }
 
+async function getCategories(lang: string, shopId:string) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/Category/GetAll/${shopId}`, {
+      headers: {
+        'Accept-Language': lang || 'en',
+      },
+      cache: 'no-store',
+    });
+
+    if (!res.ok) throw new Error('Failed to fetch categories');
+    const data = await res.json();
+
+    return data.map((category: any) => ({
+      id: category.id,
+      name: category.name,
+      userName: category.name,
+      bannerUrl: category.bannerUrl,
+      status:
+        category.isActive? lang === 'ar'
+          ? `نشط`
+          : `Active`:lang === 'ar'
+          ? `غير نشط`
+          : `Not Active`,
+      isActive: category.isActive? `Active`:`Inactive`,
+      priority: category.priority,
+      numberOfColumns: lang === 'ar'? `الشكل ${ category.numberOfColumns}`
+      : `Design ${ category.numberOfColumns}`,
+      numberOfProducts: category.numberOfProducts,
+    }));
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+}
+
 export default async function Products({
   params: { lang },
 }: {
@@ -80,6 +115,7 @@ export default async function Products({
 }) {
   const shopId = GetCookiesServer('shopId');
   const products = await getProducts(lang, shopId as string);
+  const categories = await getCategories(lang, shopId as string);
 
   const pageHeader = {
     title: lang === 'ar' ? 'منتجات المتجر' : 'Store Products',
@@ -125,7 +161,7 @@ export default async function Products({
       </Button>
     </div> */}
     <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-    <ProductTable  lang={lang} products={products}/>
+    <ProductTable  lang={lang} products={products} categories={categories}/>
 
   </div>
   </>;

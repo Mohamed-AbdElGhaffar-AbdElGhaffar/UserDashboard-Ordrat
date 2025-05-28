@@ -8,6 +8,7 @@ import { routes } from '@/config/routes';
 import cn from '@utils/class-names';
 import axios from 'axios';
 import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookiesServer';
+import { API_BASE_URL } from '@/config/base-url';
 
 export async function generateMetadata({ params }: { params: { lang: string } }) {
   const lang = params.lang;
@@ -63,6 +64,40 @@ async function fetchShopData(lang: string, shopId:string) {
   }
 }
 
+async function getCategories(lang: string, shopId:string) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/Category/GetAll/${shopId}`, {
+      headers: {
+        'Accept-Language': lang || 'en',
+      },
+      cache: 'no-store',
+    });
+
+    if (!res.ok) throw new Error('Failed to fetch categories');
+    const data = await res.json();
+
+    return data.map((category: any) => ({
+      id: category.id,
+      name: category.name,
+      userName: category.name,
+      bannerUrl: category.bannerUrl,
+      status:
+        category.isActive? lang === 'ar'
+          ? `نشط`
+          : `Active`:lang === 'ar'
+          ? `غير نشط`
+          : `Not Active`,
+      isActive: category.isActive? `Active`:`Inactive`,
+      priority: category.priority,
+      numberOfColumns: lang === 'ar'? `الشكل ${ category.numberOfColumns}`
+      : `Design ${ category.numberOfColumns}`,
+      numberOfProducts: category.numberOfProducts,
+    }));
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+}
 export default async function CreateProductPage({
   params: { lang },
 }: {
@@ -74,6 +109,7 @@ export default async function CreateProductPage({
 
   const products = await fetchProducts(lang, shopId as string);
   const shopData = await fetchShopData(lang, shopId as string);
+  const categories = await getCategories(lang, shopId as string);
 
   const pageHeader = {
     title: lang === 'ar' ? 'منتجات المتجر' : 'Store Products',
@@ -109,7 +145,14 @@ export default async function CreateProductPage({
           </Link> */}
         </PageHeader>
 
-        <CreateEditProduct lang={lang} allProducts={products.entities} currencyAbbreviation={shopData.currencyAbbreviation} languages={shopData.languages}/>
+        <CreateEditProduct 
+          lang={lang} 
+          allProducts={products.entities} 
+          currencyAbbreviation={shopData.currencyAbbreviation} 
+          languages={shopData.languages}
+          subdomainName={shopData.subdomainName}
+          categories={categories}
+        />
       </div>
     </>
   );

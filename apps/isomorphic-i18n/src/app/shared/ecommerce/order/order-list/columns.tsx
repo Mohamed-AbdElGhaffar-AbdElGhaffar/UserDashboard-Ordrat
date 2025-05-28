@@ -74,6 +74,7 @@ export const getColumns = ({
   const translations = {
     en: {
       orderId: 'Order ID',
+      type: 'Order Type',
       items: 'Items',
       price: 'Price',
       payment: 'Payment',
@@ -97,6 +98,7 @@ export const getColumns = ({
     },
     ar: {
       orderId: 'رقم الطلب',
+      type: 'نوع الطلب',
       items: 'العناصر',
       price: 'السعر',
       payment: 'طريقة الدفع',
@@ -120,6 +122,32 @@ export const getColumns = ({
     },
   };
 
+  function getOrderTypeLabel(value: number, lang: string) {
+    if (lang === 'ar') {
+      switch (value) {
+        case 0:
+          return 'تيك اواى';
+        case 1:
+          return 'فى المطعم';
+        case 2:
+          return 'ديليفرى';
+        default:
+          return '';
+      }
+    } else {
+      switch (value) {
+        case 0:
+          return 'Takeaway';
+        case 1:
+          return 'Dine In';
+        case 2:
+          return 'Home Delivery';
+        default:
+          return '';
+      }
+    }
+  }  
+
   const t = translations[lang as 'en' | 'ar'] || translations.en;
   const hasActions = RoleClientExist([
     'OrderDetails',
@@ -131,6 +159,13 @@ export const getColumns = ({
       key: 'orderNumber',
       width: 200,
       render: (value: string) => <Text>#{value}</Text>,
+    },
+    { 
+      title: <HeaderCell title={t.type} />,
+      dataIndex: 'orderType',
+      key: 'orderType',
+      width: 200,
+      render: (value: string) => <Text className="font-medium text-gray-700">{getOrderTypeLabel(Number(value), lang)}</Text>,
     },
     // {
     //   title: <HeaderCell title={t.items} />,

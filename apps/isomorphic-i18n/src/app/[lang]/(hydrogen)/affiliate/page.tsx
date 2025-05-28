@@ -122,14 +122,14 @@ export default async function AffiliatePage({
   ]);
 
   const pageHeader = {
-    title: lang === 'ar' ? 'الشركاء' : 'Affiliate',
+    title: lang === 'ar' ? 'شريك اوردرات' : 'Order Printer',
     breadcrumb: [
       {
         href: `/${lang}/storeSetting/basicData`,
         name: lang === 'ar' ? 'المتجر' : 'Store',
       },
       {
-        name: lang === 'ar' ? 'الشركاء' : 'Affiliate',
+        name: lang === 'ar' ? 'شريك اوردرات' : 'Order Printer',
       },
     ],
   };

@@ -258,6 +258,8 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
       if (fetchedOrder?.type === 2 && (fetchedOrder.status === 3 || fetchedOrder.status === 4)) {
         const info = await fetchDeliveryById(fetchedOrder.deliveryId);
         setDeliveryInfo(info);
+      }else{
+        setDeliveryInfo(null);
       }
       if (fetchedOrder?.type === 2 && (fetchedOrder.status === 3)) {
         const fetchLocDir = await fetchLocationDirection(orderId, lang);
@@ -269,7 +271,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
     fetchDrivers(selectedBranch, 1);
     getOrderAndDelivery();
     setPage(1);
-  }, [selectedBranch, offers]);
+  }, [selectedBranch, offers, isOrderBroadcasted]);
   useEffect(() => {
     const handleScroll = () => {
       const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.body.offsetHeight;
@@ -283,7 +285,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [page, maxPage, selectedBranch, offers]);
+  }, [page, maxPage, selectedBranch, offers, isOrderBroadcasted]);
   useEffect(() => {
     const interval = setInterval(async () => {
       if (order?.type === 2 && order.status === 3) {
@@ -295,11 +297,18 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
     }, 15000);
   
     return () => clearInterval(interval);
-  }, [order?.type, order?.status, orderId, lang]);
+  }, [order?.type, order?.status, orderId, lang, isOrderBroadcasted]);
   return (
     <>
       <PageHeader className='py-2' title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} >
-        {deliveryInfo? <></>:
+        {deliveryInfo? <>
+          {isOrderBroadcasted && (
+            <Button as="span" onClick={cancelBroadcastOrder} isLoading={isCheckingBroadcast} className="cursor-pointer mt-4 w-full @lg:mt-0 @lg:w-auto">
+              {/* <PiPlusBold className="me-1.5 h-[17px] w-[17px]" /> */}
+              {lang === 'ar' ? 'إلغاء الطلب' : 'Cancel Broadcast'}
+            </Button>
+          )}
+        </>:
           <>
             {!isOrderBroadcasted && (
               <Button as="span" onClick={broadcastOrder} isLoading={isCheckingBroadcast} className="cursor-pointer mt-4 w-full @lg:mt-0 @lg:w-auto">
@@ -370,7 +379,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
                       <span className="font-medium text-gray-700">{text.shippingFees}:</span>
                     </div>
                     <span className="font-bold text-green-600 text-md flex gap-2">
-                      {order.shippingFees || 0} {currencyAbbreviation === "ر.س" ? (<Image src={sarIcon} alt="SAR" width={16} height={16} />) : (<span>{currencyAbbreviation}</span>)}
+                      {(order.status === 3 || order.status === 4)? order.finalShippingFees : order.shippingFees} {currencyAbbreviation === "ر.س" ? (<Image src={sarIcon} alt="SAR" width={16} height={16} />) : (<span>{currencyAbbreviation}</span>)}
                     </span>
                   </div>
                 </div>                

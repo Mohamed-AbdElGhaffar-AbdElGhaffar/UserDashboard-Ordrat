@@ -66,8 +66,8 @@ export default function TablesForm({
       setIsSubmit(true);
       const payload = {
         branchId: mainBranch,
-        descriptionEn: values.descriptionEn,
-        descriptionAr: values.descriptionAr,
+        descriptionEn: languages === 0? values.descriptionAr : values.descriptionEn,
+        descriptionAr: languages === 1? values.descriptionEn : values.descriptionAr,
         tableNumber: values.tableNumber,
         tableStatus: 0,
       };
