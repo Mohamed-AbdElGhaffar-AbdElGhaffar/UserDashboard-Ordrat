@@ -74,6 +74,16 @@ export const productFormSchema = z.object({
   pageTitleAr: z.string().min(1, { message: messages.productPageTitleArIsRequired }),
   metaDescriptionEn: z.string().min(1, { message: messages.productMetaDescriptionEnIsRequired }),
   metaDescriptionAr: z.string().min(1, { message: messages.productMetaDescriptionArIsRequired }),
+  slugEn: z.string()
+  .min(1, { message: messages.productSlugEnIsRequired })
+  .refine((val) => !/\s/.test(val), {
+    message: messages.productSlugEnNoSpace,
+  }),
+  slugAr: z.string()
+  .min(1, { message: messages.productSlugArIsRequired })
+  .refine((val) => !/\s/.test(val), {
+    message: messages.productSlugArNoSpace,
+  }),
   IsDiscountActive: z.boolean(),
   Discount: z.any().optional(),
   DiscountType: z.string().optional(),

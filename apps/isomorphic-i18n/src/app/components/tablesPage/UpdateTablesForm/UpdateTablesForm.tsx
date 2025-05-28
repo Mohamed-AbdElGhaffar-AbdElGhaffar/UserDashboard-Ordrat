@@ -68,8 +68,8 @@ export default function UpdateTablesForm({
       setIsSubmit(true);
       const payload = {
         // shopId: mainBranch,
-        descriptionEn: values.descriptionEn,
-        descriptionAr: values.descriptionAr,
+        descriptionEn: languages === 0? values.descriptionAr : values.descriptionEn,
+        descriptionAr: languages === 1? values.descriptionEn : values.descriptionAr,
         tableNumber: values.tableNumber,
         // tableStatus: Number(values.tableStatus),
       };

@@ -506,7 +506,7 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
                 {text.deliveryInfo}
               </Title>
 
-              {deliveryInfo ? (
+              {deliveryInfo[0] ? (
                 <div className="flex gap-5 items-center border border-dashed border-mainColor rounded-lg p-5 shadow-sm">
                   <div className="shrink-0">
                     <img

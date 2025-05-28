@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Element } from 'react-scroll';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
-import { Text } from 'rizzui';
+import { Button, Text } from 'rizzui';
 import cn from '@utils/class-names';
 import FormNav, {
   formParts,
@@ -29,6 +29,10 @@ import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
 import axiosClient from '@/app/components/context/api';
 import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookiesClient';
+import { Categories } from '@/data/tan-table-data';
+import noCategories from '@public/assets/modals/noCategories.png';
+import noCategoriesAr from '@public/assets/modals/noCategoriesAr.png';
+import Link from 'next/link';
 
 const shopId = GetCookiesClient('shopId');
 const MAP_STEP_TO_COMPONENT = {
@@ -50,6 +54,8 @@ interface IndexProps {
   product?: CreateProductInput;
   allProducts?: any;
   languages: number;
+  subdomainName?: string;
+  categories: Categories[];
 }
 
 export default function CreateEditProduct({
@@ -59,7 +65,9 @@ export default function CreateEditProduct({
   lang,
   currencyAbbreviation,
   allProducts,
-  languages
+  languages,
+  subdomainName,
+  categories
 }: IndexProps) {  
 
   const text = {
@@ -71,6 +79,7 @@ export default function CreateEditProduct({
   }
   const { layout } = useLayout();
   const [isLoading, setLoading] = useState(false);
+  const [categoriesData, setCategoriesData] = useState<Categories[]>(categories);
   const methods = useForm<CreateProductInput>({
     resolver: zodResolver(productFormSchema),
     defaultValues: defaultValues(product),
@@ -91,17 +100,43 @@ export default function CreateEditProduct({
     const formData = new FormData();
 
     // Append basic product information
-    formData.append('NameAr', values.titleAr);
-    formData.append('NameEn', values.titleEn);
-    formData.append('TitleAr', values?.pageTitleAr || '');
-    formData.append('TitleEn', values?.pageTitleEn || '');
-    formData.append('DescriptionAr', values?.descriptionAr || '');
-    formData.append('DescriptionEn', values?.descriptionEn || '');
+    if (languages === 0) {
+      formData.append('NameAr', values.titleAr);
+      formData.append('NameEn', values.titleAr);
+      formData.append('TitleAr', values?.pageTitleAr || '');
+      formData.append('TitleEn', values?.pageTitleAr || '');
+      formData.append('DescriptionAr', values?.descriptionAr || '');
+      formData.append('DescriptionEn', values?.descriptionAr || '');
+      formData.append('MetaDescriptionAr', values?.metaDescriptionAr || '');
+      formData.append('MetaDescriptionEn', values?.metaDescriptionAr || '');
+      formData.append('SlugAr', values?.slugAr || '');
+      formData.append('SlugEn', values?.slugAr || '');
+    } else if (languages === 1) {
+      formData.append('NameAr', values.titleEn);
+      formData.append('NameEn', values.titleEn);
+      formData.append('TitleAr', values?.pageTitleEn || '');
+      formData.append('TitleEn', values?.pageTitleEn || '');
+      formData.append('DescriptionAr', values?.descriptionEn || '');
+      formData.append('DescriptionEn', values?.descriptionEn || '');
+      formData.append('MetaDescriptionAr', values?.metaDescriptionEn || '');
+      formData.append('MetaDescriptionEn', values?.metaDescriptionEn || '');
+      formData.append('SlugAr', values?.slugEn || '');
+      formData.append('SlugEn', values?.slugEn || '');
+    }else {
+      formData.append('NameAr', values.titleAr);
+      formData.append('NameEn', values.titleEn);
+      formData.append('TitleAr', values?.pageTitleAr || '');
+      formData.append('TitleEn', values?.pageTitleEn || '');
+      formData.append('DescriptionAr', values?.descriptionAr || '');
+      formData.append('DescriptionEn', values?.descriptionEn || '');
+      formData.append('MetaDescriptionAr', values?.metaDescriptionAr || '');
+      formData.append('MetaDescriptionEn', values?.metaDescriptionEn || '');
+      formData.append('SlugAr', values?.slugAr || '');
+      formData.append('SlugEn', values?.slugEn || '');
+    }
     if (values.IsBarcode) {
       formData.append('Barcode', values?.Barcode || '');
     }
-    formData.append('MetaDescriptionAr', values?.metaDescriptionAr || '');
-    formData.append('MetaDescriptionEn', values?.metaDescriptionEn || '');
     formData.append('Price', values?.price.toString());
     // formData.append('OldPrice', values?.oldPrice.toString());
     formData.append('BuyingPrice', values?.BuyingPrice.toString());
@@ -202,40 +237,96 @@ export default function CreateEditProduct({
       setLoading(false);
     }
   };
+  const fetchCategoriesData = async () => {
+    try {
+      const response = await axiosClient.get(`api/Category/GetAll/${shopId}`, {
+        headers: {
+          'Accept-Language': lang,
+        },
+      });
+      const data = await response.data;
 
+      const transformedData = data.map((category: any) => ({
+        id: category.id,
+        name: category.name,
+        userName: category.name,
+        bannerUrl: category.bannerUrl,
+        status:
+          category.isActive? lang === 'ar'
+            ? `نشط`
+            : `Active`:lang === 'ar'
+            ? `غير نشط`
+            : `Not Active`,
+        isActive: category.isActive? `Active`:`Inactive`,
+        priority: category.priority,
+        numberOfColumns: lang === 'ar'? `الشكل ${ category.numberOfColumns}`
+        : `Design ${ category.numberOfColumns}`,
+        numberOfProducts: category.numberOfProducts,
+      }));
+
+      setCategoriesData(transformedData);
+    } catch (error) {
+      localStorage.clear();
+      window.location.href = '/signin';
+      console.error('Error fetching plans:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategoriesData();
+  }, [lang]);
   return (
-    <div className="@container bg-white border border-muted rounded-lg p-1">
-      <FormNav
-        className={cn(
-          layout === LAYOUT_OPTIONS.BERYLLIUM && 'z-[999] 2xl:top-[72px]'
-        )}
-        lang={lang}
-      />
-      <FormProvider {...methods}>
-        <form
-          onSubmit={methods.handleSubmit(onSubmit)}
+    <>
+    {categoriesData.length == 0?
+      <div className="my-10 text-center flex flex-col items-center gap-4">
+        <img src={lang=='ar'? noCategoriesAr.src : noCategories.src} alt="Not Found" className="w-[25%] rounded-lg mx-auto" width="750" height="500"/>
+        <p className="font-medium text-xl">
+          {lang === "ar"
+            ? 'لا يوجد اقسام لإضافة منتج' 
+            : 'There are no categories to add a product.'
+          }
+        </p>
+        <Button className="w-fit p-0">
+          <Link href={`/${lang}/storeProducts/categories`} className='flex py-2 px-4' >
+            <span>{lang === 'ar' ? 'الذهاب للاقسام' : 'Go to Categories'}</span>
+          </Link>
+        </Button>
+      </div>
+      :
+      <div className="@container bg-white border border-muted rounded-lg p-1">
+        <FormNav
           className={cn(
-            'relative z-[19] [&_label.block>span]:font-medium px-3',
-            className
+            layout === LAYOUT_OPTIONS.BERYLLIUM && 'z-[999] 2xl:top-[72px]'
           )}
-        >
-          <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
-            {Object.entries(MAP_STEP_TO_COMPONENT).map(([key, Component]) => (
-              <Element
-                key={key}
-                name={formParts[key as keyof typeof formParts]}
-              >
-                {<Component className="pt-7 @2xl:pt-9 @3xl:pt-11" lang={lang} allProducts={allProducts} languages={languages} currencyAbbreviation={currencyAbbreviation} />}
-              </Element>
-            ))}
-          </div>
+          lang={lang}
+        />
+        <FormProvider {...methods}>
+          <form
+            onSubmit={methods.handleSubmit(onSubmit)}
+            className={cn(
+              'relative z-[19] [&_label.block>span]:font-medium px-3',
+              className
+            )}
+          >
+            <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
+              {Object.entries(MAP_STEP_TO_COMPONENT).map(([key, Component]) => (
+                <Element
+                  key={key}
+                  name={formParts[key as keyof typeof formParts]}
+                >
+                  {<Component className="pt-7 @2xl:pt-9 @3xl:pt-11" lang={lang} allProducts={allProducts} languages={languages} currencyAbbreviation={currencyAbbreviation} subdomainName={subdomainName} />}
+                </Element>
+              ))}
+            </div>
 
-          <FormFooter
-            isLoading={isLoading}
-            submitBtnText={slug ? text.update : text.add}
-          />
-        </form>
-      </FormProvider>
-    </div>
+            <FormFooter
+              isLoading={isLoading}
+              submitBtnText={slug ? text.update : text.add}
+            />
+          </form>
+        </FormProvider>
+      </div>
+    }
+    </>
   );
 }

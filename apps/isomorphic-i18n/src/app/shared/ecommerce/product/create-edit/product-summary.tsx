@@ -254,44 +254,46 @@ export default function ProductSummary({ className, lang, allProducts, languages
           )}
         />
       )}
-      <div className={`${(languages==0 || languages==1)? 'col-span-full':'' }`}>
-        <Controller
-          name="FrequentlyOrderedWith"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <div>
-              <label className="block font-medium text-gray-700 dark:text-gray-600 mb-1.5">
-                {text.FrequentlyOrderedWith}
-              </label>
-              <ReactSelect
-                isMulti
-                options={relatedProductsOptions}
-                value={relatedProductsOptions.filter((option) => 
-                  value && Array.isArray(value) && value.includes(option.value)
+      {relatedProductsOptions.length != 0 && (
+        <div className={`${(languages==0 || languages==1)? 'col-span-full':'' }`}>
+          <Controller
+            name="FrequentlyOrderedWith"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <div>
+                <label className="block font-medium text-gray-700 dark:text-gray-600 mb-1.5">
+                  {text.FrequentlyOrderedWith}
+                </label>
+                <ReactSelect
+                  isMulti
+                  options={relatedProductsOptions}
+                  value={relatedProductsOptions.filter((option) => 
+                    value && Array.isArray(value) && value.includes(option.value)
+                  )}
+                  onChange={(selected) => {
+                    const selectedValues = selected ? selected.map((item) => item.value) : [];
+                    onChange(selectedValues);
+                  }}
+                  placeholder={text.selectRelatedProducts}
+                  className="text-sm bg-[#f8f9fa]"
+                  classNamePrefix="react-select"
+                  // styles={{
+                  //   control: (base) => ({
+                  //     ...base,
+                  //     backgroundColor: '#f8f9fa',
+                  //   }),
+                  // }}
+                />
+                {errors?.FrequentlyOrderedWith?.message && (
+                  <span className="mt-1 text-xs text-red-500">
+                    {t(errors.FrequentlyOrderedWith.message as string)}
+                  </span>
                 )}
-                onChange={(selected) => {
-                  const selectedValues = selected ? selected.map((item) => item.value) : [];
-                  onChange(selectedValues);
-                }}
-                placeholder={text.selectRelatedProducts}
-                className="text-sm bg-[#f8f9fa]"
-                classNamePrefix="react-select"
-                // styles={{
-                //   control: (base) => ({
-                //     ...base,
-                //     backgroundColor: '#f8f9fa',
-                //   }),
-                // }}
-              />
-              {errors?.FrequentlyOrderedWith?.message && (
-                <span className="mt-1 text-xs text-red-500">
-                  {t(errors.FrequentlyOrderedWith.message as string)}
-                </span>
-              )}
-            </div>
-          )}
-        />
-      </div>
+              </div>
+            )}
+          />
+        </div>
+      )}
       <div className=''>
         <div className='flex items-center gap-4'>
           <label className='rizzui-input-label block text-sm font-medium'>

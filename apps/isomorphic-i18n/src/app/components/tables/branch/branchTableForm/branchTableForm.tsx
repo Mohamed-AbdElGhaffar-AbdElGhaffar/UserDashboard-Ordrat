@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookiesClient';
 import { PhoneNumber } from '@ui/phone-input';
 import { DateDurationPicker } from '@/app/components/ui/DatePickerTime/dateDurationPicker';
+import UpdateLocationPicker from '@/app/components/ui/map/UpdateLocationPicker';
 
 type TableFormProps = {
   title?: string;
@@ -142,10 +143,10 @@ export default function BranchTableForm({
         openAt: formatTime(values.openAt),
         closedAt: formatTime(values.closedAt),
         deliveryTime: `${mainFormik.values.deliveryTime.days.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.hours.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.minutes.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.seconds.toString().padStart(2, '0')}`,
-        nameEn: values.nameEn,
-        nameAr: values.nameAr,
+        nameEn: languages === 0? values.nameAr:values.nameEn,
+        nameAr: languages === 1? values.nameEn : values.nameAr,
         phoneNumber: values.phoneNumber,
-        zoneName: values.nameAr,
+        zoneName: languages === 1? values.nameEn : values.nameAr,
         coverageRadius: radius,
         centerLatitude: values.lat,
         centerLongitude: values.lng,
@@ -222,12 +223,22 @@ export default function BranchTableForm({
           e.preventDefault();
           mainFormik.handleSubmit();
         }}>
-          <LocationPicker 
+          {/* <LocationPicker 
             apiKey='AIzaSyCPQicAmrON3EtFwOmHvSZQ9IbONbLQmtA' 
             onLocationSelect={handleLocationSelect} 
             lang={lang} 
             setRadius={setRadius}
             radius={radius}
+          /> */}
+          <UpdateLocationPicker
+            apiKey='AIzaSyCPQicAmrON3EtFwOmHvSZQ9IbONbLQmtA' 
+            onLocationSelect={handleLocationSelect} 
+            lang={lang} 
+            setRadius={setRadius}
+            radius={radius}
+            initLat={30.0444}
+            initLng={31.2357}
+            initRadius={5000}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {languages!=1 &&(

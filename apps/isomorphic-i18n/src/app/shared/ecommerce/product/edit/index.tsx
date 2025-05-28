@@ -116,6 +116,8 @@ export default function EditProduct({
     pageTitleAr: product.titleAr,
     metaDescriptionEn: product.metaDescriptionEn,
     metaDescriptionAr: product.metaDescriptionAr,
+    slugEn: product.slugEn,
+    slugAr: product.slugAr,
     productVariants: product.variations.map((variation: any) => {
       const buttonTypeOption = buttonTypeOptions.find(option => option.value === variation.buttonType) || { label: 'Radio', value: 0 };
       return {
@@ -152,14 +154,40 @@ export default function EditProduct({
     try {
       const formData = new FormData();
   
-      formData.append("NameEn", values.titleEn);
-      formData.append("NameAr", values.titleAr);
-      formData.append("TitleEn", values.pageTitleEn || "");
-      formData.append("TitleAr", values.pageTitleAr || "");
-      formData.append("MetaDescriptionEn", values.metaDescriptionEn || "");
-      formData.append("MetaDescriptionAr", values.metaDescriptionAr || "");
-      formData.append("DescriptionEn", values.descriptionEn || "");
-      formData.append("DescriptionAr", values.descriptionAr || "");
+      if (languages === 0) {
+        formData.append('NameAr', values.titleAr);
+        formData.append('NameEn', values.titleAr);
+        formData.append('TitleAr', values?.pageTitleAr || '');
+        formData.append('TitleEn', values?.pageTitleAr || '');
+        formData.append('DescriptionAr', values?.descriptionAr || '');
+        formData.append('DescriptionEn', values?.descriptionAr || '');
+        formData.append('MetaDescriptionAr', values?.metaDescriptionAr || '');
+        formData.append('MetaDescriptionEn', values?.metaDescriptionAr || '');
+        formData.append('SlugAr', values?.slugAr || '');
+        formData.append('SlugEn', values?.slugAr || '');
+      } else if (languages === 1) {
+        formData.append('NameAr', values.titleEn);
+        formData.append('NameEn', values.titleEn);
+        formData.append('TitleAr', values?.pageTitleEn || '');
+        formData.append('TitleEn', values?.pageTitleEn || '');
+        formData.append('DescriptionAr', values?.descriptionEn || '');
+        formData.append('DescriptionEn', values?.descriptionEn || '');
+        formData.append('MetaDescriptionAr', values?.metaDescriptionEn || '');
+        formData.append('MetaDescriptionEn', values?.metaDescriptionEn || '');
+        formData.append('SlugAr', values?.slugEn || '');
+        formData.append('SlugEn', values?.slugEn || '');
+      }else {
+        formData.append('NameAr', values.titleAr);
+        formData.append('NameEn', values.titleEn);
+        formData.append('TitleAr', values?.pageTitleAr || '');
+        formData.append('TitleEn', values?.pageTitleEn || '');
+        formData.append('DescriptionAr', values?.descriptionAr || '');
+        formData.append('DescriptionEn', values?.descriptionEn || '');
+        formData.append('MetaDescriptionAr', values?.metaDescriptionAr || '');
+        formData.append('MetaDescriptionEn', values?.metaDescriptionEn || '');
+        formData.append('SlugAr', values?.slugAr || '');
+        formData.append('SlugEn', values?.slugEn || '');
+      }
       if (values.IsBarcode) {
         formData.append('Barcode', values?.Barcode || '');
       }
@@ -390,6 +418,8 @@ export default function EditProduct({
           pageTitleAr: updatedProduct.titleAr,
           metaDescriptionEn: updatedProduct.metaDescriptionEn,
           metaDescriptionAr: updatedProduct.metaDescriptionAr,
+          slugEn: updatedProduct.slugEn,
+          slugAr: updatedProduct.slugAr,
           productVariants: updatedProduct.variations.map((variation: any) => {
             const buttonTypeOption = buttonTypeOptions.find(option => option.value === variation.buttonType) || { label: 'Radio', value: 0 };
             return {

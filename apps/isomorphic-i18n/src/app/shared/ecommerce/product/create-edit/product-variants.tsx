@@ -17,18 +17,6 @@ const Select = dynamic(() => import('rizzui').then((mod) => mod.Select), {
   loading: () => <SelectLoader />,
 });
 
-// Button type options
-const buttonTypeOptions = [
-  { label: 'Radio', value: 0 },
-  { label: 'Dropdown', value: 1 },
-  // { label: 'Checkbox', value: 2 },
-  { label: 'Input', value: 3 },
-  { label: 'Phone Number', value: 4 },
-  { label: 'Email', value: 5 },
-  // { label: 'Date', value: 6 },
-  // { label: 'Image', value: 7 },
-];
-
 export default function ProductVariants({ className, lang = 'en', languages,currencyAbbreviation }: { className?: string; currencyAbbreviation?: string; lang?: string; languages?: number; }) {
   const text = {
     sectionTitle: lang === 'ar' ? "خيارات المتغيرات" : "Variant Options",
@@ -47,8 +35,27 @@ export default function ProductVariants({ className, lang = 'en', languages,curr
     choiceImage: lang === 'ar' ? "رابط الصورة" : "Image URL",
     isDefault: lang === 'ar' ? "يتم اختيارة تلقائيا ؟" : "Selected Automatically?",
     isActive: lang === 'ar' ? "مفعل؟" : "Active?",
-  };
 
+    radio: lang === 'ar' ? 'زر اختيارات' : 'Radio',
+    dropdown: lang === 'ar' ? 'قائمة منسدلة' : 'Dropdown',
+    input: lang === 'ar' ? 'حقل إدخال' : 'Input',
+    phone: lang === 'ar' ? 'رقم الهاتف' : 'Phone Number',
+    email: lang === 'ar' ? 'البريد الإلكتروني' : 'Email',
+    checkbox: lang === 'ar' ? 'اختيار متعدد' : 'Checkbox',
+    date: lang === 'ar' ? 'التاريخ' : 'Date',
+    image: lang === 'ar' ? 'صورة' : 'Image',
+  };
+  // Button type options
+  const buttonTypeOptions = [
+    { label: text.radio, value: 0 },
+    { label: text.dropdown, value: 1 },
+    // { label: text.checkbox, value: 2 },
+    { label: text.input, value: 3 },
+    { label: text.phone, value: 4 },
+    { label: text.email, value: 5 },
+    // { label: text.date, value: 6 },
+    // { label: text.image, value: 7 },
+  ];
   const { control, register, getValues, setValue, watch, formState: { errors } } = useFormContext();
 
   const { fields, append, remove } = useFieldArray({

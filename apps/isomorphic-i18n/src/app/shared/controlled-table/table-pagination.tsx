@@ -31,7 +31,7 @@ export default function TablePagination({
   return (
     <div
       className={cn(
-        "table-pagination flex items-center justify-center sm:justify-between",
+        "table-pagination flex flex-col-reverse sm:flex-row gap-3 sm:gap-0 items-center justify-center sm:justify-between",
         paginatorClassName
       )}
     >
@@ -43,7 +43,7 @@ export default function TablePagination({
           </div>
         )
       ) : (
-        <div className="hidden items-center sm:flex">
+        <div className="items-center flex">
           {lang=='ar'?"صفوف لكل صفحة":"Rows per page"}:{" "}
           <Select
             options={paginationLimitOptions}

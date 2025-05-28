@@ -94,12 +94,12 @@ export default function CategoryTableForm({
         // Create FormData
         const formData = new FormData();
         // formData.append('ShopId', shopId);
-        formData.append('NameEn', values.nameEn);
-        formData.append('NameAr', values.nameAr);
-        formData.append('TitleEn', values.TitleEn);
-        formData.append('TitleAr', values.TitleAr);
-        formData.append('MetaDescriptionEn', values.MetaDescriptionEn);
-        formData.append('MetaDescriptionAr', values.MetaDescriptionAr);
+        formData.append('NameEn', languages === 0? values.nameAr : values.nameEn);
+        formData.append('NameAr', languages === 1? values.nameEn : values.nameAr);
+        formData.append('TitleEn', languages === 0? values.TitleAr : values.TitleEn);
+        formData.append('TitleAr', languages === 1? values.TitleEn : values.TitleAr);
+        formData.append('MetaDescriptionEn', languages === 0? values.MetaDescriptionAr : values.MetaDescriptionEn);
+        formData.append('MetaDescriptionAr', languages === 1? values.MetaDescriptionEn : values.MetaDescriptionAr);
         formData.append('Priority', String(values.Priority));
         formData.append('NumberOfColumns', values.NumberOfColumns);
         formData.append('ShowAllProducts',  String(values.ShowAllProducts));

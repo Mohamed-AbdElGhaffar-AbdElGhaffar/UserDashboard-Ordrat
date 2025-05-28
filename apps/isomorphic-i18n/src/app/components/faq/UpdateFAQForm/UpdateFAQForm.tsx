@@ -155,19 +155,19 @@ export default function UpdateFAQForm({
     onSubmit: async (values) => {
       try {
         const requestBody = {
-          nameAr: values.nameAr,
-          nameEn: values.nameEn,
-          titleAr: values.nameAr,
-          titleEn: values.nameEn,
-          metaDescriptionAr: values.nameAr,
-          metaDescriptionEn: values.nameEn,
+          nameAr: languages === 1 ? values.nameEn : values.nameAr,
+          nameEn: languages === 0 ? values.nameAr : values.nameEn,
+          titleAr: languages === 1 ? values.nameEn : values.nameAr,
+          titleEn: languages === 0 ? values.nameAr : values.nameEn,
+          metaDescriptionAr: languages === 1 ? values.nameEn : values.nameAr,
+          metaDescriptionEn: languages === 0 ? values.nameAr : values.nameEn,
           imageId: values.imageId,
           faQs: faqs.map((faq) => ({
             id: faq.id || undefined,
-            questionAr: faq.questionAr,
-            questionEn: faq.questionEn,
-            answerAr: faq.answerAr,
-            answerEn: faq.answerEn,
+            questionAr: languages === 1 ? faq.questionEn : faq.questionAr,
+            questionEn: languages === 0 ? faq.questionAr : faq.questionEn,
+            answerAr: languages === 1 ? faq.answerEn : faq.answerAr,
+            answerEn: languages === 0 ? faq.answerAr : faq.answerEn,
           })),
         };
         console.log("requestBody: ",requestBody);
