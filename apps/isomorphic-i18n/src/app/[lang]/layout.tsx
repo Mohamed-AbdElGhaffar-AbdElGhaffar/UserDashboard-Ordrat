@@ -58,12 +58,13 @@ export default async function RootLayout({
                       style: {
                         zIndex: 999999,
                       },
+                      className: 'toastTop'
                     }}
                     containerStyle={{
                       zIndex: 999999,
                       position: 'fixed',
                       left: 0,
-                      top:20,
+                      top:90,
                     }}
                   />
                   <GlobalDrawer lang={lang} />

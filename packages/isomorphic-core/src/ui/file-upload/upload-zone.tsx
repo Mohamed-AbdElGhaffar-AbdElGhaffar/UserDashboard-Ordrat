@@ -4,7 +4,7 @@ import Image from 'next/image';
 import toast from 'react-hot-toast';
 import isEmpty from 'lodash/isEmpty';
 import prettyBytes from 'pretty-bytes';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from '@uploadthing/react/hooks';
 import { PiCheckBold, PiTrashBold, PiUploadSimpleBold } from 'react-icons/pi';
 import { generateClientDropzoneAccept } from 'uploadthing/client';
@@ -12,7 +12,7 @@ import { useUploadThing } from '../../utils/uploadthing';
 import { Button, Text, FieldError } from 'rizzui';
 import cn from '../../utils/class-names';
 import UploadIcon from '../../components/shape/upload';
-import { endsWith } from 'lodash';
+import { endsWith, isEqual } from 'lodash';
 import { FileWithPath } from 'react-dropzone';
 import { ClientUploadedFileData } from 'uploadthing/types';
 
@@ -83,7 +83,7 @@ export default function UploadZone({
       } else {
         setFiles(filesWithDimensions.slice(0, 1));
       }
-      setValue(name, filesWithDimensions);
+      setValue(name, filesWithDimensions, { shouldValidate: true });
     });
   }, [multiple, name, setFiles, setValue]);  
 
@@ -97,9 +97,9 @@ export default function UploadZone({
     // Update the state
     setFiles(updatedFiles);
     if (updatedFiles.length === 0 ) {
-      setValue(name,undefined)
+      setValue(name,undefined, { shouldValidate: true })
     }else{
-      setValue(name,updatedFiles)
+      setValue(name,updatedFiles, { shouldValidate: true })
     }
   }
 
@@ -117,7 +117,7 @@ export default function UploadZone({
         if (setValue) {
           // const respondedUrls = res?.map((r) => r.url);
           setFiles([]);
-          setValue(name,undefined);
+          setValue(name,undefined, { shouldValidate: true });
           // const respondedUrls = res?.map((r) => ({
           //   name: r.name,
           //   size: r.size,
@@ -156,6 +156,13 @@ export default function UploadZone({
     },
     multiple: multiple,
   });
+
+  useEffect(() => {
+    const formFiles = getValues(name);
+    if (!isEqual(formFiles, files)) {
+      setFiles(formFiles || []);
+    }
+  }, [getValues(name)]); 
 
   return (
     <div className={cn('grid @container', className)}>
@@ -200,7 +207,7 @@ export default function UploadZone({
             isLoading={isUploading}
             onClear={() => {
               setFiles([])
-              setValue(name,undefined)
+              setValue(name,undefined, { shouldValidate: true })
             }}
             onUpload={() => startUpload(notUploadedItems)}
             text={text.textButtons}
@@ -213,7 +220,7 @@ export default function UploadZone({
             isLoading={isUploading}
             onClear={() => {
               setFiles([])
-              setValue(name,undefined)
+              setValue(name,undefined, { shouldValidate: true })
             }}
             onUpload={() => startUpload(notUploadedItems)}
             text={text.textButtons}
@@ -226,7 +233,7 @@ export default function UploadZone({
             isLoading={isUploading}
             onClear={() => {
               setFiles([])
-              setValue(name,undefined)
+              setValue(name,undefined, { shouldValidate: true })
             }}
             onUpload={() => startUpload(files)}
             text={text.textButtons}

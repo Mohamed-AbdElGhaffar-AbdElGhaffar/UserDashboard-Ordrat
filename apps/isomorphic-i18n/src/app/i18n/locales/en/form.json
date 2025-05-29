@@ -340,6 +340,8 @@
   "form-product-price-required": "Product price is required",
   "form-old-price-is-required": "Product old price is required",
   "form-buying-price-is-required": "Product buying price is required",
+  "form-discount-percent": "Discount cannot exceed 100%",
+  "form-discount-fixed-price": "Discount cannot exceed price",
   "form-sale-price-required": "Sale price is required",
   "form-shipping-price-required": "Shipping price is required",
   "form-city-price-required": "City price is required",

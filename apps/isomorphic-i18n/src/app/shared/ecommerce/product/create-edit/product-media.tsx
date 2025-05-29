@@ -17,6 +17,7 @@ export default function ProductMedia({ className, lang, languages }: ProductMedi
   }
   const { getValues, setValue, formState: { errors } } = useFormContext();
   const { t } = useTranslation(lang!, 'form');
+  console.log("error: ",errors);
   
   return (
     <FormGroup

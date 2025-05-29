@@ -149,13 +149,23 @@ export default function ProductPricing({ lang, currencyAbbreviation }: { lang?: 
               />
             </div>
             <div>
-              <Input
-                label={text.inputDiscount}
-                placeholder="0"
-                {...register('Discount')}
-                error={t(errors.Discount?.message as string)}
-                type="number"
-              />
+            <Controller
+              name="Discount"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  label={text.inputDiscount}
+                  placeholder="0"
+                  type="number"
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(value ? parseFloat(value) : null);
+                  }}
+                  error={t(errors.Discount?.message as string)}
+                />
+              )}
+            />
             </div>
           </div>
         )}

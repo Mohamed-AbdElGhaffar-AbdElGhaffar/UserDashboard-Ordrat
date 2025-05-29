@@ -24,8 +24,9 @@ type ModalChangeStockNumberFormProps = {
   lang: string;
   stocks: any[];
   productImage: string;
+  productName: string;
 };
-export default function ModalChangeStockNumber({ lang = 'en', stocks, productImage }: ModalChangeStockNumberFormProps) {
+export default function ModalChangeStockNumber({ lang = 'en', stocks, productImage, productName }: ModalChangeStockNumberFormProps) {
   const { closeModal } = useModal();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mainBranch, setProductData } = useUserContext();  
@@ -94,6 +95,7 @@ export default function ModalChangeStockNumber({ lang = 'en', stocks, productIma
           <div className="flex flex-row items-center justify-center w-full">
             <Image src={ productImage || warehouse} className={`${productImage? 'w-28 h-28 rounded-full overflow-hidden border-2 border-white shadow-md object-cover':''}`} alt="Status Icon" width={96} height={96} />
           </div>
+          <p className="text-2xl text-center mb-2">{productName}</p>
           <p className="text-2xl text-center mb-2">{text.title}</p>
 
           <Input

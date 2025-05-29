@@ -85,7 +85,13 @@ export const productFormSchema = z.object({
     message: messages.productSlugArNoSpace,
   }),
   IsDiscountActive: z.boolean(),
-  Discount: z.any().optional(),
+  Discount: z
+    .union([z.string(), z.number(), z.null(), z.undefined()])
+    .transform((val) => {
+      if (val === undefined || val === null || val === '') return 0;
+      const parsed = Number(val);
+      return isNaN(parsed) ? 0 : parsed;
+    }),
   DiscountType: z.string().optional(),
   // VAT: z.string().optional(),
   // VATType: z.string().optional(),
@@ -179,5 +185,25 @@ export const productFormSchema = z.object({
     .optional(),
   // tags: z.array(z.string()).optional(),
 })
+.superRefine((data, ctx) => {
+  const { Discount, DiscountType, price } = data;
+
+  if (DiscountType === '0' && Discount > 100) {
+    ctx.addIssue({
+      path: ['Discount'],
+      code: z.ZodIssueCode.custom,
+      message: messages.discountPercentCannotExceed100,
+    });
+  }
+
+  if (DiscountType === '1' && typeof price === 'number' && Discount > price) {
+    ctx.addIssue({
+      path: ['Discount'],
+      code: z.ZodIssueCode.custom,
+      message: messages.discountFixedCannotExceedPrice,
+    });
+  }
+});
+
 
 export type CreateProductInput = z.infer<typeof productFormSchema>;
