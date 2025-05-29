@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Element } from 'react-scroll';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,7 +46,7 @@ interface IndexProps {
   lang?: string;
   className?: string;
   currencyAbbreviation?: string;
-  product: any;
+  initialProduct: any;
   allProducts?: any;
   languages: number;
 }
@@ -65,7 +65,7 @@ async function fetchProductById(shopId: string, productId: string) {
 
 export default function EditProduct({
   lang = 'en',
-  product,
+  initialProduct,
   className,
   currencyAbbreviation,
   allProducts,
@@ -82,6 +82,20 @@ export default function EditProduct({
   }
   const { layout } = useLayout();
   const [isLoading, setLoading] = useState(false);
+  const cookiebranches = GetCookiesClient('branches') as string;
+  const cookiesBranches = JSON.parse(cookiebranches);
+  const [product, setProduct] = useState(initialProduct);
+
+  useEffect(() => {
+    const loadLatestProduct = async () => {
+      const latest = await fetchProductById(shopId as string, initialProduct.id);
+      if (latest && JSON.stringify(latest) !== JSON.stringify(initialProduct)) {
+        setProduct(latest);
+      }
+    };
+    loadLatestProduct();
+  }, [initialProduct]);
+  
   const buttonTypeOptions = [
     { label: 'Radio', value: 0 },
     { label: 'Dropdown', value: 1 },
@@ -108,7 +122,7 @@ export default function EditProduct({
     Discount: product.discount,
     DiscountType: product.discountType.toString(),
     HasStock: product.stocks.length == 0 ? false : true || false,
-    StockNumber: product.stockNumber,
+    StockNumber: product.stocks[0].stockNumber,
     BuyingPrice: product.buyingPrice || 0,
     // VAT: product.vat,
     // VATType: product.vatType.toString(),
@@ -146,6 +160,55 @@ export default function EditProduct({
     defaultValues: staticDefaultValues,
   });
   
+  useEffect(() => {
+    if (product) {
+      methods.reset({
+        titleEn: product.nameEn,
+        titleAr: product.nameAr,
+        categories: product.categoryId,
+        descriptionEn: product.descriptionEn,
+        descriptionAr: product.descriptionAr,
+        IsBarcode: !!product.barcode,
+        Barcode: product.barcode,
+        FrequentlyOrderedWith: product.frequentlyOrderedWith.map((p: any) => p.relatedProductId),
+        productImages: product.images.map((img: any) => img.imageUrl),
+        price: product.price,
+        BuyingPrice: product.buyingPrice || 0,
+        HasStock: product.stocks.length !== 0,
+        StockNumber: product.stocks[0].stockNumber,
+        IsDiscountActive: product.isDiscountActive,
+        Discount: product.discount,
+        DiscountType: product.discountType?.toString() || '0',
+        pageTitleEn: product.titleEn,
+        pageTitleAr: product.titleAr,
+        metaDescriptionEn: product.metaDescriptionEn,
+        metaDescriptionAr: product.metaDescriptionAr,
+        slugEn: product.slugEn,
+        slugAr: product.slugAr,
+        productVariants: product.variations.map((variation: any) => {
+          const buttonTypeOption = buttonTypeOptions.find(opt => opt.value === variation.buttonType) || { label: 'Radio', value: 0 };
+          return {
+            id: variation.id,
+            nameAr: variation.nameAr,
+            nameEn: variation.nameEn,
+            buttonType: buttonTypeOption,
+            priority: variation.priority,
+            isRequired: variation.isRequired,
+            isActive: variation.isActive,
+            choices: variation.choices.map((choice: any) => ({
+              id: choice.id,
+              nameAr: choice.nameAr,
+              nameEn: choice.nameEn,
+              price: choice.price,
+              isDefault: choice.isDefault,
+              isActive: choice.isActive,
+              image: choice.imageUrl,
+            })),
+          };
+        }),
+      });
+    }
+  }, [product, methods.reset]);  
 
   const onSubmit: SubmitHandler<CreateProductInput> = async (values) => {
     setLoading(true);
@@ -206,7 +269,7 @@ export default function EditProduct({
         formData.append('DiscountType', values.DiscountType);
       }
       if (values.Discount && values?.IsDiscountActive) {
-        formData.append('Discount', values.Discount);
+        formData.append('Discount', values.Discount.toString());
       }
       // if (values.VATType) {
       //   formData.append('VATType', values.VATType);
@@ -393,61 +456,133 @@ export default function EditProduct({
           },
         }
       );
-      const updatedProduct = await fetchProductById(shopId as string, product.id);
+      if (cookiesBranches.length == 1) {
+        const stockFormData = new FormData();
+        stockFormData.append('StockNumber', values.StockNumber);
+        try {
+          const responseStock = await axiosClient.put(`api/Stock/UpdateProductStock/${cookiesBranches[0].id}/${product.id}`, stockFormData);
+          
+          if (responseStock) {
+            const updatedProduct = await fetchProductById(shopId as string, product.id);
+            if (updatedProduct) {
+              methods.reset({
+                titleEn: updatedProduct.nameEn,
+                titleAr: updatedProduct.nameAr,
+                categories: updatedProduct.categoryId,
+                descriptionEn: updatedProduct.descriptionEn,
+                descriptionAr: updatedProduct.descriptionAr,
+                IsBarcode: updatedProduct.barcode? true : false,
+                Barcode: updatedProduct.barcode,
+                FrequentlyOrderedWith: updatedProduct.frequentlyOrderedWith.map((product :any) => product.relatedProductId),
+                productImages: updatedProduct.images.map((image :any) => image.imageUrl),
+                price: updatedProduct.price,
+                // oldPrice: updatedProduct.oldPrice,
+                BuyingPrice: updatedProduct.buyingPrice || 0,
+                HasStock: updatedProduct.stocks.length == 0 ? false : true || false,
+                StockNumber: updatedProduct.stocks[0].stockNumber,
+                IsDiscountActive: updatedProduct.isDiscountActive,
+                Discount: updatedProduct.discount,
+                DiscountType: updatedProduct.discountType.toString(),
+                pageTitleEn: updatedProduct.titleEn,
+                pageTitleAr: updatedProduct.titleAr,
+                metaDescriptionEn: updatedProduct.metaDescriptionEn,
+                metaDescriptionAr: updatedProduct.metaDescriptionAr,
+                slugEn: updatedProduct.slugEn,
+                slugAr: updatedProduct.slugAr,
+                productVariants: updatedProduct.variations.map((variation: any) => {
+                  const buttonTypeOption = buttonTypeOptions.find(option => option.value === variation.buttonType) || { label: 'Radio', value: 0 };
+                  return {
+                    id: variation.id,
+                    nameAr: variation.nameAr,
+                    nameEn: variation.nameEn,
+                    buttonType: buttonTypeOption,
+                    priority: variation.priority,
+                    isRequired: variation.isRequired,
+                    isActive: variation.isActive,
+                    choices: variation.choices.map((choice: any) => ({
+                      id: choice.id,
+                      nameAr: choice.nameAr,
+                      nameEn: choice.nameEn,
+                      price: choice.price,
+                      isDefault: choice.isDefault,
+                      isActive: choice.isActive,
+                      image: choice.imageUrl,
+                    })),
+                  };
+                }),
+              });
+            }
+        
+            // Success message
+            toast.success(lang === "ar" ? "تم تعديل المنتج بنجاح!" : "Product updated successfully!");  
+          }  else {
+            toast.error(
+              lang === 'ar'
+                ? `فشل في التغيير  `
+                : `Failed to change `
+            );
+          }
+        } catch (error) {
+          console.error('Error Change Stock Number:', error);
+          toast.error(lang === 'ar' ? 'حدث خطأ أثناء تغيير عدد المخزون' : 'An error occurred while change stock number');
+        }finally{
+          setLoading(false);
+        }
+      }else {
+        const updatedProduct = await fetchProductById(shopId as string, product.id);
+        if (updatedProduct) {
+          methods.reset({
+            titleEn: updatedProduct.nameEn,
+            titleAr: updatedProduct.nameAr,
+            categories: updatedProduct.categoryId,
+            descriptionEn: updatedProduct.descriptionEn,
+            descriptionAr: updatedProduct.descriptionAr,
+            IsBarcode: updatedProduct.barcode? true : false,
+            Barcode: updatedProduct.barcode,
+            FrequentlyOrderedWith: updatedProduct.frequentlyOrderedWith.map((product :any) => product.relatedProductId),
+            productImages: updatedProduct.images.map((image :any) => image.imageUrl),
+            price: updatedProduct.price,
+            // oldPrice: updatedProduct.oldPrice,
+            BuyingPrice: updatedProduct.buyingPrice || 0,
+            HasStock: updatedProduct.stocks.length == 0 ? false : true || false,
+            StockNumber: updatedProduct.stocks[0].stockNumber,
+            IsDiscountActive: updatedProduct.isDiscountActive,
+            Discount: updatedProduct.discount,
+            DiscountType: updatedProduct.discountType.toString(),
+            pageTitleEn: updatedProduct.titleEn,
+            pageTitleAr: updatedProduct.titleAr,
+            metaDescriptionEn: updatedProduct.metaDescriptionEn,
+            metaDescriptionAr: updatedProduct.metaDescriptionAr,
+            slugEn: updatedProduct.slugEn,
+            slugAr: updatedProduct.slugAr,
+            productVariants: updatedProduct.variations.map((variation: any) => {
+              const buttonTypeOption = buttonTypeOptions.find(option => option.value === variation.buttonType) || { label: 'Radio', value: 0 };
+              return {
+                id: variation.id,
+                nameAr: variation.nameAr,
+                nameEn: variation.nameEn,
+                buttonType: buttonTypeOption,
+                priority: variation.priority,
+                isRequired: variation.isRequired,
+                isActive: variation.isActive,
+                choices: variation.choices.map((choice: any) => ({
+                  id: choice.id,
+                  nameAr: choice.nameAr,
+                  nameEn: choice.nameEn,
+                  price: choice.price,
+                  isDefault: choice.isDefault,
+                  isActive: choice.isActive,
+                  image: choice.imageUrl,
+                })),
+              };
+            }),
+          });
+        }
     
-      if (updatedProduct) {
-        methods.reset({
-          titleEn: updatedProduct.nameEn,
-          titleAr: updatedProduct.nameAr,
-          categories: updatedProduct.categoryId,
-          descriptionEn: updatedProduct.descriptionEn,
-          descriptionAr: updatedProduct.descriptionAr,
-          IsBarcode: updatedProduct.barcode? true : false,
-          Barcode: updatedProduct.barcode,
-          FrequentlyOrderedWith: updatedProduct.frequentlyOrderedWith.map((product :any) => product.relatedProductId),
-          productImages: updatedProduct.images.map((image :any) => image.imageUrl),
-          price: updatedProduct.price,
-          // oldPrice: updatedProduct.oldPrice,
-          BuyingPrice: updatedProduct.buyingPrice || 0,
-          HasStock: updatedProduct.stocks.length == 0 ? false : true || false,
-          StockNumber: updatedProduct.stockNumber,
-          IsDiscountActive: updatedProduct.isDiscountActive,
-          Discount: updatedProduct.discount,
-          DiscountType: updatedProduct.discountType.toString(),
-          pageTitleEn: updatedProduct.titleEn,
-          pageTitleAr: updatedProduct.titleAr,
-          metaDescriptionEn: updatedProduct.metaDescriptionEn,
-          metaDescriptionAr: updatedProduct.metaDescriptionAr,
-          slugEn: updatedProduct.slugEn,
-          slugAr: updatedProduct.slugAr,
-          productVariants: updatedProduct.variations.map((variation: any) => {
-            const buttonTypeOption = buttonTypeOptions.find(option => option.value === variation.buttonType) || { label: 'Radio', value: 0 };
-            return {
-              id: variation.id,
-              nameAr: variation.nameAr,
-              nameEn: variation.nameEn,
-              buttonType: buttonTypeOption,
-              priority: variation.priority,
-              isRequired: variation.isRequired,
-              isActive: variation.isActive,
-              choices: variation.choices.map((choice: any) => ({
-                id: choice.id,
-                nameAr: choice.nameAr,
-                nameEn: choice.nameEn,
-                price: choice.price,
-                isDefault: choice.isDefault,
-                isActive: choice.isActive,
-                image: choice.imageUrl,
-              })),
-            };
-          }),
-        });
-      }
-  
-      // Success message
-      toast.success(lang === "ar" ? "تم تعديل المنتج بنجاح!" : "Product updated successfully!");  
-      setLoading(false);
-      // methods.reset();
+        // Success message
+        toast.success(lang === "ar" ? "تم تعديل المنتج بنجاح!" : "Product updated successfully!");  
+        setLoading(false);
+      }      
     } catch (error) {
       console.error("Error updating product:", error);
       toast.error(

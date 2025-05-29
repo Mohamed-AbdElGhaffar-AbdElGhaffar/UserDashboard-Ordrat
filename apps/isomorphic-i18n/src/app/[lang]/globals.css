@@ -1750,3 +1750,7 @@ html[dir=rtl] .rizzui-checkbox-icon{
     height: 225px;
   }
 }
+.rizzui-textarea-field,
+.rizzui-input-field{
+  font-size: 16px !important;
+}

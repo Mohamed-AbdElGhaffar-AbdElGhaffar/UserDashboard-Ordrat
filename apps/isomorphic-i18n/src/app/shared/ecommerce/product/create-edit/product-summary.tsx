@@ -59,6 +59,8 @@ export default function ProductSummary({ className, lang, allProducts, languages
     setValue,
   } = useFormContext();
   const { t } = useTranslation(lang!, 'form');
+  const cookiebranches = GetCookiesClient('branches') as string;
+  const cookiesBranches = JSON.parse(cookiebranches);
   // const categoryOption = [
   //   {
   //     value: 'fruits',
@@ -341,7 +343,7 @@ export default function ProductSummary({ className, lang, allProducts, languages
             )}
           />
         </div>
-        {/* {HasStock && (
+        {HasStock && cookiesBranches.length == 1 && (
           <Input
             type="number"
             // label={text.StockNumber}
@@ -350,7 +352,7 @@ export default function ProductSummary({ className, lang, allProducts, languages
             {...register('StockNumber', { valueAsNumber: true })}
             error={t(errors.StockNumber?.message as string)}
           />
-        )} */}
+        )}
       </div>
 
       {/* <Controller

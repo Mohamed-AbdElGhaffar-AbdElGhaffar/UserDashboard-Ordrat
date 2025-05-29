@@ -79,6 +79,9 @@ export default function CreateEditProduct({
   }
   const { layout } = useLayout();
   const [isLoading, setLoading] = useState(false);
+  const cookiebranches = GetCookiesClient('branches') as string;
+  const cookiesBranches = JSON.parse(cookiebranches);
+  
   const [categoriesData, setCategoriesData] = useState<Categories[]>(categories);
   const methods = useForm<CreateProductInput>({
     resolver: zodResolver(productFormSchema),
@@ -86,7 +89,6 @@ export default function CreateEditProduct({
   });
 
   const onSubmit: SubmitHandler<CreateProductInput> = async (values) => {
-    setLoading(true);
     // setTimeout(() => {
     //   setLoading(false);
     //   console.log('product_values', values);
@@ -98,143 +100,191 @@ export default function CreateEditProduct({
     console.log("values: ",values);
     
     const formData = new FormData();
-
-    // Append basic product information
-    if (languages === 0) {
-      formData.append('NameAr', values.titleAr);
-      formData.append('NameEn', values.titleAr);
-      formData.append('TitleAr', values?.pageTitleAr || '');
-      formData.append('TitleEn', values?.pageTitleAr || '');
-      formData.append('DescriptionAr', values?.descriptionAr || '');
-      formData.append('DescriptionEn', values?.descriptionAr || '');
-      formData.append('MetaDescriptionAr', values?.metaDescriptionAr || '');
-      formData.append('MetaDescriptionEn', values?.metaDescriptionAr || '');
-      formData.append('SlugAr', values?.slugAr || '');
-      formData.append('SlugEn', values?.slugAr || '');
-    } else if (languages === 1) {
-      formData.append('NameAr', values.titleEn);
-      formData.append('NameEn', values.titleEn);
-      formData.append('TitleAr', values?.pageTitleEn || '');
-      formData.append('TitleEn', values?.pageTitleEn || '');
-      formData.append('DescriptionAr', values?.descriptionEn || '');
-      formData.append('DescriptionEn', values?.descriptionEn || '');
-      formData.append('MetaDescriptionAr', values?.metaDescriptionEn || '');
-      formData.append('MetaDescriptionEn', values?.metaDescriptionEn || '');
-      formData.append('SlugAr', values?.slugEn || '');
-      formData.append('SlugEn', values?.slugEn || '');
+    if(values.DiscountType === '0' && values.Discount > 100){
+      methods.setError('Discount', {
+        type: 'manual',
+        message: lang === 'ar' ? 'لا يمكن أن يتجاوز الخصم 100%' : 'Discount cannot exceed 100%',
+      });
+      toast.error(
+        lang === 'ar'
+          ? 'يجب ان يكون الخصم اقل من او يساوي 100%'
+          : 'The discount must be less than or equal to 100%'
+      );
+    }else if(values.DiscountType === '1' && values.Discount > values.price){
+      methods.setError('Discount', {
+        type: 'manual',
+        message: lang === 'ar'
+          ? 'الخصم لا يمكن أن يكون أكبر من السعر'
+          : 'Discount cannot exceed price',
+      });
+      toast.error(
+        lang === 'ar'
+          ? 'يجب ان لا يقل الخصم عن سعر البيع'
+          : 'The discount must not be less than or equal selling price'
+      );
     }else {
-      formData.append('NameAr', values.titleAr);
-      formData.append('NameEn', values.titleEn);
-      formData.append('TitleAr', values?.pageTitleAr || '');
-      formData.append('TitleEn', values?.pageTitleEn || '');
-      formData.append('DescriptionAr', values?.descriptionAr || '');
-      formData.append('DescriptionEn', values?.descriptionEn || '');
-      formData.append('MetaDescriptionAr', values?.metaDescriptionAr || '');
-      formData.append('MetaDescriptionEn', values?.metaDescriptionEn || '');
-      formData.append('SlugAr', values?.slugAr || '');
-      formData.append('SlugEn', values?.slugEn || '');
-    }
-    if (values.IsBarcode) {
-      formData.append('Barcode', values?.Barcode || '');
-    }
-    formData.append('Price', values?.price.toString());
-    // formData.append('OldPrice', values?.oldPrice.toString());
-    formData.append('BuyingPrice', values?.BuyingPrice.toString());
-    formData.append('HasStock', `${values?.HasStock}` || 'false');
-    // if (values?.HasStock) {
-    //   formData.append('StockNumber', values?.StockNumber? values?.StockNumber?.toString() : '0');
-    // }
-    formData.append('sourceChannel', '0');
-    
-    // formData.append('CategoryId', values.categories);
-    // formData.append('ShopId', '');
-    formData.append('IsDiscountActive', (!!values?.IsDiscountActive).toString());
-    if (values.DiscountType && values?.IsDiscountActive) {
-      formData.append('DiscountType', values.DiscountType);
-    }
-    if (values.Discount && values?.IsDiscountActive) {
-      formData.append('Discount', values.Discount);
-    }
-    // if (values.VATType) {
-    //   formData.append('VATType', values.VATType);
-    // }
-    // if (values.VAT) {
-    //   formData.append('VAT', values.VAT);
-    // }
-    // formData.append('Discount', '0'); // Assuming no discount
-    // formData.append('VATType', '0'); // Adjust as needed
-    // formData.append('VAT', '0'); // Adjust as needed
-
-    // Append product images
-    values.productImages.forEach((image, index) => {
-      console.log("image: ",image);
+      // Append basic product information
+      if (languages === 0) {
+        formData.append('NameAr', values.titleAr);
+        formData.append('NameEn', values.titleAr);
+        formData.append('TitleAr', values?.pageTitleAr || '');
+        formData.append('TitleEn', values?.pageTitleAr || '');
+        formData.append('DescriptionAr', values?.descriptionAr || '');
+        formData.append('DescriptionEn', values?.descriptionAr || '');
+        formData.append('MetaDescriptionAr', values?.metaDescriptionAr || '');
+        formData.append('MetaDescriptionEn', values?.metaDescriptionAr || '');
+        formData.append('SlugAr', values?.slugAr || '');
+        formData.append('SlugEn', values?.slugAr || '');
+      } else if (languages === 1) {
+        formData.append('NameAr', values.titleEn);
+        formData.append('NameEn', values.titleEn);
+        formData.append('TitleAr', values?.pageTitleEn || '');
+        formData.append('TitleEn', values?.pageTitleEn || '');
+        formData.append('DescriptionAr', values?.descriptionEn || '');
+        formData.append('DescriptionEn', values?.descriptionEn || '');
+        formData.append('MetaDescriptionAr', values?.metaDescriptionEn || '');
+        formData.append('MetaDescriptionEn', values?.metaDescriptionEn || '');
+        formData.append('SlugAr', values?.slugEn || '');
+        formData.append('SlugEn', values?.slugEn || '');
+      }else {
+        formData.append('NameAr', values.titleAr);
+        formData.append('NameEn', values.titleEn);
+        formData.append('TitleAr', values?.pageTitleAr || '');
+        formData.append('TitleEn', values?.pageTitleEn || '');
+        formData.append('DescriptionAr', values?.descriptionAr || '');
+        formData.append('DescriptionEn', values?.descriptionEn || '');
+        formData.append('MetaDescriptionAr', values?.metaDescriptionAr || '');
+        formData.append('MetaDescriptionEn', values?.metaDescriptionEn || '');
+        formData.append('SlugAr', values?.slugAr || '');
+        formData.append('SlugEn', values?.slugEn || '');
+      }
+      if (values.IsBarcode) {
+        formData.append('Barcode', values?.Barcode || '');
+      }
+      formData.append('Price', values?.price.toString());
+      // formData.append('OldPrice', values?.oldPrice.toString());
+      formData.append('BuyingPrice', values?.BuyingPrice.toString());
+      formData.append('HasStock', `${values?.HasStock}` || 'false');
+      // if (values?.HasStock) {
+      //   formData.append('StockNumber', values?.StockNumber? values?.StockNumber?.toString() : '0');
+      // }
+      formData.append('sourceChannel', '0');
       
-      formData.append(`Images[${index}].isPrimary`, index === 0 ? 'true' : 'false');
-      if (image instanceof File) {
-        formData.append(`Images[${index}].image`, image);
+      // formData.append('CategoryId', values.categories);
+      // formData.append('ShopId', '');
+      formData.append('IsDiscountActive', (!!values?.IsDiscountActive).toString());
+      if (values.DiscountType && values?.IsDiscountActive) {
+        formData.append('DiscountType', values.DiscountType);
       }
-    });
-    
-    values?.FrequentlyOrderedWith?.forEach((relatedProductId, index) => {
-      if (relatedProductId) {
-        formData.append(`FrequentlyOrderedWith[${index}].relatedProductId`, relatedProductId);
+      if (values.Discount && values?.IsDiscountActive) {
+        formData.append('Discount', values.Discount.toString());
       }
-    });
-
-    // Append product variations
-    values.productVariants?.forEach((variant, vIndex) => {
-
-      formData.append(`Variations[${vIndex}].nameAr`, variant?.nameAr || '');
-      formData.append(`Variations[${vIndex}].nameEn`, variant?.nameEn || '');
-      formData.append(`Variations[${vIndex}].buttonType`, variant?.buttonType?.toString() || '');
-      formData.append(`Variations[${vIndex}].priority`, variant?.priority?.toString() || '');
-      formData.append(`Variations[${vIndex}].isRequired`, variant?.isRequired? `${variant?.isRequired}` : 'false');
-      formData.append(`Variations[${vIndex}].isActive`, variant?.isActive? `${variant?.isActive}` : 'false');
-
-      // Append variant choices
-      variant?.choices?.forEach((choice, cIndex) => {
-        formData.append(`Variations[${vIndex}].choices[${cIndex}].nameAr`, choice.nameAr);
-        formData.append(`Variations[${vIndex}].choices[${cIndex}].nameEn`, choice.nameEn);
-        formData.append(`Variations[${vIndex}].choices[${cIndex}].price`, choice.price.toString());
-        formData.append(`Variations[${vIndex}].choices[${cIndex}].isDefault`, choice.isDefault? choice.isDefault.toString() : 'false');
-        formData.append(`Variations[${vIndex}].choices[${cIndex}].isActive`, choice.isActive? choice.isActive.toString() : 'false');
-        if (choice.image) {
-          formData.append(`Variations[${vIndex}].choices[${cIndex}].image`, choice.image);
+      // if (values.VATType) {
+      //   formData.append('VATType', values.VATType);
+      // }
+      // if (values.VAT) {
+      //   formData.append('VAT', values.VAT);
+      // }
+      // formData.append('Discount', '0'); // Assuming no discount
+      // formData.append('VATType', '0'); // Adjust as needed
+      // formData.append('VAT', '0'); // Adjust as needed
+  
+      // Append product images
+      values.productImages.forEach((image, index) => {
+        console.log("image: ",image);
+        
+        formData.append(`Images[${index}].isPrimary`, index === 0 ? 'true' : 'false');
+        if (image instanceof File) {
+          formData.append(`Images[${index}].image`, image);
         }
       });
-    });
-
-    try {
-      const response = await axiosClient.post(`/api/Products/Create/${shopId}/${values.categories}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      
+      values?.FrequentlyOrderedWith?.forEach((relatedProductId, index) => {
+        if (relatedProductId) {
+          formData.append(`FrequentlyOrderedWith[${index}].relatedProductId`, relatedProductId);
+        }
       });
-
-      toast.success(
-        lang === 'ar' ? 'تم إنشاء المنتج بنجاح!' : 'Product created successfully!'
-      );
-      setLoading(false);
-      methods.reset();
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message;
+  
+      // Append product variations
+      values.productVariants?.forEach((variant, vIndex) => {
+  
+        formData.append(`Variations[${vIndex}].nameAr`, variant?.nameAr || '');
+        formData.append(`Variations[${vIndex}].nameEn`, variant?.nameEn || '');
+        formData.append(`Variations[${vIndex}].buttonType`, variant?.buttonType?.toString() || '');
+        formData.append(`Variations[${vIndex}].priority`, variant?.priority?.toString() || '');
+        formData.append(`Variations[${vIndex}].isRequired`, variant?.isRequired? `${variant?.isRequired}` : 'false');
+        formData.append(`Variations[${vIndex}].isActive`, variant?.isActive? `${variant?.isActive}` : 'false');
+  
+        // Append variant choices
+        variant?.choices?.forEach((choice, cIndex) => {
+          formData.append(`Variations[${vIndex}].choices[${cIndex}].nameAr`, choice.nameAr);
+          formData.append(`Variations[${vIndex}].choices[${cIndex}].nameEn`, choice.nameEn);
+          formData.append(`Variations[${vIndex}].choices[${cIndex}].price`, choice.price.toString());
+          formData.append(`Variations[${vIndex}].choices[${cIndex}].isDefault`, choice.isDefault? choice.isDefault.toString() : 'false');
+          formData.append(`Variations[${vIndex}].choices[${cIndex}].isActive`, choice.isActive? choice.isActive.toString() : 'false');
+          if (choice.image) {
+            formData.append(`Variations[${vIndex}].choices[${cIndex}].image`, choice.image);
+          }
+        });
+      });
+      setLoading(true);
+      try {
+        const response = await axiosClient.post(`/api/Products/Create/${shopId}/${values.categories}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        if (cookiesBranches.length == 1) {
+          const stockFormData = new FormData();
+          stockFormData.append('StockNumber', values.StockNumber);
+          try {
+            const responseStock = await axiosClient.put(`api/Stock/UpdateProductStock/${cookiesBranches[0].id}/${response.data.message}`, stockFormData);
     
-      if (errorMessage === "Sorry, You have exceed the limit of add product") {
-        toast.error(
-          lang === 'ar'
-            ? 'عذراً، لقد تجاوزت الحد المسموح به لإضافة المنتجات'
-            : 'Sorry, you have exceeded the product addition limit.'
-        );
-      } else {
-        toast.error(
-          lang === 'ar'
-            ? 'فشل في إنشاء المنتج. حاول مجدداً.'
-            : 'Failed to create product. Please try again.'
-        );
+            if (responseStock) {
+              toast.success(
+                lang === 'ar' ? 'تم إنشاء المنتج بنجاح!' : 'Product created successfully!'
+              );
+              methods.reset();
+            }  else {
+                      toast.error(
+                        lang === 'ar'
+                          ? `فشل في التغيير  `
+                          : `Failed to change `
+                      );
+                    }
+          } catch (error) {
+            console.error('Error Change Stock Number:', error);
+            toast.error(lang === 'ar' ? 'حدث خطأ أثناء تغيير عدد المخزون' : 'An error occurred while change stock number');
+          }finally{
+            setLoading(false);
+          }
+        }else {
+          toast.success(
+            lang === 'ar' ? 'تم إنشاء المنتج بنجاح!' : 'Product created successfully!'
+          );
+          setLoading(false);
+          methods.reset();
+        }
+      } catch (error: any) {
+        const errorMessage = error?.response?.data?.message;
+      
+        if (errorMessage === "Sorry, You have exceed the limit of add product") {
+          toast.error(
+            lang === 'ar'
+              ? 'عذراً، لقد تجاوزت الحد المسموح به لإضافة المنتجات'
+              : 'Sorry, you have exceeded the product addition limit.'
+          );
+        } else {
+          toast.error(
+            lang === 'ar'
+              ? 'فشل في إنشاء المنتج. حاول مجدداً.'
+              : 'Failed to create product. Please try again.'
+          );
+        }
+      
+        console.error('API Error:', errorMessage || error);
+        setLoading(false);
       }
-    
-      console.error('API Error:', errorMessage || error);
-      setLoading(false);
     }
   };
   const fetchCategoriesData = async () => {

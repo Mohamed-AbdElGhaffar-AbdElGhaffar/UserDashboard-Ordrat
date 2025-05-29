@@ -121,7 +121,7 @@ export default async function ProductPage({
             </Link> */}
           </PageHeader>
           {/* Pass the fetched product data to the CreateEditProduct component */}
-          <EditProduct lang={lang} product={product} allProducts={products.entities.filter((p: any) => p.id !== id)} currencyAbbreviation={shopData.currencyAbbreviation} languages={shopData.languages} />
+          <EditProduct lang={lang} initialProduct={product} allProducts={products.entities.filter((p: any) => p.id !== id)} currencyAbbreviation={shopData.currencyAbbreviation} languages={shopData.languages} />
         </div>
         :
         <NotFound />

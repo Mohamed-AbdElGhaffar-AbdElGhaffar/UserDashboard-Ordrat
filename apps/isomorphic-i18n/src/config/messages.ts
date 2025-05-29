@@ -25,6 +25,8 @@ export const messages = {
   priceIsRequired: 'form-product-price-required',
   oldPriceIsRequired: 'form-old-price-is-required',
   buyingPriceIsRequired: 'form-buying-price-is-required',
+  discountPercentCannotExceed100: 'form-discount-percent',
+  discountFixedCannotExceedPrice: 'form-discount-fixed-price',
   retailPriceIsRequired: 'form-retail-price-is-required',
   salePriceIsRequired: 'form-sale-price-required',
   shippingPriceIsRequired: 'form-shipping-price-required',

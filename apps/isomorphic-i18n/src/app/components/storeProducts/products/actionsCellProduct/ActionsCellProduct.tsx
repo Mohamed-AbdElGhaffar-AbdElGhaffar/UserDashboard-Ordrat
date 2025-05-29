@@ -31,6 +31,7 @@ const ActionsCellProduct: React.FC<ActionsCellProps> = ({ row, lang, view = fals
         lang={lang} 
         stocks={row.original.stocks}
         productImage={row.original.imageUrl}
+        productName={row.original.name}
       />,
       customSize: '480px',
     });
