@@ -69,9 +69,54 @@ export default function ProductClassicCard({
   const { addItemToCart, isInCart } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
+
+  const productData = {
+    id: product.id,
+    name: lang === 'ar' ? product.nameAr : product.nameEn,
+    description: lang === 'ar' ? product.descriptionAr : product.descriptionEn,
+    nameEn: product.nameEn,
+    nameAr: product.nameAr,
+    descriptionEn: product.descriptionEn,
+    descriptionAr: product.descriptionAr,
+    vat: product.vat,
+    vatType: product.vatType,
+    isDiscountActive: product.isDiscountActive,
+    discount: product.discount,
+    discountType: product.discountType,
+    isActive: product.isActive,
+    createdAt: product.createdAt,
+    lastUpdatedAt: product.lastUpdatedAt,
+    isTopSelling: product.isTopSelling,
+    isTopRated: product.isTopRated,
+    metaDescriptionEn: product.metaDescriptionEn,
+    metaDescriptionAr: product.metaDescriptionAr,
+    imageUrl: product.images?.length > 0 ? product.images[0].imageUrl : 'https://s3.amazonaws.com/redqteam.com/isomorphic-furyroad/public/food/1.webp',
+    categoryId: product.categoryId,
+    numberOfSales: product.numberOfSales,
+    variations: product.variations,
+    frequentlyOrderedWith: product.frequentlyOrderedWith,
+    reviews: product.reviews,
+    price: product.finalPrice,
+    oldPrice: product.price,
+  };
+
+  const cartItem: CartItem = {
+    id: `id:${productData.id}&&nameAr:${productData.nameAr}&&nameEn:${productData.nameEn}&&descriptionEn:${productData.descriptionEn}&&descriptionAr:${productData.descriptionAr}&&metaDescriptionEn:${productData.metaDescriptionEn}&&metaDescriptionAr:${productData.metaDescriptionAr}&&${''}`,
+    name: productData.name || "Default Item",
+    description: productData.description,
+    image: productData.imageUrl || "",
+    price: (productData.price) || 0,
+    oldPrice: (productData.oldPrice) || 0,
+    quantity,
+    orderItemVariations: [],
+  };
   
   const handleOpenModal = () => {
-    setIsModalOpen(true);
+    if(product.variations.length == 0){
+      addItemToCart(cartItem, 1);
+    }else {
+      setIsModalOpen(true);
+    }
   };
 
   const handleCloseModal = () => {

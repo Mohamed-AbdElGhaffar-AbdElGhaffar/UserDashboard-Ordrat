@@ -158,7 +158,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
   } = useNegotiator(orderId);
   // console.log("broadcastStatus: ",broadcastStatus);
   // console.log("isOrderBroadcasted: ",isOrderBroadcasted);
-  // console.log("offers: ",offers);
+  console.log("offers: ",offers);
   
   const text = {
     hiring: lang === 'ar' ? 'تعيين' : 'Hiring',
@@ -257,6 +257,8 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
       setCurrencyAbbreviation(shopData?.currencyAbbreviation);
       if (fetchedOrder?.type === 2 && (fetchedOrder.status === 3 || fetchedOrder.status === 4)) {
         const info = await fetchDeliveryById(fetchedOrder.deliveryId);
+        console.log("info: ",info);
+        
         setDeliveryInfo(info);
       }else{
         setDeliveryInfo(null);
@@ -268,7 +270,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
     }
   }
   useEffect(() => {
-    fetchDrivers(selectedBranch, 1);
+    // fetchDrivers(selectedBranch, 1);
     getOrderAndDelivery();
     setPage(1);
   }, [selectedBranch, offers, isOrderBroadcasted]);
@@ -278,7 +280,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
       if (bottom && page < maxPage) {
         const nextPage = page + 1;
         setPage(nextPage);
-        fetchDrivers(selectedBranch, nextPage);
+        // fetchDrivers(selectedBranch, nextPage);
         getOrderAndDelivery();
       }
     };
@@ -302,12 +304,10 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
     <>
       <PageHeader className='py-2' title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} >
         {deliveryInfo? <>
-          {isOrderBroadcasted && (
-            <Button as="span" onClick={cancelBroadcastOrder} isLoading={isCheckingBroadcast} className="cursor-pointer mt-4 w-full @lg:mt-0 @lg:w-auto">
-              {/* <PiPlusBold className="me-1.5 h-[17px] w-[17px]" /> */}
-              {lang === 'ar' ? 'إلغاء الطلب' : 'Cancel Broadcast'}
-            </Button>
-          )}
+          <Button as="span" onClick={cancelBroadcastOrder} isLoading={isCheckingBroadcast} className="cursor-pointer mt-4 w-full @lg:mt-0 @lg:w-auto">
+            {/* <PiPlusBold className="me-1.5 h-[17px] w-[17px]" /> */}
+            {lang === 'ar' ? 'إلغاء الطلب' : 'Cancel Broadcast'}
+          </Button>
         </>:
           <>
             {!isOrderBroadcasted && (
@@ -332,8 +332,8 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
               <div className='w-full flex justify-between items-center gap-2'>
                 <div className='w-[calc(100%-48px)] flex gap-2'>
                   <Image
-                    src={`${deliveryInfo[0].personalPhotoUrl}` || delivery.src}
-                    alt={`${deliveryInfo[0].firstName} ${deliveryInfo[0].lastName}`}
+                    src={deliveryInfo[0]?.personalPhotoUrl || delivery.src}
+                    alt={`${deliveryInfo[0]?.firstName} ${deliveryInfo[0].lastName}`}
                     className="w-[40px] h-[40px] object-contain rounded-full"
                     width={600}
                     height={360}
@@ -341,7 +341,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
                   <div className='w-[calc(100%-38px)]'>
                     <div className='w-full flex gap-1'>
                       <p className="font-bold text-[14px] capitalize text-[#E92E3E] truncate overflow-hidden whitespace-nowrap max-w-[calc(100%-84px)]">
-                        {deliveryInfo[0].firstName} {deliveryInfo[0].lastName}
+                        {deliveryInfo[0]?.firstName} {deliveryInfo[0]?.lastName}
                       </p>
                       <p className="font-semibold text-[14px] text-[#AEAEAE] truncate overflow-hidden whitespace-nowrap max-w-[80px]">
                         {/* ({offer.numberOfOrders} {text.trip}) */}
@@ -440,8 +440,13 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
                             </p>
                           </div>
                           <p className="font-semibold text-[14px] capitalize text-[#979797]">
-                            {text.away} : <span>{offer.RouteDistanceToBranch || 50} {text.km}</span>
+                            {text.away} : <span>{offer.routeDistanceToBranch || 50}</span>
                           </p>
+                          {formatDuration(offer.routeDurationToBranch, lang) && (
+                            <p className="font-semibold text-[14px] capitalize text-[#979797]">
+                              {text.remainingTime} : <span>{formatDuration(offer.routeDurationToBranch, lang)}</span>
+                            </p>
+                          )}
                         </div>
                       </div>
                       <Image
