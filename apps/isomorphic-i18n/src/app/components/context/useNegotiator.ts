@@ -8,10 +8,11 @@ import Cookies from 'js-cookie';
 
 interface DeliveryOffer {
   deliveryId: string;
+  // orderId: string;
   proposedPrice: number;
   numberOfOrders: number;
-  RouteDurationToBranch: number;
-  RouteDistanceToBranch: string;
+  routeDurationToBranch: number;
+  routeDistanceToBranch: string;
   photoUrl: string;
   name: string;
 }
@@ -94,20 +95,23 @@ export function useNegotiator(orderId?: string) {
 
     connection.on('DeliveryResponded', (response) => {
       const deliveryId = response.deliveryId;
+      // const orderId = response.orderId;
       const proposedPrice = response.proposedFee;
       const numberOfOrders = response.numberOfOrders;
       const name = response.name;
       const photoUrl = response.photoUrl;
-      const RouteDurationToBranch = response.RouteDurationToBranch;
-      const RouteDistanceToBranch = response.RouteDistanceToBranch;
+      const routeDurationToBranch = response.routeDurationToBranch;
+      const routeDistanceToBranch = response.routeDistanceToBranch;
       console.log('📨 DeliveryResponded received: ', response);
-      setOffers((prev) => {
-        const updated = prev.filter((o) => o.deliveryId !== deliveryId);
-        return [...updated, { deliveryId, proposedPrice, name, photoUrl, numberOfOrders, RouteDistanceToBranch, RouteDurationToBranch }];
-      });
-      setTimeout(() => {
-        setOffers((prev) => prev.filter((o) => o.deliveryId !== deliveryId));
-      }, 10000);
+      if(response.orderId == orderId){
+        setOffers((prev) => {
+          const updated = prev.filter((o) => o.deliveryId !== deliveryId);
+          return [...updated, { deliveryId, proposedPrice, name, photoUrl, numberOfOrders, routeDistanceToBranch, routeDurationToBranch }];
+        });
+        setTimeout(() => {
+          setOffers((prev) => prev.filter((o) => o.deliveryId !== deliveryId));
+        }, 10000);
+      }
     });
 
     connection.on('DeliveryCanceledOffer', (response) => {

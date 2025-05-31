@@ -5,6 +5,7 @@ import { FaLink, FaQrcode, FaShareAlt, FaCopy } from 'react-icons/fa';
 import { IoCheckmarkDoneSharp } from 'react-icons/io5';
 import QRCode from 'qrcode.react';
 import { Tooltip } from 'rizzui';
+import toast from 'react-hot-toast';
 
 interface ReferralLinkCardProps {
   referralLink: string;
@@ -34,7 +35,7 @@ const ReferralLinkCard = ({ referralLink, lang }: ReferralLinkCardProps) => {
         console.error('Error sharing:', err);
       }
     } else {
-      alert('Share not supported on this browser.');
+      toast.error('Share not supported on this browser.');
     }
   };
 

@@ -433,13 +433,15 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
             <span>{currencyAbbreviation}</span>
           )}</span>
                 </div>
-                <div className="flex justify-between font-medium">
-                  {t('Shipping-Fees')} <span className='flex items-center gap-1'>{order?.shippingFees} {currencyAbbreviation === "ر.س" ? (
-            <Image src={sarIcon} alt="SAR" width={12} height={12} />
-          ) : (
-            <span>{currencyAbbreviation}</span>
-          )}</span>
-                </div>
+                {order?.type === 2 && (
+                  <div className="flex justify-between font-medium">
+                    {t('Shipping-Fees')} <span className='flex items-center gap-1'>{order?.shippingFees} {currencyAbbreviation === "ر.س" ? (
+              <Image src={sarIcon} alt="SAR" width={12} height={12} />
+            ) : (
+              <span>{currencyAbbreviation}</span>
+            )}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-medium">
                   {t('Vat')} <span className='flex items-center gap-1'>{order?.totalVat} {currencyAbbreviation === "ر.س" ? (
             <Image src={sarIcon} alt="SAR" width={12} height={12} />
