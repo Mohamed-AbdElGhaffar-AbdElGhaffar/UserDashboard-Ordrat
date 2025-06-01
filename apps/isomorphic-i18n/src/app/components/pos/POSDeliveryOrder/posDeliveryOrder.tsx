@@ -103,6 +103,7 @@ type POSDeliveryOrderProps = {
   items: Item[];
   freeShppingTarget: number;
   shopData: any;
+  currencyAbbreviation: string;
 };
 
 export default function POSDeliveryOrder({
@@ -113,7 +114,9 @@ export default function POSDeliveryOrder({
   branchZones,
   items,
   freeShppingTarget,
-  shopData
+  shopData,
+  currencyAbbreviation
+
 }: POSDeliveryOrderProps) {
   const shopId = GetCookiesClient('shopId');
   const userType = GetCookiesClient('userType');
@@ -308,7 +311,7 @@ export default function POSDeliveryOrder({
               };
               
               if (orderDetails) {
-                printOrderReceipt(orderDetails, lang, customerInfo);
+                printOrderReceipt(orderDetails, lang, customerInfo,currencyAbbreviation);
               }
               toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح' : 'Order created successfully');
               onSuccess?.();
@@ -597,7 +600,7 @@ export default function POSDeliveryOrder({
               };
 
               if (orderDetails) {
-                printOrderReceipt(orderDetails, lang, customerInfo);
+                printOrderReceipt(orderDetails, lang, customerInfo,currencyAbbreviation);
               }
               toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح' : 'Order created successfully');
               onSuccess?.();

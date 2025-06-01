@@ -6,10 +6,13 @@ import { Branches, CouponEntity } from '@/data/tan-table-data';
 import { createColumnHelper } from '@tanstack/react-table';
 import DateCell from '@ui/date-cell';
 import { Checkbox, Text } from 'rizzui';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+import Image from 'next/image';
+
 
 const columnHelper = createColumnHelper<CouponEntity>();
 
-export const defaultColumns = (lang: string) => {
+export const defaultColumns = (lang: string,currencyAbbreviation:string) => {
   const hasActions = RoleClientExist([
     'DeleteCoupon',
     'UpdateCoupon',
@@ -42,8 +45,12 @@ export const defaultColumns = (lang: string) => {
       size: 240,
       header: lang === 'ar' ? 'قيمة الخصم' : 'discount Value',
       cell: ({ row }) => (
-        <Text className="font-lexend text-sm font-medium text-gray-900 dark:text-gray-700">
-          {row.original.discountValue}
+        <Text className="font-lexend text-sm font-medium text-gray-900 dark:text-gray-700 flex items-center gap-1">
+          {row.original.discountValue} {row.original.discountType === 0  ? '%' : currencyAbbreviation === "ر.س" ? (
+                            <Image src={sarIcon} alt="SAR" width={10} height={10} />
+                          ) : (
+                            <span>{currencyAbbreviation}</span>
+                          )}
         </Text>
       ),
     }),

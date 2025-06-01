@@ -204,12 +204,12 @@ export default function SignInForm({lang}:{lang?: string;}) {
             <div className="flex items-center justify-between pb-2">
               <Link
                 href={`/auth/forgot-password`}
-                className="h-auto p-0 text-sm font-semibold text-blue underline transition-colors hover:text-gray-900 hover:no-underline"
+                className="h-auto p-0 text-sm font-semibold text-redColor underline transition-colors hover:text-gray-900 hover:no-underline"
               >
                 {t('auth-forget-password')}
               </Link>
             </div>
-            <Button isLoading={loading} disabled={loading} className={`w-full ${loading? 'border dark:backdrop-blur focus-visible:ring-muted dark:hover:bg-muted/70 cursor-not-allowed border-muted bg-muted/70 text-muted-foreground backdrop-blur-xl hover:border-muted hover:bg-muted/70' : 'bg-[#e11d48] hover:bg-[#be123c]'}`} type="submit" size="lg">
+            <Button isLoading={loading} disabled={loading} className={`w-full ${loading? 'border dark:backdrop-redColor focus-visible:ring-muted dark:hover:bg-muted/70 cursor-not-allowed border-muted bg-muted/70 text-muted-foreground backdrop-blur-xl hover:border-muted hover:bg-muted/70' : 'bg-[#e11d48] hover:bg-[#be123c]'}`} type="submit" size="lg">
               <span>{t('auth-login')}</span>{' '}
               <PiArrowRightBold className="ms-2 mt-0.5 h-5 w-5 rtl:rotate-180" />
             </Button>

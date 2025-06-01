@@ -386,7 +386,7 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
                         email: '',
                         phoneNumber: userData.phoneNumber
                       };
-                      printOrderReceipt(orderPrint, lang, customerInfo);
+                      printOrderReceipt(orderPrint, lang, customerInfo, currencyAbbreviation);
                     }else{
                       printOrderReceipt(orderPrint, lang);
                     }

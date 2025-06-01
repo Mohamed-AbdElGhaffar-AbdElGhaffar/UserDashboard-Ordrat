@@ -1,6 +1,8 @@
 'use client';
 
+import Image from 'next/image';
 import { FaAward } from 'react-icons/fa';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 interface AffiliateStats {
   totalReferrals: number;
@@ -13,12 +15,17 @@ interface AffiliateStats {
 
 interface AffiliateLevelProps {
   lang: string;
+  currencyAbbreviation: string;
   affiliateStats: AffiliateStats;
 }
 
-export function AffiliateLevel({ lang, affiliateStats }: AffiliateLevelProps) {
+export function AffiliateLevel({ lang, affiliateStats,currencyAbbreviation }: AffiliateLevelProps) {
   const isAr = lang === 'ar';
-
+const currency=currencyAbbreviation === "ر.س" ? (
+                  <Image src={sarIcon} alt="SAR" width={10} height={10} />
+                ) : (
+                  <span>{currencyAbbreviation}</span>
+                )
   const text = {
     title: isAr ? 'مستوى الشراكة' : 'Affiliate Level',
     heading: isAr ? `تابع مستوى ${affiliateStats?.patchLevel}` : `Level ${affiliateStats?.patchLevel} Affiliate Partner`,

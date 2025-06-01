@@ -18,6 +18,7 @@ import toast from 'react-hot-toast';
 import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookiesClient';
 import WidgetCard from '@components/cards/widget-card';
 import { getColumns } from './columns';
+import sarIconGreen from '@public/assets/Saudi_Riyal_Symbol_green.png'
 
 const shopId = GetCookiesClient('shopId');
 
@@ -34,7 +35,7 @@ const filterState = {
   status: '',
 }; 
 
-export default function AffiliateTable({ usersData = [], lang }: { usersData: any[]; lang:string; }) {
+export default function AffiliateTable({ usersData = [], lang,currencyAbbreviation }: { usersData: any[]; lang:string;currencyAbbreviation:string }) {
   // const [pageSize, setPageSize] = useState(10);
 
   // const onHeaderCellClick = (value: string) => ({
@@ -144,6 +145,7 @@ export default function AffiliateTable({ usersData = [], lang }: { usersData: an
         createdAt: new Date(user.transactionDate),
         Description: user.description || '--------',
         status: user.status || 'Pending',
+        currencyAbbreviation,
       }));
       const pages = Math.ceil(transformedUsers.length / pageSize);
 
@@ -235,9 +237,10 @@ export default function AffiliateTable({ usersData = [], lang }: { usersData: an
       lang,
       checkedItems: selectedRowKeys,
       onChecked: handleRowSelect,
-      handleSelectAll
+      handleSelectAll,
+      currencyAbbreviation
     });
-  }, [data, sortConfig, handleSort, onDeleteItem, lang, selectedRowKeys]);
+  }, [data, sortConfig, handleSort, onDeleteItem, lang, selectedRowKeys,currencyAbbreviation]);
 
   const { visibleColumns, checkedColumns, setCheckedColumns } =
     useColumn(columns);

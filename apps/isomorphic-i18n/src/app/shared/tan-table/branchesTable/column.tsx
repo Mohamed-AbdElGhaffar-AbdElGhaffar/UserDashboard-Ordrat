@@ -101,7 +101,7 @@ const formatTimeLocalized = (time: string, lang: string): string => {
   }
 };
 
-export const defaultColumns = (lang: string, languages: number) => {
+export const defaultColumns = (lang: string, languages: number,currencyAbbreviation:string) => {
   const updateStatusActivate = RoleClientExist([
     'ActivateBranch',
   ]);
@@ -203,7 +203,7 @@ export const defaultColumns = (lang: string, languages: number) => {
         header: '',
         enablePinning: true,
         enableSorting: false,
-        cell: ({ row }) => <ActionsCellBranch row={row} lang={lang} languages={languages}/>,
+        cell: ({ row }) => <ActionsCellBranch row={row} lang={lang} languages={languages} currencyAbbreviation={currencyAbbreviation}/>,
       })
     );
   }

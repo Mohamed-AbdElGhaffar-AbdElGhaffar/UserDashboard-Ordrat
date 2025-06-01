@@ -19,6 +19,8 @@ import { format } from "date-fns";
 import { DateDurationPicker } from '@/app/components/ui/DatePickerTime/dateDurationPicker';
 import UpdateLocationPicker from '@/app/components/ui/map/UpdateLocationPicker';
 import { PhoneNumber } from '@ui/phone-input';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+import Image from 'next/image';
 
 const parseDurationString = (durationStr: string): {
   days: number;
@@ -40,6 +42,7 @@ type TableFormProps = {
   onSuccess?: () => void;
   lang: string;
   id: string;
+  currencyAbbreviation: string;
   languages: number;
 };
 
@@ -48,9 +51,16 @@ export default function UpdateBranchForm({
   onSuccess,
   lang = 'en',
   id,
-  languages
+  languages,
+  currencyAbbreviation
 }: TableFormProps) {
   const { closeModal } = useModal();
+  const currency = currencyAbbreviation === "ر.س" ? (
+    <Image src={sarIcon} alt="SAR" width={15} height={15} />
+  ) : (
+    <span>{currencyAbbreviation}</span>
+  )
+
   const text = {
     nameEn: lang === 'ar' ? 'الأسم (انجليزي)' : 'Name (English)',
     nameAr: lang === 'ar' ? 'الأسم (عربي)' : 'Name (Arabic)',
@@ -66,7 +76,6 @@ export default function UpdateBranchForm({
     deliveryCharge: lang === 'ar' ? 'رسوم التوصيل الثابتة' : 'Fixed Delivery Charge',
     deliveryPerKilo: lang === 'ar' ? 'رسوم لكل كيلومتر' : 'Charge Per Kilo',
     minimumDeliveryCharge: lang === 'ar' ? 'الحد الأدنى لرسوم التوصيل' : 'Minimum Delivery Charge',
-    currency: lang === 'ar' ? "ج.م" : "EGP",
     wrongPhone: lang === 'ar' ? 'رقم الهاتف غير صالح' : 'Invalid phone number',
 
     submit: lang === 'ar' ? 'تعديل' : 'Update',
@@ -161,8 +170,8 @@ export default function UpdateBranchForm({
         openAt: formatTime(values.openAt),
         closedAt: formatTime(values.closedAt),
         deliveryTime: `${mainFormik.values.deliveryTime.days.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.hours.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.minutes.toString().padStart(2, '0')}:${mainFormik.values.deliveryTime.seconds.toString().padStart(2, '0')}`,
-        nameEn: languages === 0? values.nameAr:values.nameEn,
-        nameAr: languages === 1? values.nameEn : values.nameAr,
+        nameEn: languages === 0 ? values.nameAr : values.nameEn,
+        nameAr: languages === 1 ? values.nameEn : values.nameAr,
         phoneNumber: values.phoneNumber,
         zoneName: values.nameAr,
         coverageRadius: radius,
@@ -176,8 +185,8 @@ export default function UpdateBranchForm({
       };
 
       console.log("API Payload: ", payload);
-      console.log("real radius: ",radius);
-      
+      console.log("real radius: ", radius);
+
       try {
         const response = await axiosClient.put(`/api/Branch/Update/${id}`, payload);
         console.log('Response:', response.data);
@@ -243,7 +252,7 @@ export default function UpdateBranchForm({
 
     fetchBranchData();
   }, [id, lang]);
-  
+
   useEffect(() => {
     if (languages === 0) {
       mainFormik.setFieldValue('nameEn', 'no data');
@@ -264,10 +273,10 @@ export default function UpdateBranchForm({
     mainFormik.setFieldValue('location', address || '');
     mainFormik.setFieldValue('lat', lat || '');
     mainFormik.setFieldValue('lng', lng || '');
-    mainFormik.setFieldValue('radius', radius || 0);    
+    mainFormik.setFieldValue('radius', radius || 0);
   };
-  console.log("mainFormik.errors: ",mainFormik.errors);
-  
+  console.log("mainFormik.errors: ", mainFormik.errors);
+
 
   return (
     <div className='py-1'>
@@ -282,10 +291,10 @@ export default function UpdateBranchForm({
           e.preventDefault();
           mainFormik.handleSubmit();
         }}>
-          <UpdateLocationPicker 
-            apiKey='AIzaSyCPQicAmrON3EtFwOmHvSZQ9IbONbLQmtA' 
-            onLocationSelect={handleLocationSelect} 
-            lang={lang} 
+          <UpdateLocationPicker
+            apiKey='AIzaSyCPQicAmrON3EtFwOmHvSZQ9IbONbLQmtA'
+            onLocationSelect={handleLocationSelect}
+            lang={lang}
             setRadius={setRadius}
             radius={radius}
             initLat={initLat}
@@ -293,10 +302,10 @@ export default function UpdateBranchForm({
             initRadius={initRadius}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {languages!=1 &&(
+            {languages != 1 && (
               <Input label={text.nameAr} placeholder={text.nameAr} name="nameAr" value={mainFormik.values.nameAr} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.nameAr && mainFormik.errors.nameAr ? mainFormik.errors.nameAr : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
             )}
-            {languages!=0 &&(
+            {languages != 0 && (
               <Input label={text.nameEn} placeholder={text.nameEn} name="nameEn" value={mainFormik.values.nameEn} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.nameEn && mainFormik.errors.nameEn ? mainFormik.errors.nameEn : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
             )}
             <PhoneNumber
@@ -314,7 +323,7 @@ export default function UpdateBranchForm({
             <Input label={text.location} placeholder={text.location} name="location" value={mainFormik.values.location} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.location && mainFormik.errors.location ? mainFormik.errors.location : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
             {/* openAt Time */}
             <div className='w-full'>
-              <DateTimePicker 
+              <DateTimePicker
                 lable={text.openAt}
                 lang={lang}
                 selectedDate={mainFormik.values.openAt}
@@ -326,7 +335,7 @@ export default function UpdateBranchForm({
             </div>
             {/* closedAt Time */}
             <div className='w-full'>
-              <DateTimePicker 
+              <DateTimePicker
                 lable={text.closedAt}
                 lang={lang}
                 selectedDate={mainFormik.values.closedAt}
@@ -338,13 +347,13 @@ export default function UpdateBranchForm({
             </div>
             {/* deliveryTime Time */}
             <div className='w-full'>
-              <DateDurationPicker 
+              <DateDurationPicker
                 lable={text.deliveryTime}
                 lang={lang}
                 selectedDuration={mainFormik.values.deliveryTime}
                 onChange={(val) => mainFormik.setFieldValue('deliveryTime', val)}
               />
-              {typeof mainFormik.errors.deliveryTime === 'string'  && (
+              {typeof mainFormik.errors.deliveryTime === 'string' && (
                 <div className="text-red-500 text-sm mt-1">{mainFormik.errors.deliveryTime}</div>
               )}
             </div>
@@ -358,10 +367,10 @@ export default function UpdateBranchForm({
               />
             </div>
             {mainFormik.values.isFixedDelivery ? (
-              <Input prefix={text.currency} type="number" step="any" label={text.deliveryCharge} placeholder={text.deliveryCharge} name="deliveryCharge" value={mainFormik.values.deliveryCharge} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.deliveryCharge && mainFormik.errors.deliveryCharge ? mainFormik.errors.deliveryCharge : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
-            ):(<>
-              <Input prefix={text.currency} type="number" step="any" label={text.deliveryPerKilo} placeholder={text.deliveryPerKilo} name="deliveryPerKilo" value={mainFormik.values.deliveryPerKilo} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.deliveryPerKilo && mainFormik.errors.deliveryPerKilo ? mainFormik.errors.deliveryPerKilo : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
-              <Input prefix={text.currency} type="number" step="any" label={text.minimumDeliveryCharge} placeholder={text.minimumDeliveryCharge} name="minimumDeliveryCharge" value={mainFormik.values.minimumDeliveryCharge} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.minimumDeliveryCharge && mainFormik.errors.minimumDeliveryCharge ? mainFormik.errors.minimumDeliveryCharge : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+              <Input prefix={currency} type="number" step="any" label={text.deliveryCharge} placeholder={text.deliveryCharge} name="deliveryCharge" value={mainFormik.values.deliveryCharge} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.deliveryCharge && mainFormik.errors.deliveryCharge ? mainFormik.errors.deliveryCharge : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+            ) : (<>
+              <Input prefix={currency} type="number" step="any" label={text.deliveryPerKilo} placeholder={text.deliveryPerKilo} name="deliveryPerKilo" value={mainFormik.values.deliveryPerKilo} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.deliveryPerKilo && mainFormik.errors.deliveryPerKilo ? mainFormik.errors.deliveryPerKilo : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+              <Input prefix={currency} type="number" step="any" label={text.minimumDeliveryCharge} placeholder={text.minimumDeliveryCharge} name="minimumDeliveryCharge" value={mainFormik.values.minimumDeliveryCharge} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.minimumDeliveryCharge && mainFormik.errors.minimumDeliveryCharge ? mainFormik.errors.minimumDeliveryCharge : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
             </>)
             }
           </div>

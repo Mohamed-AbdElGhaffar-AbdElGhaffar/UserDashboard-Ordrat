@@ -6,10 +6,12 @@ import DateCell from '@ui/date-cell';
 import ActionsCellProduct from '@/app/components/storeProducts/products/actionsCellProduct/ActionsCellProduct';
 import ActionsCellActive from '@/app/components/storeProducts/products/actionsCellActive/ActionsCellActive';
 import { RoleClientExist } from '@/app/components/ui/roleClientExist/RoleClientExist';
+import Image from 'next/image';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 const columnHelper = createColumnHelper<Product>();
 
-export const defaultColumns = (lang: string) => {
+export const defaultColumns = (lang: string,currencyAbbreviation:string) => {
   const updateActivationStatus = RoleClientExist([
     'ChangeProductsActivationStatus',
   ]);
@@ -76,9 +78,12 @@ export const defaultColumns = (lang: string) => {
       size: 140,
       header: lang === 'ar' ? "السعر" : 'Price',
       cell: ({ row }) => (
-        <Text className="font-lexend text-sm font-medium text-gray-900 dark:text-gray-700">
-          {row.original.price}
-        </Text>
+        <Text className="font-lexend text-sm font-medium text-gray-900 dark:text-gray-700 flex gap-1 items-center">
+          {row.original.price} {currencyAbbreviation === "ر.س" ? (
+                              <Image src={sarIcon} alt="SAR" width={12} height={12} />
+                            ) : (
+                              <span>{currencyAbbreviation}</span>
+                            )}</Text>
       ),
     }),
     // columnHelper.accessor('oldPrice', {

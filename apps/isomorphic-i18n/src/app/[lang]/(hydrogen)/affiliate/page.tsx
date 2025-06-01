@@ -3,22 +3,24 @@ import { metaObject } from '@/config/site.config';
 import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookiesServer';
 import AffiliateComponent from '@/app/components/affiliate/affiliateComponent/AffiliateComponent';
 import { API_BASE_URL } from '@/config/base-url';
+import { fetchShopData } from '@/app/api/shop';
 
 export async function generateMetadata({ params }: { params: { lang: string } }) {
   const lang = params.lang;
   return {
     ...metaObject(
       lang === 'ar'
-        ? 'نظام الشركاء | اربح من خلال الترويج لأوردات'
-        : 'Affiliate Program | Earn by Promoting Ordrat',
+        ? 'شريك أوردرات | اربح من خلال الترويج لأوردات'
+        : 'Ordrat Partner | Earn by Promoting Ordrat',
       lang,
       undefined,
       lang === 'ar'
-        ? 'انضم إلى نظام الشركاء وابدأ في تحقيق الأرباح من خلال دعوة المستخدمين والمتاجر إلى منصة أوردات.'
-        : 'Join the affiliate program and start earning by inviting users and shops to the Ordrat platform.'
+        ? 'انضم إلى برنامج شريك أوردرات وابدأ في تحقيق الأرباح من خلال دعوة المستخدمين والمتاجر إلى منصة أوردات.'
+        : 'Join the Ordrat Partner program and start earning by inviting users and shops to the Ordrat platform.'
     ),
   };
 }
+
 
 async function getValidAccessToken(accessToken: string | null, refreshToken: string | null): Promise<string | null> {
   if (!accessToken && refreshToken) {
@@ -114,6 +116,9 @@ export default async function AffiliatePage({
 }) {
   const accessToken = GetCookiesServer('accessToken');
   const refreshToken = GetCookiesServer('refreshToken');
+  const shopId = GetCookiesServer('shopId');
+  
+  const shopData = await fetchShopData(lang, shopId as string);
 
   const [affiliateLink, affiliateStats, affiliateWallet] = await Promise.all([
     fetchAffiliateLink(accessToken, refreshToken),
@@ -142,6 +147,7 @@ export default async function AffiliatePage({
         affiliateLink={affiliateLink}
         affiliateStats={affiliateStats}
         affiliateWallet={affiliateWallet}
+        currencyAbbreviation={shopData?.currencyAbbreviation}
       />
     </div>
   );

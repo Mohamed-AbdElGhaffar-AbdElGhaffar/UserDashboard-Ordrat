@@ -1,8 +1,13 @@
 'use client';
 
 import { FaWallet } from 'react-icons/fa';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+import sarIconRed from '@public/assets/Saudi_Riyal_Symbol_Red.png'
+import Image from 'next/image';
+
 interface WalletDetailsProps {
   lang: string;
+  currencyAbbreviation: string;
   affiliateWallet: {
     id: string;
     userId: string;
@@ -18,7 +23,17 @@ interface WalletDetailsProps {
     }[];
   };
 }
-export function WalletDetails({ lang, affiliateWallet }:WalletDetailsProps) {
+export function WalletDetails({ lang, affiliateWallet,currencyAbbreviation }:WalletDetailsProps) {
+  const currency=currencyAbbreviation === "ر.س" ? (
+                  <Image src={sarIcon} alt="SAR" width={20} height={20} />
+                ) : (
+                  <span>{currencyAbbreviation}</span>
+                )
+  const sarRed=currencyAbbreviation === "ر.س" ? (
+                  <Image src={sarIconRed} alt="SAR" width={20} height={20} />
+                ) : (
+                  <span>{currencyAbbreviation}</span>
+                )
   const text = {
     title: lang === 'ar' ? 'تفاصيل المحفظة' : 'Wallet Details',
     available: lang === 'ar' ? 'الرصيد المتاح للسحب' : 'Available Balance for Withdrawal',
@@ -26,7 +41,6 @@ export function WalletDetails({ lang, affiliateWallet }:WalletDetailsProps) {
     pending: lang === 'ar' ? 'قيد الانتظار' : 'Pending',
     withdrawn: lang === 'ar' ? 'المسحوب' : 'Withdrawn',
     walletId: 'Your ID',
-    currency: lang === 'ar' ? "ج.م" : "EGP",
   };
 
   return (
@@ -39,7 +53,7 @@ export function WalletDetails({ lang, affiliateWallet }:WalletDetailsProps) {
       </div>
       <div className="p-6 pb-0">
         <div className="flex flex-col mb-6">
-          <div className="text-3xl font-bold text-primary mb-1">{affiliateWallet?.pendingBalance || '0.00'}{text.currency}</div>
+          <div className="text-3xl font-bold text-primary mb-1 flex items-center  gap-1">{affiliateWallet?.pendingBalance || '0.00'}{sarRed}</div>
           <div className="text-sm text-gray-500 flex items-center gap-1">
             <span className="w-2 h-2 bg-green-500 rounded-full" />
             {text.available}
@@ -51,15 +65,15 @@ export function WalletDetails({ lang, affiliateWallet }:WalletDetailsProps) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div className="text-center bg-gray-50 p-4 rounded">
-            <div className="text-xl font-semibold">{affiliateWallet?.balance || '0.00'}{text.currency}</div>
+            <div className="text-xl font-semibold flex items-center gap-1 justify-center">{affiliateWallet?.balance || '0.00'}{currency}</div>
             <div className="text-xs text-gray-500 uppercase">{text.total}</div>
           </div>
           <div className="text-center bg-gray-50 p-4 rounded">
-            <div className="text-xl font-semibold">{affiliateWallet?.pendingBalance || '0.00'}{text.currency}</div>
+            <div className="text-xl font-semibold flex items-center gap-1 justify-center">{affiliateWallet?.pendingBalance || '0.00'}{currency}</div>
             <div className="text-xs text-gray-500 uppercase">{text.pending}</div>
           </div>
           <div className="text-center bg-gray-50 p-4 rounded">
-            <div className="text-xl font-semibold">{affiliateWallet?.withdrawedBalance || '0.00'}{text.currency}</div>
+            <div className="text-xl font-semibold flex items-center gap-1 justify-center">{affiliateWallet?.withdrawedBalance || '0.00'}{currency}</div>
             <div className="text-xs text-gray-500 uppercase">{text.withdrawn}</div>
           </div>
         </div>

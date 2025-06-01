@@ -41,6 +41,7 @@ const Select = dynamic(() => import('rizzui').then((mod) => mod.Select), {
 type POSOrderFormProps = {
   title?: string;
   lang: string;
+  currencyAbbreviation: string;
   onSuccess?: () => void;
   tables: { value: string; label: string }[];
   clearItemFromCart: (id: number | string) => void;
@@ -130,7 +131,8 @@ export default function POSOrderForm({
   tables,
   clearItemFromCart,
   items,
-  branchOption
+  branchOption,
+  currencyAbbreviation
 }: POSOrderFormProps) {
   const shopId = GetCookiesClient('shopId');
   const userType = GetCookiesClient('userType');
@@ -391,7 +393,7 @@ export default function POSOrderForm({
             // Auto-print the invoice
             console.log("orderDetails: ",orderDetails);
             
-            printOrderReceipt(orderDetails, lang, customerInfo);
+            printOrderReceipt(orderDetails, lang, customerInfo,currencyAbbreviation);
           }
         } else {
           console.error('Error creating order:', response.data);

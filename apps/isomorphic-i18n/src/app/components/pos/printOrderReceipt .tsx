@@ -2,6 +2,8 @@ import { toCurrency } from '@utils/to-currency';
 import { format } from 'date-fns';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import Image from 'next/image';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 export interface OrderAddress {
   street: string;
@@ -110,7 +112,8 @@ export const printOrderReceipt = (
   order: Order, 
   lang: string = 'en', 
   endUser?: OrderCustomer,
-  printerId?: string
+  currencyAbbreviation?: string,
+  printerId?: string,
 ): void => {
   if (!order) return;
 
@@ -125,6 +128,10 @@ export const printOrderReceipt = (
   const vat = order?.totalVat || 0;
   const discount = order?.discount || 0;
   const total = order?.totalPrice || 0;
+const currency =
+  currencyAbbreviation === 'ر.س'
+    ? `<img src="/assets/Saudi_Riyal_Symbol.svg.png" width="12" height="12" style="display:inline-block; vertical-align:middle;" />`
+    : currencyAbbreviation || '';
 
   // Set padding value - you can adjust this as needed
   const xPadding = '5mm';
@@ -285,7 +292,7 @@ export const printOrderReceipt = (
               <tr>
                 <td>${item.quantity}</td>
                 <td>${item.product?.name || ''}</td>
-                <td>${toCurrency(item.itemPrice * item.quantity, lang)}</td>
+                <td>${item.itemPrice * item.quantity} ${currency}</td>
               </tr>
               ${item.orderItemVariations?.flatMap(variation =>
                 variation.choices?.map(choice => `
@@ -294,7 +301,7 @@ export const printOrderReceipt = (
                     <td>
                       ${isRTL ? variation.variationNameAr : variation.variationNameEn}: ${isRTL ? choice.choiceNameAr : choice.choiceNameEn}
                     </td>
-                    <td>${toCurrency(choice.price * item.quantity, lang)}</td>
+                    <td>${choice.price * item.quantity} ${currency}</td>
                   </tr>
                 `) || []
               ).join('')}
@@ -304,23 +311,26 @@ export const printOrderReceipt = (
         
         <!-- Totals -->
         <div style="margin-bottom: 8px;">
-          <div class="price-row"><span>${isRTL ? 'المجموع الفرعي:' : 'Subtotal:'}</span><span>${toCurrency(subtotal, lang)}</span></div>
-          
+          <div class="price-row flex justify-between items-center">
+  <span>${isRTL ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
+  <span>${subtotal} ${currency}</span>
+</div>
+
           ${order.type == 2 ? `
-          <div class="price-row"><span>${isRTL ? 'رسوم التوصيل:' : 'Delivery Charge:'}</span><span>${toCurrency(shippingFees, lang)}</span></div>` : ''}
+          <div class="price-row"><span>${isRTL ? 'رسوم التوصيل:' : 'Delivery Charge:'}</span><span>${shippingFees} ${currency}</span></div>` : ''}
           
           ${serviceCharge > 0 ? `
-          <div class="price-row"><span>${isRTL ? 'رسوم الخدمة:' : 'Service Charge:'}</span><span>${toCurrency(serviceCharge, lang)}</span></div>` : ''}
+          <div class="price-row"><span>${isRTL ? 'رسوم الخدمة:' : 'Service Charge:'}</span><span>${serviceCharge} ${currency}</span></div>` : ''}
           
           ${vat > 0 ? `
-          <div class="price-row"><span>${isRTL ? 'ضريبة القيمة المضافة:' : 'VAT:'}</span><span>${toCurrency(vat, lang)}</span></div>` : ''}
+          <div class="price-row"><span>${isRTL ? 'ضريبة القيمة المضافة:' : 'VAT:'}</span><span>${vat} ${currency}</span></div>` : ''}
           
           ${discount > 0 ? `
-          <div class="price-row"><span>${isRTL ? 'الخصم:' : 'Discount:'}</span><span>-${toCurrency(discount, lang)}</span></div>` : ''}
+          <div class="price-row"><span>${isRTL ? 'الخصم:' : 'Discount:'}</span><span>-${discount} ${currency}</span></div>` : ''}
           
           <div class="price-row bold border-top">
             <span>${isRTL ? 'الإجمالي:' : 'Total:'}</span>
-            <span>${toCurrency(total, lang)}</span>
+            <span>${total} ${currency}</span>
           </div>
         </div>
         
@@ -469,28 +479,31 @@ export const printOrderReceipt = (
       const rightCol = isRTL ? paddingValue : (80 - paddingValue);
       
       doc.text(`${isRTL ? 'المجموع الفرعي:' : 'Subtotal:'}`, leftCol, y);
-      doc.text(`${toCurrency(subtotal, lang)}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
+      doc.text(`${subtotal.toFixed(2)} ${currency}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
       y += 4;
       
       doc.text(`${isRTL ? 'رسوم التوصيل:' : 'Delivery:'}`, leftCol, y);
-      doc.text(`${toCurrency(shippingFees, lang)}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
+      doc.text(`${shippingFees.toFixed(2)} ${currency}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
+
       y += 4;
       
       if (serviceCharge > 0) {
         doc.text(`${isRTL ? 'رسوم الخدمة:' : 'Service:'}`, leftCol, y);
-        doc.text(`${toCurrency(serviceCharge, lang)}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
+        doc.text(`${serviceCharge.toFixed(2)} ${currency}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
         y += 4;
       }
       
       if (vat > 0) {
         doc.text(`${isRTL ? 'ضريبة القيمة المضافة:' : 'VAT:'}`, leftCol, y);
-        doc.text(`${toCurrency(vat, lang)}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
+      doc.text(`${vat.toFixed(2)} ${currency}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
+
         y += 4;
       }
       
       if (discount > 0) {
         doc.text(`${isRTL ? 'الخصم:' : 'Discount:'}`, leftCol, y);
-        doc.text(`-${toCurrency(discount, lang)}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
+      doc.text(`-${discount.toFixed(2)} ${currency}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
+
         y += 4;
       }
       
@@ -500,7 +513,7 @@ export const printOrderReceipt = (
       
       doc.setFont(isRTL ? 'helvetica' : 'courier', 'bold');
       doc.text(`${isRTL ? 'الإجمالي:' : 'Total:'}`, leftCol, y);
-      doc.text(`${toCurrency(total, lang)}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
+      doc.text(`${total.toFixed(2)} ${currency}`, rightCol, y, { align: isRTL ? 'left' : 'right' });
       y += 6;
       
       // Add address if available - adjusted for padding

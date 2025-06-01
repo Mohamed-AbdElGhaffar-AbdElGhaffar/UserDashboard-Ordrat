@@ -1,3 +1,5 @@
+import { fetchShopData } from '@/app/api/shop';
+import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookiesServer';
 import PageHeader from '@/app/shared/page-header';
 import CouponTable from '@/app/shared/tan-table/couponTable';
 import { metaObject } from '@/config/site.config';
@@ -19,13 +21,17 @@ export async function generateMetadata({ params }: { params: { lang: string } })
   };
 }
 
-export default function Coupon({
+export default async function Coupon({
   params: { lang },
 }: {
   params: {
     lang: string;
   };
 }) {
+    const shopId = GetCookiesServer('shopId');
+    
+    const shopData = await fetchShopData(lang, shopId as string);
+  
   const pageHeader = {
     title: lang === 'ar' ? 'الكوبون' : 'Coupon',
     breadcrumb: [
@@ -44,7 +50,9 @@ export default function Coupon({
   };
   return <>
     <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-    <CouponTable lang={lang} />
+    <CouponTable lang={lang} 
+    currencyAbbreviation={shopData?.currencyAbbreviation}
+    />
 
     <WidgetCard title=
       {lang === 'ar' ? 'نصائح وإرشادات' : 'Tips and advice'}

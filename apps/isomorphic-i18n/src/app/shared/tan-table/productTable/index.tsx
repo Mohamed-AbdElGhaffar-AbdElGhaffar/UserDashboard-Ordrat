@@ -23,7 +23,7 @@ import ModalNoCategory from '@/app/components/ui/modals/ModalNoCategory';
 
 const shopId = GetCookiesClient('shopId');
 
-export default function ProductTable({lang = "en", products, categories}:{lang?:string; products: Product[]; categories: Categories[];}) {
+export default function ProductTable({lang = "en", products, categories,currencyAbbreviation}:{lang?:string; products: Product[]; categories: Categories[]; currencyAbbreviation:string}) {
   const { openModal } = useModal();
   const [inputName, setInputName] = useState('');
 
@@ -43,7 +43,7 @@ export default function ProductTable({lang = "en", products, categories}:{lang?:
   
   const { table, setData } = useTanStackTable<Product>({
     tableData: defaultData,
-    columnConfig: defaultColumns(lang),
+    columnConfig: defaultColumns(lang,currencyAbbreviation),
     options: {
       initialState: {
         pagination: {
@@ -180,6 +180,7 @@ export default function ProductTable({lang = "en", products, categories}:{lang?:
         numberOfColumns: lang === 'ar'? `الشكل ${ category.numberOfColumns}`
         : `Design ${ category.numberOfColumns}`,
         numberOfProducts: category.numberOfProducts,
+        currencyAbbreviation,
       }));
 
       setCategoriesData(transformedData);

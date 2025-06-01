@@ -12,16 +12,17 @@ import RoleExist from '@/app/components/ui/roleExist/RoleExist';
 interface ActionsCellProps {
   row: { original: { id: string; name: string; }; id: string };
   lang:string;
+  currencyAbbreviation:string;
   languages: number;
 }
 
-const ActionsCellBranch: React.FC<ActionsCellProps> = ({ row, lang, languages }) => {    
+const ActionsCellBranch: React.FC<ActionsCellProps> = ({ row, lang, languages,currencyAbbreviation }) => {    
   const { openModal } = useModal();
   const { setBranchesData } = useUserContext();
 
   const handleOpenModal = () => {
     openModal({
-      view: <UpdateBranchForm title={lang == "en"?"Update Branch":'تعديل الفرع'} lang={lang} id={row.original.id} onSuccess={()=>setBranchesData(true)} languages={languages}/>,
+      view: <UpdateBranchForm title={lang == "en"?"Update Branch":'تعديل الفرع'} lang={lang} id={row.original.id} onSuccess={()=>setBranchesData(true)} languages={languages} currencyAbbreviation={currencyAbbreviation}/>,
       customSize: '700px',
     });
   };

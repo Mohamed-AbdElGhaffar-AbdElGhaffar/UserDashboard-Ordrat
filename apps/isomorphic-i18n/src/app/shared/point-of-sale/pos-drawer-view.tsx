@@ -24,6 +24,7 @@ import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookie
 import POSTableOrderProducts from './pos-table-order-products';
 import { printOrderReceipt } from '@/app/components/pos/printOrderReceipt ';
 import POSDeliveryOrder from '@/app/components/pos/POSDeliveryOrder/posDeliveryOrder';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 function parseProductData(productString: string) {
   const dataPairs = productString.split('&&');
@@ -94,12 +95,13 @@ type POSOrderTypes = {
   branchOption: any[];
   allDatatables: any[];
   languages: number;
-  branchZones: { id:string; lat: number; lng: number; zoonRadius: number }[]; 
+  branchZones: { id: string; lat: number; lng: number; zoonRadius: number }[];
   freeShppingTarget: number;
   defaultUser: string;
   shopData: any;
+  currencyAbbreviation: string;
 };
- 
+
 export default function POSDrawerView({
   className,
   lang,
@@ -110,18 +112,19 @@ export default function POSDrawerView({
   removeItemFromCart,
   clearItemFromCart,
   tables,
-  branchOption, 
+  branchOption,
   allDatatables,
   languages,
   branchZones,
   freeShppingTarget,
   defaultUser,
-  shopData
+  shopData,
+  currencyAbbreviation
 }: POSOrderTypes) {
-  const { shipping, setShipping, posTableOrderId, setPOSTableOrderId, 
+  const { shipping, setShipping, posTableOrderId, setPOSTableOrderId,
     updateMainBranch, setUpdateMainBranch, setTablesData,
     mainBranch } = useUserContext();
-  const { openModal } = useModal();  
+  const { openModal } = useModal();
   const shopId = GetCookiesClient('shopId');
   const userType = GetCookiesClient('userType');
   const [loading, setLoading] = useState(false);
@@ -133,7 +136,7 @@ export default function POSDrawerView({
   useEffect(() => {
     i18n.changeLanguage(lang);
   }, [lang, i18n]);
- 
+
   useEffect(() => {
     if (updateMainBranch == true) {
       setPOSTableOrderId('');
@@ -146,26 +149,28 @@ export default function POSDrawerView({
 
   useEffect(() => {
     if (!posTableOrderId?.order?.items) return;
-  
+
     const filteredItems = filterItems(items, posTableOrderId);
     const increasedQuantityItems = findMatchingItems(items, posTableOrderId);
-  
+
     setIsUpdatedAvailable(filteredItems.length === 0 && increasedQuantityItems.length === 0);
   }, [lang, items, posTableOrderId]);
 
   function handleOrder() {
     setLoading(true);
-    if(onOrderSuccess){onOrderSuccess();}
+    if (onOrderSuccess) { onOrderSuccess(); }
     if (shipping == 'takeaway') {
       setTimeout(() => {
-        setLoading(false); 
+        setLoading(false);
         openModal({
           view: (
-            <POSOrderForm 
-              clearItemFromCart={clearItemFromCart} 
-              items={items} tables={tables} onSuccess={onSuccess} 
-              title={lang === 'ar' ? "الكاشير" : "POS"} 
-              lang={lang!} 
+            <POSOrderForm
+              clearItemFromCart={clearItemFromCart}
+              items={items} tables={tables} onSuccess={onSuccess}
+              title={lang === 'ar' ? "الكاشير" : "POS"}
+              lang={lang!}
+              currencyAbbreviation={shopData.currencyAbbreviation}
+
               branchOption={branchOption}
             />
           ),
@@ -173,18 +178,20 @@ export default function POSDrawerView({
         })
         console.log('createOrder data ->', orderedItems);
       }, 600);
-    }else{
+    } else {
       setTimeout(() => {
-        setLoading(false); 
+        setLoading(false);
         openModal({
           view: (
             <POSDeliveryOrder
-              title={lang === 'ar' ? "الكاشير" : "POS"} 
-              lang={lang!} onSuccess={onSuccess} 
+              title={lang === 'ar' ? "الكاشير" : "POS"}
+              lang={lang!} onSuccess={onSuccess}
               languages={languages} branchZones={branchZones}
               items={items}
               freeShppingTarget={freeShppingTarget}
               shopData={shopData}
+              currencyAbbreviation={shopData.currencyAbbreviation}
+
             />
           ),
           customSize: '700px',
@@ -195,15 +202,15 @@ export default function POSDrawerView({
   }
 
   function handleTables() {
-    if(onOrderSuccess){onOrderSuccess();}
+    if (onOrderSuccess) { onOrderSuccess(); }
     openModal({
       view: (
         <POSTablesForm
-          title={lang === 'ar' ? "الطاولات" : "Tables"} 
+          title={lang === 'ar' ? "الطاولات" : "Tables"}
           lang={lang!}
-          items={items} 
-          clearItemFromCart={clearItemFromCart} 
-          addItemToCart={addItemToCart} 
+          items={items}
+          clearItemFromCart={clearItemFromCart}
+          addItemToCart={addItemToCart}
           allDatatables={allDatatables}
           languages={languages}
         />
@@ -222,13 +229,13 @@ export default function POSDrawerView({
     return orderVariations.every((orderVar) => {
       const realVar = realVariations[orderVar.variationId];
       if (!realVar) return false;
-  
+
       return orderVar.choices.every((choice: any) => {
         // Check for input-based variation (e.g., inputValue)
         if (choice.inputValue) {
           return realVar.inputValue === choice.inputValue;
         }
-  
+
         // Check for choice-based variation (e.g., choiceId)
         return realVar.choiceId === choice.choiceId;
       });
@@ -237,7 +244,7 @@ export default function POSDrawerView({
 
   function filterItems(items: any[], posTableOrderId: any) {
     const orderItems = posTableOrderId.order.items;
-  
+
     // Find items that are not in the current order or are cancelled
     return items.filter((item) => {
       const realProductData = parseProductData(item.id);
@@ -245,24 +252,24 @@ export default function POSDrawerView({
         orderItem.product.id === realProductData.id &&
         variationsMatch(orderItem.orderItemVariations, realProductData.variations)
       );
-  
+
       // Include items that are either not found or marked as cancelled
       if (!orderItem || orderItem.cancelled) {
         return true;
       }
-  
+
       return false;
     });
   }
-  
+
   function findMatchingItems(items: any[], posTableOrderId: any) {
     const orderItems = posTableOrderId.order.items;
-  
+
     // Find all matching order items and attach their ID
     return items
       .map((item) => {
         const realProductData = parseProductData(item.id);
-  
+
         // Find matching order item
         const orderItem = orderItems.find((orderItem: any) =>
           orderItem.product.id === realProductData.id &&
@@ -270,37 +277,37 @@ export default function POSDrawerView({
           variationsMatch(orderItem.orderItemVariations, realProductData.variations) &&
           item.quantity > orderItem.quantity
         );
-  
+
         // If a matching order item is found, attach the orderItem.id to the item
         if (orderItem) {
           return { ...item, orderItemId: orderItem.id, orderId: posTableOrderId.order.id };
         }
-  
+
         // Return null if no match
         return null;
       })
       .filter((item) => item !== null); // Remove null values
   }
-  
+
   async function handleUpdateOrder() {
     setUpdateOrderLoading(true); // Start loading
     setIsUpdatedAvailable(true);
     console.log("posTableOrderId: ", posTableOrderId);
     console.log("items: ", items);
-    
+
     const filteredItems = filterItems(items, posTableOrderId);
     console.log("Filtered Items: ", filteredItems);
-    
+
     const increasedQuantityItems = findMatchingItems(items, posTableOrderId);
     console.log("Increased Quantity Items: ", increasedQuantityItems);
-  
+
     try {
       // Handle filtered items (new items to be added)
       if (filteredItems.length !== 0) {
         for (const item of filteredItems) {
           const realProductData = parseProductData(item.id);
           const formData = new FormData();
-          
+
           // Append required fields
           formData.append('Quantity', item.quantity.toString());
           formData.append('ItemPrice', item.price.toString());
@@ -312,11 +319,11 @@ export default function POSDrawerView({
           formData.append('ShopId', shopId as string);
           formData.append('ProductId', realProductData.id);
           formData.append('sourceChannel', '1');
-  
+
           // Handle variations
           item.orderItemVariations?.forEach((variation: any, vIndex: any) => {
             formData.append(`OrderItemVariations[${vIndex}].variationId`, variation.variationId);
-            
+
             variation.choices.forEach((choice: any, cIndex: any) => {
               if (choice.choiceId) {
                 formData.append(`OrderItemVariations[${vIndex}].choices[${cIndex}].choiceId`, choice.choiceId);
@@ -329,7 +336,7 @@ export default function POSDrawerView({
               }
             });
           });
-  
+
           try {
             const response = await axiosClient.put(
               `/api/Order/AddOrderitemasync/${posTableOrderId.order.id}`,
@@ -341,7 +348,7 @@ export default function POSDrawerView({
                 },
               }
             );
-  
+
             if (response.status === 200) {
               console.log(`Item ${item.name} added successfully!`);
               toast.success(
@@ -372,7 +379,7 @@ export default function POSDrawerView({
           }
         }
       }
-  
+
       // Handle increased quantity items (update existing items)
       if (increasedQuantityItems.length !== 0) {
         for (const item of increasedQuantityItems) {
@@ -380,7 +387,7 @@ export default function POSDrawerView({
             const formData = new FormData();
             formData.append('sourceChannel', '1');
             const quantity = item.quantity;
-  
+
             await axiosClient.put(
               `/api/Order/UpdateOrderItemQuantity/UpdateOrderItemQuantity${item.orderId}/${item.orderItemId}`,
               formData,
@@ -388,7 +395,7 @@ export default function POSDrawerView({
                 params: { quantity },
               }
             );
-  
+
             toast.success(lang === 'ar' ? 'تم تحديث الكمية بنجاح!' : 'Quantity updated successfully!');
           } catch (error) {
             console.error('Error updating quantity:', error);
@@ -401,7 +408,7 @@ export default function POSDrawerView({
           }
         }
       }
-  
+
       // No items to add or update
       if (filteredItems.length === 0 && increasedQuantityItems.length === 0) {
         console.log("No items to add.");
@@ -427,7 +434,7 @@ export default function POSDrawerView({
     setAddOrderToTable(true);
     const accessToken = GetCookiesClient('accessToken') as string;
     const decodedToken = decodeJWT(accessToken);
-    console.log("decodedToken: ",decodedToken);
+    console.log("decodedToken: ", decodedToken);
     try {
       const formData = new FormData();
       formData.append('paymentmethod', '0');
@@ -438,9 +445,9 @@ export default function POSDrawerView({
       formData.append('BranchId', mainBranch);
       formData.append('EndUserId', defaultUser);
       if (decodedToken.uid) {
-        if(userType == '4'){
+        if (userType == '4') {
           formData.append('EmployeeId', decodedToken.uid);
-        }else{
+        } else {
           formData.append('SellerId', decodedToken.uid);
         }
       }
@@ -457,10 +464,10 @@ export default function POSDrawerView({
       formData.append('Service', '0');
       formData.append('Status', '2');
       const now = new Date();
-      const formattedDate = now.toISOString().slice(0, 19).replace('T', ' '); 
-      
+      const formattedDate = now.toISOString().slice(0, 19).replace('T', ' ');
+
       formData.append('CreatedAt', formattedDate);
-      
+
       items.forEach((item, index) => {
         const realProductData = parseProductData(item.id as string)
         formData.append(`Items[${index}].quantity`, item.quantity.toString());
@@ -501,23 +508,23 @@ export default function POSDrawerView({
 
         if (orderNumber) {
           localStorage.setItem('orderNumber', orderNumber.toString());
-        }     
-        if (orderId) {      
+        }
+        if (orderId) {
           try {
             const tableResponse = await axiosClient.patch(
               `/api/Order/SelectTableForOrder/SelectTableForOrder/${orderId}/${posTableOrderId.id}`
             );
-      
+
             if (tableResponse.status === 200) {
               setTablesData(true);
               handleReturn();
-              toast.success(<Text as="b">{lang == 'ar'? `تم فتح الطلب رقم ${response.data.orderNumber} للطاولة بنجاح!` : `Order placed ${response.data.orderNumber} to table successfully!`}</Text>);
+              toast.success(<Text as="b">{lang == 'ar' ? `تم فتح الطلب رقم ${response.data.orderNumber} للطاولة بنجاح!` : `Order placed ${response.data.orderNumber} to table successfully!`}</Text>);
             } else {
               console.error('Error assigning table:', tableResponse.data);
               toast.error(
                 <Text as="b">
-                  {lang == 'ar' 
-                    ? 'فشل في تعيين الطاولة. حاول مجددًا.' 
+                  {lang == 'ar'
+                    ? 'فشل في تعيين الطاولة. حاول مجددًا.'
                     : 'Failed to assign table. Please try again.'}
                 </Text>
               );
@@ -526,13 +533,13 @@ export default function POSDrawerView({
             console.error('Error during table assignment:', error);
             toast.error(
               <Text as="b">
-                {lang == 'ar' 
-                  ? 'حدث خطأ أثناء تعيين الطاولة. حاول مجددًا.' 
+                {lang == 'ar'
+                  ? 'حدث خطأ أثناء تعيين الطاولة. حاول مجددًا.'
                   : 'Error occurred while assigning table. Please try again.'}
               </Text>
             );
           }
-        } 
+        }
       } else {
         console.error('Error creating order:', response.data);
         toast.error(<Text as="b">Failed to place order. Please try again.</Text>);
@@ -544,7 +551,7 @@ export default function POSDrawerView({
       setAddOrderToTable(false);
     }
   };
-  
+
   const handleCloseOrder = async () => {
     setCloseOrder(true);
     try {
@@ -571,14 +578,14 @@ export default function POSDrawerView({
           return;
         }
       }
-  
+
       // Change the order status if the order is paid or already paid
       try {
         const changeOrderStatusResponse = await axiosClient.patch(
           `/api/Order/ChangeOrderStatus/${posTableOrderId.order.id}?orderStatus=4`,
           new FormData().append('sourceChannel', '1')
         );
-  
+
         if (changeOrderStatusResponse.status === 200) {
           // Clear the cart items
           items.forEach(item => clearItemFromCart(item.id));
@@ -610,7 +617,7 @@ export default function POSDrawerView({
                 itemPrice: item.itemPrice,
                 product: {
                   id: item.product.id,
-                  name: lang == 'ar'? item.product.nameAr : item.product.nameEn
+                  name: lang == 'ar' ? item.product.nameAr : item.product.nameEn
                 },
                 orderItemVariations: item.orderItemVariations.map((variation: any) => ({
                   variationId: variation.variationId,
@@ -624,8 +631,8 @@ export default function POSDrawerView({
                   }))
                 }))
               }))
-          };          
-          
+          };
+
           const mockCustomer = {
             id: "cust-001",
             firstName: "Ahmed",
@@ -633,7 +640,7 @@ export default function POSDrawerView({
             phoneNumber: "+966501234567"
           };
           const orderDetails: any | null = await fetchOrderDetails(posTableOrderId.order.id, lang!);
-          printOrderReceipt(orderDetails, lang);
+          printOrderReceipt(orderDetails, lang,undefined,currencyAbbreviation);
         } else {
           console.error('Error changing order status:', changeOrderStatusResponse.data);
           toast.error(
@@ -688,7 +695,7 @@ export default function POSDrawerView({
         <div className="px-5 pb-0 pe-3 lg:px-7 lg:pb-0">
           {!!orderedItems?.length && (
             <>
-              {posTableOrderId?.tableStatus == 1?
+              {posTableOrderId?.tableStatus == 1 ?
                 <POSTableOrderProducts
                   lang={lang}
                   orderedItems={orderedItems}
@@ -697,16 +704,18 @@ export default function POSDrawerView({
                   clearItemFromCart={clearItemFromCart}
                   itemClassName="pe-4"
                   simpleBarClassName={simpleBarClassName}
+                  currencyAbbreviation={shopData.currencyAbbreviation}
                   showControls
-                />
-                :
-                <POSOrderProducts
+                  />
+                  :
+                  <POSOrderProducts
                   lang={lang}
                   orderedItems={orderedItems}
                   removeItemFromCart={removeItemFromCart}
                   clearItemFromCart={clearItemFromCart}
                   itemClassName="pe-4"
                   simpleBarClassName={simpleBarClassName}
+                  currencyAbbreviation={shopData.currencyAbbreviation}
                   showControls
                 />
               }
@@ -737,7 +746,7 @@ export default function POSDrawerView({
       )}
       {!!orderedItems?.length && (
         <>
-          {posTableOrderId?
+          {posTableOrderId ?
             <>
               {posTableOrderId.tableStatus == 1 && (
                 <div className="flex gap-4 px-5 my-4 lg:px-7">
@@ -781,10 +790,10 @@ export default function POSDrawerView({
       )}
       {!!orderedItems?.length && (
         <div className="border-t border-gray-300 p-5 pb-7 lg:p-7">
-          <PriceCalculation lang={lang} shippingValue={shipping} shopData={shopData}/>
-          {posTableOrderId?
+          <PriceCalculation lang={lang} shippingValue={shipping} shopData={shopData} currencyAbbreviation={currencyAbbreviation as any} />
+          {posTableOrderId ?
             <div className="flex gap-4">
-              {posTableOrderId.tableStatus == 1?
+              {posTableOrderId.tableStatus == 1 ?
                 <Button
                   className="h-11 w-full"
                   isLoading={updateOrderLoading}
@@ -832,15 +841,15 @@ export default function POSDrawerView({
       )}
       {!orderedItems?.length && (
         <div className="p-4 pb-10 sm:pb-7">
-          {posTableOrderId?
+          {posTableOrderId ?
             <div className="flex flex-col gap-4">
-              {posTableOrderId.tableStatus == 1 &&(
+              {posTableOrderId.tableStatus == 1 && (
                 <Button
-                 className="h-11 w-full"
-                 isLoading={closeOrder}
-                 onClick={handleCloseOrder}
+                  className="h-11 w-full"
+                  isLoading={closeOrder}
+                  onClick={handleCloseOrder}
                 >
-                 {t("close-order")}
+                  {t("close-order")}
                 </Button>
               )}
               <Button
@@ -870,9 +879,9 @@ export default function POSDrawerView({
 
 const TAX_PERCENTAGE = 5;
 
-export function PriceCalculation({ lang='en', shippingValue, shopData }:{ lang?:string; shippingValue?: string; shopData?: any; }) {
+export function PriceCalculation({ lang = 'en', shippingValue, shopData, currencyAbbreviation }: { lang?: string; shippingValue?: string; shopData?: any; currencyAbbreviation: string }) {
   const { t, i18n } = useTranslation(lang!, "home");
-  const {posTableOrderId} = useUserContext();
+  const { posTableOrderId } = useUserContext();
   useEffect(() => {
     i18n.changeLanguage(lang);
   }, [lang, i18n]);
@@ -883,7 +892,7 @@ export function PriceCalculation({ lang='en', shippingValue, shopData }:{ lang?:
   );
   // const tax = total * (TAX_PERCENTAGE / 100);
   // const subTotal = total + tax;
-  
+
   const isDineIn = !!posTableOrderId;
 
   // Service logic
@@ -906,11 +915,28 @@ export function PriceCalculation({ lang='en', shippingValue, shopData }:{ lang?:
     <div className="mb-4 space-y-3.5">
       <p className="flex items-center justify-between">
         <span className="text-gray-500">{t('subtotal')}</span>
-        <span className="font-medium text-gray-900">
-          {lang === 'ar'
-            ? `${total.toFixed(2)} ${t('currency')}`
-            : `${t('currency')} ${total.toFixed(2)}`}
+        <span className="font-medium text-gray-900 flex items-center gap-1">
+          {lang === 'ar' ? (
+            <>
+              {total.toFixed(2)}{' '}
+              {currencyAbbreviation === 'ر.س' ? (
+                <Image src={sarIcon} alt="SAR" width={16} height={16} />
+              ) : (
+                <span>{currencyAbbreviation}</span>
+              )}
+            </>
+          ) : (
+            <>
+              {currencyAbbreviation === 'ر.س' ? (
+                <Image src={sarIcon} alt="SAR" width={16} height={16} />
+              ) : (
+                <span>{currencyAbbreviation}</span>
+              )}{' '}
+              {total.toFixed(2)}
+            </>
+          )}
         </span>
+
       </p>
 
       {shouldApplyVat && (
@@ -919,8 +945,21 @@ export function PriceCalculation({ lang='en', shippingValue, shopData }:{ lang?:
           <span className="font-medium text-gray-900">
             {vat > 0
               ? lang === 'ar'
-                ? `${vat.toFixed(2)} ${t('currency')}`
-                : `${t('currency')} ${vat.toFixed(2)}`
+                ? <>
+                  {vat.toFixed(2)}  {currencyAbbreviation === 'ر.س' ? (
+                    <Image src={sarIcon} alt="SAR" width={16} height={16} />
+                  ) : (
+                    <span>{currencyAbbreviation}</span>
+                  )}
+                </>
+                : <>
+                  {currencyAbbreviation === 'ر.س' ? (
+                    <Image src={sarIcon} alt="SAR" width={16} height={16} />
+                  ) : (
+                    <span>{currencyAbbreviation}</span>
+                  )}
+                  {vat.toFixed(2)}
+                </>
               : t('free')}
           </span>
         </p>
@@ -932,8 +971,22 @@ export function PriceCalculation({ lang='en', shippingValue, shopData }:{ lang?:
           <span className="font-medium text-gray-900">
             {service > 0
               ? lang === 'ar'
-                ? `${service.toFixed(2)} ${t('currency')}`
-                : `${t('currency')} ${service.toFixed(2)}`
+                ?
+                <>
+                  {service.toFixed(2)}  {currencyAbbreviation === 'ر.س' ? (
+                    <Image src={sarIcon} alt="SAR" width={16} height={16} />
+                  ) : (
+                    <span>{currencyAbbreviation}</span>
+                  )}
+                </>
+                :
+                <>
+                  {currencyAbbreviation === 'ر.س' ? (
+                    <Image src={sarIcon} alt="SAR" width={16} height={16} />
+                  ) : (
+                    <span>{currencyAbbreviation}</span>
+                  )} {service.toFixed(2)}
+                </>
               : t('free')}
           </span>
         </p>
@@ -941,10 +994,26 @@ export function PriceCalculation({ lang='en', shippingValue, shopData }:{ lang?:
 
       <p className="flex items-center justify-between border-t border-gray-300 pt-3.5 text-base font-semibold">
         <span className="text-gray-900">{t('total')}:</span>
-        <span className="text-gray-900">
+        <span className="text-gray-900 flex items-center gap-1">
           {lang === 'ar'
-            ? `${subTotal.toFixed(2)} ${t('currency')}`
-            : `${t('currency')} ${subTotal.toFixed(2)}`}
+            ?
+            <>
+            {subTotal.toFixed(2)}  {currencyAbbreviation === 'ر.س' ? (
+        <Image src={sarIcon} alt="SAR" width={16} height={16} />
+      ) : (
+        <span>{currencyAbbreviation}</span>
+      )}
+            </>
+            :
+            <>
+              {currencyAbbreviation === 'ر.س' ? (
+        <Image src={sarIcon} alt="SAR" width={16} height={16} />
+      ) : (
+        <span>{currencyAbbreviation}</span>
+      )} {subTotal.toFixed(2)}
+            </>
+          
+          }
         </span>
       </p>
     </div>

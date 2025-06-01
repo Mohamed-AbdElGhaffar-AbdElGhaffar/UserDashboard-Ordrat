@@ -80,7 +80,7 @@ export default function HeaderMenuRight({ lang }: { lang?: string }) {
           value={branchOption?.find((option: any) => option.value === mainBranch)}
           onChange={(value: any) => handleBranchChange(value)}
           placeholder={text.placeholderBranch}
-          className="w-[105px] xs:w-48 md:full text-sm py-1 px-2"
+          className="w-[115px] xs:w-48 md:full text-sm py-1 px-2"
           dropdownClassName="!w-[128px] xs:!w-[192px] text-sm py-1"
           style={{ minWidth: 128 }}
           getOptionValue={(option) => option.value}

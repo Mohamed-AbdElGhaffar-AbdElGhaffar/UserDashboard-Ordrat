@@ -96,6 +96,7 @@ type PosSidebarProps = {
   freeShppingTarget: number;
   defaultUser: string;
   shopData: any;
+  currencyAbbreviation: string;
 }; 
 
 function PostSidebar({
@@ -111,7 +112,8 @@ function PostSidebar({
   branchZones,
   freeShppingTarget,
   defaultUser,
-  shopData
+  shopData,
+  currencyAbbreviation
 }: PosSidebarProps) {
   const { shipping, setShipping, posTableOrderId, setPOSTableOrderId, 
     updateMainBranch, setUpdateMainBranch, setTablesData,
@@ -162,6 +164,7 @@ function PostSidebar({
               items={items} tables={tables} onSuccess={resetCart} 
               title={lang === 'ar' ? "الكاشير" : "POS"} 
               lang={lang!} 
+              currencyAbbreviation={shopData.currencyAbbreviation}
               branchOption={branchOption}
             />
           ),
@@ -181,6 +184,8 @@ function PostSidebar({
               items={items}
               freeShppingTarget={freeShppingTarget}
               shopData={shopData}
+              currencyAbbreviation={shopData.currencyAbbreviation}
+
             />
           ),
           customSize: '700px',
@@ -630,7 +635,7 @@ function PostSidebar({
           };
           const orderDetails: any | null = await fetchOrderDetails(posTableOrderId.order.id, lang);
 
-          printOrderReceipt(orderDetails, lang);
+          printOrderReceipt(orderDetails, lang,undefined,currencyAbbreviation);
           // printOrderReceipt(posTableOrderId.order, lang, {
           //   firstName: posTableOrderId.order.endUser?.firstName,
           //   lastName: posTableOrderId.order.endUser?.lastName,
@@ -756,6 +761,7 @@ function PostSidebar({
               removeItemFromCart={removeItemFromCart}
               clearItemFromCart={clearItemFromCart}
               simpleBarClassName={simpleBarClassName}
+              currencyAbbreviation={shopData.currencyAbbreviation}
               showControls
             />
             :
@@ -765,6 +771,7 @@ function PostSidebar({
               removeItemFromCart={removeItemFromCart}
               clearItemFromCart={clearItemFromCart}
               simpleBarClassName={simpleBarClassName}
+              currencyAbbreviation={shopData.currencyAbbreviation}
               showControls
             />
           }
@@ -829,7 +836,7 @@ function PostSidebar({
       )}
       {!!orderedItems?.length && (
         <div className="border-t border-gray-300 p-4 pb-0 lg:p-4">
-          <PriceCalculation lang={lang} shippingValue={shipping} shopData={shopData}/>
+          <PriceCalculation lang={lang} shippingValue={shipping} shopData={shopData} currencyAbbreviation={currencyAbbreviation} />
           {posTableOrderId?
             <div className="flex gap-4">
               {posTableOrderId.tableStatus == 1?

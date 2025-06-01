@@ -1,4 +1,5 @@
 // import ProductsCategory from '@/app/components/storeProducts/products/productsCategory';
+import { fetchShopData } from '@/app/api/shop';
 import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookiesServer';
 import PageHeader from '@/app/shared/page-header';
 import ProductTable from '@/app/shared/tan-table/productTable';
@@ -116,6 +117,7 @@ export default async function Products({
   const shopId = GetCookiesServer('shopId');
   const products = await getProducts(lang, shopId as string);
   const categories = await getCategories(lang, shopId as string);
+  const shopData = await fetchShopData(lang, shopId as string);
 
   const pageHeader = {
     title: lang === 'ar' ? 'منتجات المتجر' : 'Store Products',
@@ -161,7 +163,7 @@ export default async function Products({
       </Button>
     </div> */}
     <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-    <ProductTable  lang={lang} products={products} categories={categories}/>
+    <ProductTable  lang={lang} products={products} categories={categories} currencyAbbreviation={shopData?.currencyAbbreviation as string}/>
 
   </div>
   </>;

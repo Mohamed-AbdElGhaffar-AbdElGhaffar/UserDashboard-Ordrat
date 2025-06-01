@@ -17,6 +17,7 @@ import { useEffect } from 'react';
 import { useModal } from '../modal-views/use-modal';
 import { useUserContext } from '@/app/components/context/UserContext';
 import ModalCancelOrderItem from '@/app/components/ui/modals/ModalCancelOrderItem';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 function parseProductData(productString: string) {
   const dataPairs = productString.split('&&');
@@ -58,12 +59,14 @@ export default function POSTableOrderProducts({
   orderedItems,
   removeItemFromCart,
   clearItemFromCart,
+  currencyAbbreviation
 }: {
   className?: string;
   lang?: string;
   orderId: string;
   itemClassName?: string;
   simpleBarClassName?: string;
+  currencyAbbreviation?: string;
   showControls?: boolean;
   orderedItems: CartItem[];
   removeItemFromCart: (id: number | string) => void;
@@ -132,11 +135,19 @@ export default function POSTableOrderProducts({
                   <div className="mb-2 text-xs font-medium text-gray-900">
                     {lang =='ar'?
                       <>
-                        {' '}x{' '}{item.quantity}{' '}{toCurrency(item?.salePrice ?? item.price , lang)} 
+                        {' '}x{' '}{item.quantity}{' '}{item?.salePrice ?? item.price }  {currencyAbbreviation === 'ر.س' ? (
+        <Image src={sarIcon} alt="SAR" width={16} height={16} />
+      ) : (
+        <span>{currencyAbbreviation}</span>
+      )} 
                       </>
                       :
                       <>
-                        {toCurrency(item?.salePrice ?? item.price , lang)} x{' '}
+                        {item?.salePrice ?? item.price}  {currencyAbbreviation === 'ر.س' ? (
+        <Image src={sarIcon} alt="SAR" width={16} height={16} />
+      ) : (
+        <span>{currencyAbbreviation}</span>
+      )} x{' '}
                         {item.quantity}
                       </>
                     }

@@ -36,6 +36,8 @@ import Select from 'react-select'
 import UpdateAddStoreButton from "../store/UpdateAddStoreButton";
 import RoleExist from "../ui/roleExist/RoleExist";
 import { GetCookiesClient } from "../ui/getCookiesClient/GetCookiesClient";
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+
 const QuillEditor = dynamic(() => import("@ui/quill-editor"), {
     ssr: false,
 });
@@ -172,6 +174,11 @@ export default function Addsettings({ lang }: { lang?: string }) {
                                     <CustomInput
                                         label={t('freeShppingTarget')}
                                         placeholder={t('freeShppingTarget')}
+                                        prefix={shop?.currencyAbbreviation === "ر.س" ? (
+                  <Image src={sarIcon} alt="SAR" width={15} height={15} />
+                ) : (
+                  <span>{shop?.currencyAbbreviation}</span>
+                )}
                                         id="freeShppingTarget"
                                         name="freeShppingTarget"
                                         readOnly
