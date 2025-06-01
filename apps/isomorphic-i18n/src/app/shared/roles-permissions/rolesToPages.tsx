@@ -100,6 +100,18 @@ export function generatePagesFromRoles(roles: string[], lang: string = 'en') {
       permissions: ['sellerDashboard-term-refund'],
       label: { en: 'Control Refund Policy', ar: 'التحكم في سياسة الاسترداد' },
     },
+    {
+      permissions: ['sellerDashboard-tables-create'],
+      label: { en: 'Add Table', ar: 'اضافة طاولة' },
+    },
+    {
+      permissions: ['AssignCategoryPrinter', 'DeleteCategoryPrinter'],
+      label: { en: 'Assign Category Printer', ar: 'تعيين اقسام الطابعة' },
+    },
+    {
+      permissions: ['sellerDashboard-affiliate'],
+      label: { en: 'Control Affiliate Program', ar: 'التحكم في برنامج الشركاء' },
+    },
   ];
 
   const translatePermission = (perm: string): { en: string; ar: string } => {
@@ -150,6 +162,13 @@ export function generatePagesFromRoles(roles: string[], lang: string = 'en') {
       ShopContactInfoGetByShopId: { en: 'View Contact Information', ar: 'عرض بيانات التواصل' },
 
       PixelGetAll: { en: 'View Platforms', ar: 'عرض المنصات' },
+
+      UpdateTable: { en: 'Update Table', ar: 'تعديل الطاولة' },
+      DeleteTable: { en: 'Delete Table', ar: 'حذف الطاولة' },
+
+      CreatePrinter: { en: 'Create Printer', ar: 'إضافة طابعة' },
+      UpdatePrinter: { en: 'Update Printer', ar: 'تعديل الطابعة' },
+      DeletePrinter: { en: 'Delete Printer', ar: 'حذف الطابعة' },
     };
     return translations[perm] ?? { en: perm, ar: perm };
   };
@@ -234,6 +253,18 @@ export function generatePagesFromRoles(roles: string[], lang: string = 'en') {
       permissions: ['PixelGetAll', 'GetPixelsByShopId', 'PixelUpdate', 'AssignPixelToShop', 'DeassignPixelFromShop'] 
     },
     { 
+      key: 'sellerDashboard-tables', 
+      nameEn: 'Tables', 
+      nameAr: 'الطاولات', 
+      permissions: ['sellerDashboard-tables-create', 'UpdateTable', 'DeleteTable'] 
+    },
+    { 
+      key: 'sellerDashboard-printer', 
+      nameEn: 'Printer', 
+      nameAr: 'الطابعة', 
+      permissions: ['CreatePrinter', 'UpdatePrinter', 'DeletePrinter', 'AssignCategoryPrinter', 'DeleteCategoryPrinter'] 
+    },
+    { 
       key: 'sellerDashboard-storeSetting-seo', 
       nameEn: 'Seo', 
       nameAr: 'تحسين محركات البحث', 
@@ -256,6 +287,12 @@ export function generatePagesFromRoles(roles: string[], lang: string = 'en') {
       nameEn: 'Statistics', 
       nameAr: 'الاحصائيات', 
       permissions: ['sellerDashboard-statistics'] 
+    },
+    { 
+      key: 'sellerDashboard-affiliate', 
+      nameEn: 'Affiliate Program', 
+      nameAr: 'برنامج الشركاء', 
+      permissions: ['sellerDashboard-affiliate'] 
     },
     { 
       key: 'sellerDashboard-storeSetting-qr-code', 

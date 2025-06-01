@@ -31,13 +31,13 @@ export default function ProgressSummary({ lang, completed, total }: ProgressSumm
       <div className="progress-visual flex justify-center mb-6">
         <div className="progress-ring relative w-[140px] h-[140px]">
           <svg viewBox="0 0 140 140" className="w-full h-full rotate-[-90deg]">
-            <circle cx="70" cy="70" r="60" className="ring-bg" stroke="#f1f5f9" strokeWidth="12" fill="none" />
+            <circle cx="70" cy="70" r="60" className="ring-bg" stroke={total == completed?"#16a34a":"#f1f5f9"} strokeWidth="12" fill="none" />
             <circle
               cx="70"
               cy="70"
               r="60"
               className="ring-progress"
-              stroke="#dc3545"
+              stroke={total == completed?"#16a34a":"#dc3545"}
               strokeWidth="12"
               strokeLinecap="round"
               fill="none"
@@ -47,7 +47,7 @@ export default function ProgressSummary({ lang, completed, total }: ProgressSumm
             />
           </svg>
           <div className="ring-text absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-            <div className="ring-percentage text-3xl font-bold text-rose-600 leading-none">
+            <div className={`ring-percentage text-3xl font-bold ${total == completed?"text-green-600":"text-rose-600"} leading-none`}>
               {percentage}%
             </div>
             <div className="ring-label text-sm text-slate-500 mt-1">

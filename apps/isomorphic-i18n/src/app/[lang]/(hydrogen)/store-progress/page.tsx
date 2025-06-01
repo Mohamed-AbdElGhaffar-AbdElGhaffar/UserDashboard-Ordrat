@@ -11,13 +11,13 @@ export async function generateMetadata({ params }: { params: { lang: string } })
   return {
     ...metaObject(
       lang === 'ar'
-        ? 'الفروع | إدارة الفروع الخاصة بك'
-        : 'Branches | Manage Your Store Locations',
+        ? 'أكمل إعداد متجرك'
+        : 'Complete Store Progress',
       lang,
       undefined,
       lang === 'ar'
-        ? 'أضف فروع جديدة وحدد بيانات الموقع والخدمات المتاحة بكل سهولة.'
-        : 'Add new branches and define location and available services easily.'
+      ? 'تابع تنفيذ المهام الأساسية لإعداد متجرك وابدأ البيع بسرعة وكفاءة.'
+      : 'Follow the essential steps to complete your store setup and start selling quickly and efficiently.'  
     ),
   };
 }
@@ -41,6 +41,24 @@ async function fetchShopData(lang: string, shopId:string) {
   }
 }
 
+async function fetchShopHighPriority(lang: string, shopId:string) {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/ShopHighPriority/items?shopId=${shopId}`,
+      {
+        headers: {
+          'Accept-Language': lang,
+        },
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching date:', error);
+    return null;
+  }
+}
+
 export default async function storeProgress({
   params: { lang },
 }: {
@@ -50,6 +68,7 @@ export default async function storeProgress({
 }) {
   const shopId = GetCookiesServer('shopId');
   const shopData = await fetchShopData(lang, shopId as string);
+  const shopHighPriority = await fetchShopHighPriority(lang, shopId as string);
 
   const pageHeader = {
     title: lang === 'ar' ? 'أكمل إعداد متجرك' : 'Complete Store Progress',
@@ -63,8 +82,16 @@ export default async function storeProgress({
       },
     ],
   };
+  console.log("shopHighPriority.tasks: ",shopHighPriority.tasks);
+  
   return <>
-    <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-    <StoreProgressLayout lang={lang} shopData={shopData} />
+    <StoreProgressLayout 
+      lang={lang} 
+      shopData={shopData} 
+      initialTasks={shopHighPriority.tasks} 
+      initialTotal={shopHighPriority.summary.total} 
+      initialCompleted={shopHighPriority.summary.completed}
+      pageHeader={pageHeader}
+    />
   </>;
 }

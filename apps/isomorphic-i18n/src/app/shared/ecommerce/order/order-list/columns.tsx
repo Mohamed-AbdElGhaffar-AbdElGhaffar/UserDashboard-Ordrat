@@ -243,20 +243,20 @@ export const getColumns = ({
       width: 200,
       render: (value: string) => <DateCell lang={lang} date={new Date(value)} />,
     },
-    {
-      title: (
-        <HeaderCell
-          title={t.modified}
-          // sortable
-          // ascending={sortConfig?.direction === 'asc' && sortConfig?.key === 'lastUpdatedAt'}
-        />
-      ),
-      // onHeaderCell: () => onHeaderCellClick('lastUpdatedAt'),
-      dataIndex: 'lastUpdatedAt',
-      key: 'lastUpdatedAt',
-      width: 200,
-      render: (value: string) => value !== "0001-01-01T00:00:00" ? <DateCell lang={lang} date={new Date(value)} /> : '--',
-    },
+    // {
+    //   title: (
+    //     <HeaderCell
+    //       title={t.modified}
+    //       // sortable
+    //       // ascending={sortConfig?.direction === 'asc' && sortConfig?.key === 'lastUpdatedAt'}
+    //     />
+    //   ),
+    //   // onHeaderCell: () => onHeaderCellClick('lastUpdatedAt'),
+    //   dataIndex: 'lastUpdatedAt',
+    //   key: 'lastUpdatedAt',
+    //   width: 200,
+    //   render: (value: string) => value !== "0001-01-01T00:00:00" ? <DateCell lang={lang} date={new Date(value)} /> : '--',
+    // },
     {
       title: <HeaderCell title={t.status} />,
       dataIndex: 'status',

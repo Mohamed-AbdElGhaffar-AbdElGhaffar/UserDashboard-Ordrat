@@ -71,14 +71,14 @@ export default function SignIn({
         // bannerDescription={t.bannerDescription}
         isSocialLoginActive={false}
         pageImage={
-          <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[620px] 2xl:w-[710px]">
+          <div className="relative mx-auto w-full">
             <Image
-              src={lang === "ar"? signUpBGAr : signUpBG}
+              src={lang === "ar" ? signUpBGAr : signUpBG}
               alt="Sign Up Thumbnail"
-              fill
+              width={1000}
+              height={550}
               priority
-              sizes="(max-width: 768px) 100vw"
-              className="object-cover"
+              className="w-full h-auto object-contain rounded-lg"
             />
           </div>
         }

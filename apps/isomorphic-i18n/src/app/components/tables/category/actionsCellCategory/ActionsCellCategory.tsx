@@ -17,7 +17,7 @@ interface ActionsCellProps {
 
 const ActionsCellCategory: React.FC<ActionsCellProps> = ({ row, lang, languages }) => {    
   const { openModal } = useModal();
-  const { setCategoriesData } = useUserContext();
+  const { setCategoriesData, setProgressData } = useUserContext();
 
   const handleOpenModal = () => {
     openModal({
@@ -32,6 +32,7 @@ const ActionsCellCategory: React.FC<ActionsCellProps> = ({ row, lang, languages 
   
       if (response.status === 200 || response.status === 204) {
         setCategoriesData(true);
+        setProgressData(true);
         toast.success(lang === 'ar' ? 'تم حذف القسم بنجاح!' : 'Category deleted successfully!');
       } else {
         toast.error(lang === 'ar' ? 'حدث خطأ أثناء الحذف' : 'An error occurred while deleting the Category');

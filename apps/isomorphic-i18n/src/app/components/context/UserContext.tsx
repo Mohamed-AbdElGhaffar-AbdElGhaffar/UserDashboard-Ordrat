@@ -45,6 +45,8 @@ type UserContextType = {
   setPOSTableOrderId: React.Dispatch<React.SetStateAction<any>>;
   updateMainBranch: boolean;
   setUpdateMainBranch: React.Dispatch<React.SetStateAction<boolean>>;
+  progressData: boolean;
+  setProgressData: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -71,6 +73,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children  }) =
   const [posTableOrderId, setPOSTableOrderId] = useState(null);
   const [mainBranch, setMainBranch] = useState('');
   const [updateMainBranch, setUpdateMainBranch] = useState<boolean>(false);
+  const [progressData, setProgressData] = useState<boolean>(false);
 
   
   return (
@@ -94,7 +97,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children  }) =
       shipping, setShipping,
       posTableOrderId, setPOSTableOrderId,
       mainBranch, setMainBranch,
-      updateMainBranch, setUpdateMainBranch
+      updateMainBranch, setUpdateMainBranch,
+      progressData, setProgressData,
     }}>
       {children}
     </UserContext.Provider>

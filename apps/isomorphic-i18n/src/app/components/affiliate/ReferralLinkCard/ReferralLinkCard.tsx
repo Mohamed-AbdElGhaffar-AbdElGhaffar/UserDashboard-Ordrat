@@ -27,8 +27,8 @@ const ReferralLinkCard = ({ referralLink, lang }: ReferralLinkCardProps) => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Referral Link',
-          text: 'Join via this referral link',
+          // title: 'Referral Link',
+          // text: 'Join via this referral link',
           url: referralLink,
         });
       } catch (err) {

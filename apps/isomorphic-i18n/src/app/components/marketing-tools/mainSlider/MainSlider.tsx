@@ -38,18 +38,22 @@ function MainSlider({lang, data}:{lang?:string; data:any;}) {
       if (!response.ok) {
         throw new Error('Failed to fetch order');
       }
-      const data:Banner[] = await response.json();
+      const newData: Banner[] = await response.json();
 
-      setbanner(data);
+      const areEqual = JSON.stringify(newData) === JSON.stringify(data);
+  
+      if (!areEqual) {
+        setbanner(newData);
+      }
     } catch (error) {
       console.error('Error fetching order:', error);
     } finally {
       setLoading(false);
     }
   };
-  // useEffect(() => {
-  //   fetchOrder();
-  // }, []);
+  useEffect(() => {
+    fetchOrder();
+  }, []);
   useEffect(() => {
     if (bannersData == true) {
       fetchOrder();
@@ -70,7 +74,7 @@ function MainSlider({lang, data}:{lang?:string; data:any;}) {
   };
 
   return <>
-    <div className='w-full lg:w-6/12 h-full lg:bg-white lg:border lg:border-gray-200 lg:rounded-xl flex flex-col items-center'>
+    <div id="main-slider-step" className='w-full lg:w-6/12 h-full lg:bg-white lg:border lg:border-gray-200 lg:rounded-xl flex flex-col items-center'>
       <div className="w-full p-5 hidden lg:flex justify-between items-center">
         <h2 className='mb-3'>{text.title}</h2>
       </div>
