@@ -20,7 +20,7 @@ import toast from 'react-hot-toast';
 import RoleExist from '@/app/components/ui/roleExist/RoleExist';
 import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookiesClient';
 
-export default function BranchesTable({lang = "en", languages, branches}:{lang?:string; languages: number; branches: Branches[];}) {
+export default function BranchesTable({lang = "en", languages, branches,currencyAbbreviation}:{lang?:string; languages: number; branches: Branches[];currencyAbbreviation:string}) {
   const shopId = GetCookiesClient('shopId');
   const [defaultData, setDefaultData] = useState<Branches[]>(branches);
   const { branchesData, setBranchesData } = useUserContext();
@@ -28,7 +28,7 @@ export default function BranchesTable({lang = "en", languages, branches}:{lang?:
   const router = useRouter();
   const { table, setData } = useTanStackTable<Branches>({
     tableData: defaultData,
-    columnConfig: defaultColumns(lang, languages),
+    columnConfig: defaultColumns(lang, languages,currencyAbbreviation),
     options: {
       initialState: {
         pagination: {
@@ -90,6 +90,7 @@ export default function BranchesTable({lang = "en", languages, branches}:{lang?:
         openAt: branch.openAt,
         closedAt: branch.closedAt,
         deliveryTime: branch.deliveryTime,
+        currencyAbbreviation
       }));
 
       setDefaultData(transformedData);
@@ -128,7 +129,7 @@ export default function BranchesTable({lang = "en", languages, branches}:{lang?:
               </Button>
             </RoleExist>
             <RoleExist PageRoles={['CreateBranch']}>
-              <AddButton lang={lang} title={lang == "en"?"Add Branch":'إضافة فرع'} onSuccess={handleRefreshData} languages={languages}/>
+              <AddButton lang={lang} title={lang == "en"?"Add Branch":'إضافة فرع'} onSuccess={handleRefreshData} languages={languages} currencyAbbreviation={currencyAbbreviation}/>
             </RoleExist>
         </div>
         <TableToolbar nameEN="Branch" nameAr="الفرع" table={table}  lang={lang}/>

@@ -245,6 +245,8 @@ export default async function PointOfSalePage({
           branchZones={branchZones}
           freeShppingTarget={shopData.freeShppingTarget}
           shopData={shopData}
+          currencyAbbreviation={shopData.currencyAbbreviation}
+
         />
       </div>
     </CartProvider>

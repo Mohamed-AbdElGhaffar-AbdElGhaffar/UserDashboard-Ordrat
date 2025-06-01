@@ -16,6 +16,7 @@ type AddButtonProps = {
   title?: string;
   modalBtnLabel?: string;
   className?: string;
+  currencyAbbreviation?: string;
   buttonLabel?: string;
   lang?: string;
   onSuccess?: () => void;
@@ -27,7 +28,8 @@ export default function AddButton({
   className,
   lang,
   onSuccess,
-  languages
+  languages,
+  currencyAbbreviation
 }: React.PropsWithChildren<AddButtonProps>) {
   const { openModal } = useModal();
 
@@ -36,7 +38,7 @@ export default function AddButton({
       onClick={() =>
         openModal({
           view: (
-            <BranchTableForm title={title} lang={lang!} onSuccess={onSuccess} languages={languages}/>
+            <BranchTableForm title={title} lang={lang!} onSuccess={onSuccess} languages={languages} currencyAbbreviation={currencyAbbreviation as string}/>
           ),
           customSize: '700px',
         })

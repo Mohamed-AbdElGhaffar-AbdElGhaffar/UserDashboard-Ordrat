@@ -11,6 +11,7 @@ import { CartItem } from '@/types';
 import { useCart } from '@/store/quick-cart/cart.context';
 import { toCurrency } from '@utils/to-currency';
 import { useTranslation } from '@/app/i18n/client';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 export type PosProduct = {
   id: string;
@@ -69,6 +70,13 @@ export default function ProductClassicCard({
   const { addItemToCart, isInCart } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
+
+
+  //
+  const currency =
+  currencyAbbreviation === 'ر.س'
+    ? <Image src={sarIcon} width={15} height={15} alt='sarIcon'/>
+    : currencyAbbreviation || '';
 
   const productData = {
     id: product.id,
@@ -155,11 +163,11 @@ export default function ProductClassicCard({
           <Text as="p" className="truncate">
             {lang == 'ar'?product.descriptionAr:product.descriptionEn}
           </Text>
-          <div className="mt-2 flex items-center font-semibold text-gray-900">
-            {toCurrency(Number(finalPrice), lang)}
+          <div className="mt-2 flex items-center font-semibold text-gray-900 gap-1">
+            {Number(finalPrice)} {currency}
             {price != 0 && (
-              <del className="ps-1.5 text-[13px] font-normal text-gray-500">
-                {toCurrency(Number(price), lang)}
+              <del className="ps-1.5 text-[13px] font-normal text-gray-500 flex items-center gap-1">
+                {Number(price)} {currency}
               </del>
             )}
           </div>

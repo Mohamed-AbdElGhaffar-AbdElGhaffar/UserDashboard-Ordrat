@@ -103,6 +103,7 @@ export default async function Branches({
   };
   return <>
     <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-    <BranchesTable  lang={lang} languages={shopData.languages} branches={branches}/>
+    <BranchesTable  lang={lang} languages={shopData.languages} branches={branches} currencyAbbreviation={shopData?.currencyAbbreviation}
+/>
   </>;
 }

@@ -7,7 +7,7 @@ import cn from '@utils/class-names';
 type Props = {
 	type?: string;
 	action?: () => void;
-	price: string;
+	price: any;
 	oldPrice?: string;
 	className?: string;
 	buttonType?: "submit" | "reset" | "button" | undefined;

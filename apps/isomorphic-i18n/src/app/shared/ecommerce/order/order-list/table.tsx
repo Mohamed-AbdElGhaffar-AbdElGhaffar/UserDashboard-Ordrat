@@ -230,10 +230,10 @@ export default function OrderTable({
         showLoadingText={true}
         data={data}
         // @ts-ignore
-        columns={visibleColumns}
+        columns={columns}
         expandable={{
           expandIcon: CustomExpandIcon,
-          expandedRowRender: (record) => <ExpandedOrderRow  record={record} lang={lang} />,
+          expandedRowRender: (record) => <ExpandedOrderRow currencyAbbreviation={currencyAbbreviation as string}  record={record} lang={lang} />,
         }}
         paginatorOptions={{
           pageSize,

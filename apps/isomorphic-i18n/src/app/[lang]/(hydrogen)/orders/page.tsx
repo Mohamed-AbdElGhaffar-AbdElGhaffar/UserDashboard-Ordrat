@@ -6,9 +6,23 @@ import { GetCookiesServer } from '@/app/components/ui/getCookiesServer/GetCookie
 import WidgetCard from '@components/cards/widget-card';
 import { fetchShopData } from '@/app/api/shop';
 
-export const metadata = {
-  ...metaObject('Orders'),
-};
+export async function generateMetadata({ params }: { params: { lang: string } }) {
+  const lang = params.lang;
+
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? 'الطلبات | إدارة طلبات المتجر'
+        : 'Orders | Manage Your Store Orders',
+      lang,
+      undefined,
+      lang === 'ar'
+        ? 'تابع حالة الطلبات، راجع تفاصيلها، وادِر عمليات التوصيل من مكان واحد.'
+        : 'Track order statuses, review details, and manage deliveries all in one place.'
+    ),
+  };
+}
+
 const orderData = [
   {
     "id": "4b039bab-b4f7-431f-a7bc-6f5409e59c37",

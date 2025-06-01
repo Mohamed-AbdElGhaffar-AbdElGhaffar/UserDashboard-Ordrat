@@ -14,6 +14,7 @@ import { languages } from "../i18n/settings";
 import { UserProvider } from "../components/context/UserContext";
 import { GuardProvider } from "../components/context/GuardContext";
 import { QrStyleProvider } from "../components/contsxt1";
+import ResponsiveToaster from "../components/ResponsiveToaster";
 
 const NextProgress = dynamic(() => import("@components/next-progress"), {
   ssr: false,
@@ -53,20 +54,8 @@ export default async function RootLayout({
                 <ThemeProvider>
                   <NextProgress />
                   {children}
-                  <Toaster
-                    toastOptions={{
-                      style: {
-                        zIndex: 999999,
-                      },
-                      className: 'toastTop'
-                    }}
-                    containerStyle={{
-                      zIndex: 999999,
-                      position: 'fixed',
-                      left: 0,
-                      top:90,
-                    }}
-                  />
+                  <ResponsiveToaster />
+
                   <GlobalDrawer lang={lang} />
                   <GlobalModal />
                 </ThemeProvider>

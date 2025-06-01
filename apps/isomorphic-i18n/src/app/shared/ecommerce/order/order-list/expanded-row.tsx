@@ -3,6 +3,8 @@ import { PiXBold } from 'react-icons/pi';
 import { Title, Text } from 'rizzui';
 import image from '@public/assets/usrbig1.jpg';
 import { toCurrency } from '@utils/to-currency';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+
 const translations = {
   en: {
     noProduct: 'No product available',
@@ -19,8 +21,8 @@ const translations = {
     totalPrice: 'السعر الإجمالي',
   },
 };
-export default function ExpandedOrderRow({ record, lang }: {record:any; lang:string;}) {
-  console.log("record: ",record);
+export default function ExpandedOrderRow({ record, lang, currencyAbbreviation }: { record: any; lang: string; currencyAbbreviation: string }) {
+  console.log("record: ", record);
   const t = translations[lang as 'en' | 'ar'] || translations.en;
   if (record?.items?.length === 0) {
     return <Text>{t.noProduct}</Text>;
@@ -45,11 +47,19 @@ export default function ExpandedOrderRow({ record, lang }: {record:any; lang:str
                 {product.product.name}
               </Title>
               {/* <Text className="mb-1 text-gray-500">{product.product.images[0].entityType}</Text> */}
-              <Text className="text-xs text-gray-500">
-                {t.itemPrice}: {toCurrency(`${product.itemPrice}`,lang)}
+              <Text className="text-xs text-gray-500 flex items-center gap-1">
+                {t.itemPrice}: {`${product.itemPrice}`}{currencyAbbreviation === "ر.س" ? (
+                  <Image src={sarIcon} alt="SAR" width={10} height={10} />
+                ) : (
+                  <span>{currencyAbbreviation}</span>
+                )}
               </Text>
-              <Text className="text-xs text-gray-500">
-                {t.choicesPrice}: {toCurrency(`${product.totalChoicesPrice}`,lang)}
+              <Text className="text-xs text-gray-500 flex items-center gap-1">
+                {t.choicesPrice}: {`${product.totalChoicesPrice}`}{currencyAbbreviation === "ر.س" ? (
+                  <Image src={sarIcon} alt="SAR" width={10} height={10} />
+                ) : (
+                  <span>{currencyAbbreviation}</span>
+                )}
               </Text>
               <div className="flex flex-wrap gap-2 mt-1">
                 {product.orderItemVariations?.map((variation: any) =>
@@ -76,8 +86,12 @@ export default function ExpandedOrderRow({ record, lang }: {record:any; lang:str
                 {product.quantity}
               </Text>
             </div>
-            <Text className="font-medium text-gray-900 dark:text-gray-700">
-              {toCurrency(`${( (parseFloat(product.quantity ?? "0") * parseFloat(product.itemPrice ?? "0")) + parseFloat(product.totalChoicesPrice ?? "0") ).toFixed(2)}`,lang)}
+            <Text className="font-medium text-gray-900 dark:text-gray-700 flex items-center gap-1">
+              {`${((parseFloat(product.quantity ?? "0") * parseFloat(product.itemPrice ?? "0")) + parseFloat(product.totalChoicesPrice ?? "0")).toFixed(2)}`} {currencyAbbreviation === "ر.س" ? (
+                <Image src={sarIcon} alt="SAR" width={10} height={10} />
+              ) : (
+                <span>{currencyAbbreviation}</span>
+              )}
             </Text>
           </div>
         </article>

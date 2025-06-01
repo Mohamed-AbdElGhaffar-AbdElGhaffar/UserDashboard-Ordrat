@@ -32,6 +32,9 @@ import CustomImage from '../CustomImage';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useUserContext } from '../../context/UserContext';
+import sarIcon1 from '@public/assets/Saudi_Riyal_Symbol-white.svg.png'
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+
 const shopId = GetCookiesClient('shopId');
 // import { useCart } from '../../../../../../isomorphic/src/store/quick-cart/cart.context';
 
@@ -547,7 +550,11 @@ function POSModal({
                             {prodId.discountType ===0 ?
                            ` ${prodId.discount} %`
                            :
-                            `${prodId.discount} ${currencyAbbreviation}`
+                            `${prodId.discount} ${currencyAbbreviation === 'ر.س' ? (
+                              <Image src={sarIcon} alt="SAR" width={12} height={12} />
+                            ) : (
+                              <span>{currencyAbbreviation}</span>
+                            )}`
                           }
                           </p>
                           }
@@ -589,16 +596,30 @@ function POSModal({
                                               className="w-20 h-20 object-cover"
                                             />
                                             <div className="">
-                                              <p>{choice.name}</p>
+                                              <p className='text-center'>{choice.name}</p>
                                               {/* {choice.price && <small>{abbreviation && toCurrency(\\ */}
-                                              {choice.price}{" "}{currencyAbbreviation}
+                                              <p className='flex items-center gap-1'>
+
+                                                {choice.price}{" "}{currencyAbbreviation === 'ر.س' ? (
+                              <Image src={sarIcon} alt="SAR" width={12} height={12} />
+                            ) : (
+                              <span>{currencyAbbreviation}</span>
+                            )}
+                                              </p>    
                                               {/* , lang, abbreviation)}</small>} */}
                                             </div>
                                           </>
                                         ) : (
                                           <div className="h-10">
-                                            <p>{choice.name}</p>
-                                            {choice.price}{" "}{currencyAbbreviation}
+                                            <p className='text-center'>{choice.name}</p>
+                                            <p className='flex items-center gap-1'>
+
+                                            {choice.price}{" "}{currencyAbbreviation === 'ر.س' ? (
+                              <Image src={sarIcon} alt="SAR" width={12} height={12} />
+                            ) : (
+                              <span>{currencyAbbreviation}</span>
+                            )}
+                                            </p>
 
                                             {/* {choice.price && <small>{abbreviation && toCurrency(choice.price, lang, abbreviation)}</small>} */}
                                           </div>
@@ -802,7 +823,15 @@ function POSModal({
                         <ItemPrice
                           type={type}
                           buttonType="submit"
-                          price={`${finalPrice} ${currencyAbbreviation}`}
+                          price={<div className={` items-center gap-1 ${lang === 'ar' ? 'flex' : 'flex'}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+                            <span>{finalPrice}</span>
+                            {currencyAbbreviation === 'ر.س' ? (
+                              <Image src={sarIcon1} alt="SAR" width={16} height={16} />
+                            ) : (
+                              <span>{currencyAbbreviation}</span>
+                            )}
+                            </div>
+                          }
                           // oldPrice={` ${finalOldPrice}` ? `${finalOldPrice} ${currencyAbbreviation}`:''}
                           // oldPrice={finalOldPrice ? abbreviation && toCurrency(finalOldPrice, lang, abbreviation) : ''}
                           className={`${!(prodId?.hasStock || false) || (prodId.stockNumber - totalSoldQuantity > 0 && prodId.stockNumber - totalSoldQuantity - quantity >= 0) ? '' : 'cursor-no-drop bg-slate-400'}`}
@@ -866,7 +895,11 @@ function POSModal({
                             {prodId.discountType ===0 ?
                            ` ${prodId.discount} %`
                            :
-                           `${prodId.discount} ${currencyAbbreviation}`
+                           `${prodId.discount} ${currencyAbbreviation === 'ر.س' ? (
+                              <Image src={sarIcon} alt="SAR" width={12} height={12} />
+                            ) : (
+                              <span>{currencyAbbreviation}</span>
+                            )}`
                           }
                           </p>
                         }
@@ -919,17 +952,31 @@ function POSModal({
                                           className="w-20 h-20 object-cover"
                                         />
                                         <div className="">
-                                          <p>{choice.name}</p>
-                                          {choice.price}{" "}{currencyAbbreviation}
+                                          <p className='text-center'>{choice.name}</p>
+                                          {/* {choice.price && <small>{abbreviation && toCurrency(\\ */}
+                                          <p className='flex items-center gap-1'>
 
+                                            {choice.price}{" "}{currencyAbbreviation === 'ر.س' ? (
+                              <Image src={sarIcon} alt="SAR" width={12} height={12} />
+                            ) : (
+                              <span>{currencyAbbreviation}</span>
+                            )}
+                                          </p>
                                           {/* {choice.price && <small>{abbreviation && toCurrency(choice.price, lang, abbreviation)}</small>} */}
                                         </div>
                                       </>
                                     ) : (
                                       <div className="h-10">
-                                        <p>{choice.name}</p>
-                                        {choice.price}{" "}{currencyAbbreviation}
+                                        <p className='text-center'>{choice.name}</p>
+                                        {/* {choice.price && <small>{abbreviation && toCurrency(\\ */}
+                                        <p className='flex items-center gap-1'>
 
+                                          {choice.price}{" "}{currencyAbbreviation === 'ر.س' ? (
+                              <Image src={sarIcon} alt="SAR" width={12} height={12} />
+                            ) : (
+                              <span>{currencyAbbreviation}</span>
+                            )}
+                                        </p>
                                         {/* {choice.price && <small>{abbreviation && toCurrency(choice.price, lang, abbreviation)}</small>} */}
                                       </div>
                                     )
@@ -1127,15 +1174,22 @@ function POSModal({
                       <QuantityHandler plusClassName={`${!(prodId?.hasStock || false) || (prodId.stockNumber - totalSoldQuantity > 0 && prodId.stockNumber - totalSoldQuantity - quantity >= 0) ? 'text-primary' : 'cursor-no-drop text-Color30 pointer-events-none'}`} quantity={quantity} setQuantity={setQuantity} className='w-full h-full rounded-lg' />
                     </div>
                     <div className={'col-span-2'}>
-                      <ItemPrice
-                        type={type}
-                        buttonType="submit"
-                        price={`${finalPrice} ${currencyAbbreviation}`}
-                        // oldPrice={` ${finalOldPrice}` ? `${finalOldPrice} ${currencyAbbreviation}`:''}
-                        // price={abbreviation && toCurrency(finalPrice, lang, abbreviation)}
-                        // oldPrice={finalOldPrice ? abbreviation && toCurrency(finalOldPrice, lang, abbreviation) : ''}
-                        className={`${!(prodId?.hasStock || false) || (prodId.stockNumber - totalSoldQuantity > 0 && prodId.stockNumber - totalSoldQuantity - quantity >= 0) ? '' : 'cursor-no-drop  bg-slate-400'}`}
-                      />
+                       <ItemPrice
+                          type={type}
+                          buttonType="submit"
+                          price={<div className={` items-center gap-1 ${lang === 'ar' ? 'flex' : 'flex'}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+                            <span>{finalPrice}</span>
+                            {currencyAbbreviation === 'ر.س' ? (
+                              <Image src={sarIcon1} alt="SAR" width={16} height={16} />
+                            ) : (
+                              <span>{currencyAbbreviation}</span>
+                            )}
+                            </div>
+                          }
+                          // oldPrice={` ${finalOldPrice}` ? `${finalOldPrice} ${currencyAbbreviation}`:''}
+                          // oldPrice={finalOldPrice ? abbreviation && toCurrency(finalOldPrice, lang, abbreviation) : ''}
+                          className={`${!(prodId?.hasStock || false) || (prodId.stockNumber - totalSoldQuantity > 0 && prodId.stockNumber - totalSoldQuantity - quantity >= 0) ? '' : 'cursor-no-drop bg-slate-400'}`}
+                        />
                     </div>
                   </div>
                 </div>

@@ -5,6 +5,9 @@ import { Text } from 'rizzui';
 import { HeaderCell } from '@/app/shared/table';
 import DateCell from '@ui/date-cell';
 import { HiCheckCircle, HiClock } from 'react-icons/hi';
+import Image from 'next/image';
+import sarIcongreen from '@public/assets/Saudi_Riyal_Symbol_green.png'
+
 type Columns = {
   data: any[];
   sortConfig?: any;
@@ -14,12 +17,14 @@ type Columns = {
   onHeaderCellClick: (value: string) => void;
   onChecked?: (id: string) => void;
   lang?: string;
+  currencyAbbreviation: string
 };
 
 export const getColumns = ({
   sortConfig,
   onHeaderCellClick,
   lang = 'en',
+  currencyAbbreviation
 }: Columns) => {
   const text = {
     transactionId: lang === 'ar' ? 'ID المعاملة' : 'Transaction ID',
@@ -67,7 +72,18 @@ export const getColumns = ({
         <Text
           className={`font-semibold ${user.Amount >= 0 ? 'text-green-600' : 'text-red-600'}`}
         >
-          {user.Amount >= 0 ? `+${user.Amount.toFixed(2)}${text.currency}` : `-${Math.abs(user.Amount).toFixed(2)}${text.currency}`}
+          <div className="flex items-center gap-1">
+            <span className={user.Amount >= 0 ? 'text-green-600' : 'text-red-600'}>
+              {user.Amount >= 0
+                ? `+${user.Amount.toFixed(2)}`
+                : `-${Math.abs(user.Amount).toFixed(2)}`}
+            </span>
+            {currencyAbbreviation === 'ر.س' ? (
+              <Image src={sarIcongreen} alt="SAR" width={10} height={10} />
+            ) : (
+              <span>{currencyAbbreviation}</span>
+            )}
+          </div>
         </Text>
       ),
     },

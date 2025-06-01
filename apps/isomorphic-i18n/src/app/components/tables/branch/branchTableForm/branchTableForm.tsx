@@ -21,11 +21,14 @@ import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookie
 import { PhoneNumber } from '@ui/phone-input';
 import { DateDurationPicker } from '@/app/components/ui/DatePickerTime/dateDurationPicker';
 import UpdateLocationPicker from '@/app/components/ui/map/UpdateLocationPicker';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
+import Image from 'next/image';
 
 type TableFormProps = {
   title?: string;
   onSuccess?: () => void;
   lang: string;
+  currencyAbbreviation: string;
   languages: number;
 };
 
@@ -33,10 +36,16 @@ export default function BranchTableForm({
   title,
   onSuccess,
   lang = 'en',
-  languages
+  languages,
+  currencyAbbreviation
 }: TableFormProps) {
   const shopId = GetCookiesClient('shopId');
   const { closeModal } = useModal();
+const currency=currencyAbbreviation === "ر.س" ? (
+                  <Image src={sarIcon} alt="SAR" width={15} height={15} />
+                ) : (
+                  <span>{currencyAbbreviation}</span>
+                )
   const text = {
     nameEn: lang === 'ar' ? 'الأسم (انجليزي)' : 'Name (English)',
     nameAr: lang === 'ar' ? 'الأسم (عربي)' : 'Name (Arabic)',
@@ -52,7 +61,6 @@ export default function BranchTableForm({
     deliveryCharge: lang === 'ar' ? 'رسوم التوصيل الثابتة' : 'Fixed Delivery Charge',
     deliveryPerKilo: lang === 'ar' ? 'رسوم لكل كيلومتر' : 'Charge Per Kilo',
     minimumDeliveryCharge: lang === 'ar' ? 'الحد الأدنى لرسوم التوصيل' : 'Minimum Delivery Charge',
-    currency: lang === 'ar' ? "ج.م" : "EGP",
     wrongPhone: lang === 'ar' ? 'رقم الهاتف غير صالح' : 'Invalid phone number',
 
     submit: lang === 'ar' ? 'انشاء' : 'Create',
@@ -307,10 +315,10 @@ export default function BranchTableForm({
             </div>
             {mainFormik.values.isFixedDelivery ? (
 
-              <Input prefix={text.currency} type="number" step="any" label={text.deliveryCharge} placeholder={text.deliveryCharge} name="deliveryCharge" value={mainFormik.values.deliveryCharge || undefined} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.deliveryCharge && mainFormik.errors.deliveryCharge ? mainFormik.errors.deliveryCharge : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+              <Input prefix={currency} type="number" step="any" label={text.deliveryCharge} placeholder={text.deliveryCharge} name="deliveryCharge" value={mainFormik.values.deliveryCharge || undefined} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.deliveryCharge && mainFormik.errors.deliveryCharge ? mainFormik.errors.deliveryCharge : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
             ):(<>
-              <Input prefix={text.currency} type="number" step="any" label={text.deliveryPerKilo} placeholder={text.deliveryPerKilo} name="deliveryPerKilo" value={mainFormik.values.deliveryPerKilo} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.deliveryPerKilo && mainFormik.errors.deliveryPerKilo ? mainFormik.errors.deliveryPerKilo : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
-              <Input prefix={text.currency} type="number" step="any" label={text.minimumDeliveryCharge} placeholder={text.minimumDeliveryCharge} name="minimumDeliveryCharge" value={mainFormik.values.minimumDeliveryCharge} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.minimumDeliveryCharge && mainFormik.errors.minimumDeliveryCharge ? mainFormik.errors.minimumDeliveryCharge : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+              <Input prefix={currency} type="number" step="any" label={text.deliveryPerKilo} placeholder={text.deliveryPerKilo} name="deliveryPerKilo" value={mainFormik.values.deliveryPerKilo} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.deliveryPerKilo && mainFormik.errors.deliveryPerKilo ? mainFormik.errors.deliveryPerKilo : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+              <Input prefix={currency} type="number" step="any" label={text.minimumDeliveryCharge} placeholder={text.minimumDeliveryCharge} name="minimumDeliveryCharge" value={mainFormik.values.minimumDeliveryCharge} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.minimumDeliveryCharge && mainFormik.errors.minimumDeliveryCharge ? mainFormik.errors.minimumDeliveryCharge : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
             </>)
             }
           </div>

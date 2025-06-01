@@ -99,6 +99,7 @@ export default function POSPageView({ lang = 'en', filterOptions, tables, branch
             branchZones={branchZones}
             freeShppingTarget={freeShppingTarget}
             shopData={shopData}
+            currencyAbbreviation={currencyAbbreviation}
           />
         </aside>
       {/* )} */}

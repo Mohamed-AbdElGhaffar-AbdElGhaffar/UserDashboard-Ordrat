@@ -61,7 +61,7 @@ export default function SignIn({
             {t.welcome}
             <span className="relative inline-block">
               {t.signinTitle}
-              <UnderlineShape className="absolute -bottom-2 start-0 h-2.5 w-24 text-blue md:w-28 xl:-bottom-1.5 xl:w-36" />
+              <UnderlineShape className="absolute -bottom-2 text-redColor start-0 h-2.5 w-24  md:w-28 xl:-bottom-1.5 xl:w-36" />
             </span>{' '}
             {t.continue}
           </>

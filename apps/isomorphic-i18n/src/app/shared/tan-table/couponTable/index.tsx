@@ -21,14 +21,14 @@ import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookie
 const shopId = GetCookiesClient('shopId');
 import RoleExist from '@/app/components/ui/roleExist/RoleExist';
 
-export default function CouponTable({lang = "en"}:{lang?:string;}) {
+export default function CouponTable({lang = "en",currencyAbbreviation}:{lang?:string;currencyAbbreviation:string}) {
   const [defaultData, setDefaultData] = useState<CouponEntity[]>([]);
   const { couponData, setCouponData } = useUserContext();
   const { setGuard } = useGuardContext();
   const router = useRouter();
   const { table, setData } = useTanStackTable<CouponEntity>({
     tableData: defaultData,
-    columnConfig: defaultColumns(lang),
+    columnConfig: defaultColumns(lang,currencyAbbreviation),
     options: {
       initialState: {
         pagination: {
@@ -84,6 +84,7 @@ export default function CouponTable({lang = "en"}:{lang?:string;}) {
         expireDate: branch.expireDate,
         createdAt: branch.createdAt,
         usageLimit: branch.usageLimit,
+        currencyAbbreviation
       }));
 
       setDefaultData(transformedData);

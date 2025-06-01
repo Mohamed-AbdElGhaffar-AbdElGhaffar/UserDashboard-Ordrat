@@ -8,6 +8,8 @@ import { WalletDetails } from "../WalletDetails/WalletDetails";
 import { AffiliateLevel } from "../AffiliateLevel/AffiliateLevel";
 import AffiliateTable from "@/app/shared/roles-permissions/affiliate-table";
 import ReferralsTable from "@/app/shared/roles-permissions/affiliate-referrals-table";
+import Image from "next/image";
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 interface AffiliateStats {
   totalReferrals: number;
@@ -21,6 +23,7 @@ interface AffiliateStats {
 interface AffiliateComponentProps {
   lang: string;
   affiliateLink: string;
+  currencyAbbreviation: string;
   affiliateStats: AffiliateStats;
   affiliateWallet: {
     id: string;
@@ -38,10 +41,8 @@ interface AffiliateComponentProps {
   };
 }
 
-export default function AffiliateComponent({ lang, affiliateLink, affiliateStats, affiliateWallet, }: AffiliateComponentProps) {
-  const text = {
-    currency: lang === 'ar' ? "ج.م" : "EGP",
-  }
+export default function AffiliateComponent({ lang, affiliateLink, affiliateStats, affiliateWallet, currencyAbbreviation}: AffiliateComponentProps) {
+  
   
   const stats = [
     {
@@ -70,7 +71,18 @@ export default function AffiliateComponent({ lang, affiliateLink, affiliateStats
     },    
     {
       icon: FaWallet,
-      value: `${affiliateStats?.walletBalance.toFixed(2)}${text.currency}`,
+      value: <>
+      <div className="flex gap-1 items-center">
+
+      {affiliateStats?.walletBalance.toFixed(2)}
+
+      {currencyAbbreviation === "ر.س" ? (
+        <Image src={sarIcon} alt="SAR" width={15} height={15} />
+      ) : (
+        <span>{currencyAbbreviation}</span>
+      )}
+      </div>
+      </>,
       title: lang === 'ar' ? 'اجمالى المكتسب' : 'Total Earned',
       // subtitle: lang === 'ar'
       //   ? `0.00${text.currency} معلق`
@@ -87,7 +99,7 @@ export default function AffiliateComponent({ lang, affiliateLink, affiliateStats
             key={index}
             icon={item.icon}
             title={item.title}
-            value={item.value}
+            value={item.value as any}
             subtitle={item.subtitle}
           />
         ))}
@@ -95,10 +107,10 @@ export default function AffiliateComponent({ lang, affiliateLink, affiliateStats
 
       <ReferralLinkCard referralLink={affiliateLink} lang={lang} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <WalletDetails lang={lang} affiliateWallet={affiliateWallet}/>
-        <AffiliateLevel lang={lang} affiliateStats={affiliateStats}/>
+        <WalletDetails lang={lang} affiliateWallet={affiliateWallet} currencyAbbreviation={currencyAbbreviation} />
+        <AffiliateLevel lang={lang} affiliateStats={affiliateStats} currencyAbbreviation={currencyAbbreviation} />
       </div>
-      <AffiliateTable usersData={ []} lang={lang} />
+      <AffiliateTable usersData={ []} lang={lang} currencyAbbreviation={currencyAbbreviation} />
       <ReferralsTable usersData={ []} lang={lang} />
     </div>
   );

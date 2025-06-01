@@ -276,6 +276,7 @@ export type ShopInfo = {
   nameEn: string; 
   currencyId: string; 
   currencyName: string; 
+  currencyAbbreviation: string; 
   subdomainName: string;
   mainColor: string;
   secondaryColor: string;

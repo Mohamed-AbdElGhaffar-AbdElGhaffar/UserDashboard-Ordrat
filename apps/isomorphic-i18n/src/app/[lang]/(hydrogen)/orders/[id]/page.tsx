@@ -4,8 +4,33 @@ import NotFound from '@/app/not-found';
 import OrderView from '@/app/shared/ecommerce/order/order-view'
 import PageHeader from '@/app/shared/page-header';
 import { API_BASE_URL } from '@/config/base-url';
+import { metaObject } from '@/config/site.config';
 import { CartProvider } from '@/store/quick-cart/cart.context';
 import React from 'react';
+
+export async function generateMetadata({
+  params: { lang, id },
+}: {
+  params: {
+    lang: string;
+    id: string;
+  };
+}) {
+  const order = await getOrderById(id, lang);
+
+  return {
+    ...metaObject(
+      lang === 'ar'
+        ? `تفاصيل الطلب #${order.orderNumber} | منصة أوردات`
+        : `Order Details #${order.orderNumber} | Ordrat Platform`,
+      lang,
+      undefined,
+      lang === 'ar'
+        ? `شاهد تفاصيل الطلب رقم ${order.orderNumber} من خلال لوحة التحكم في منصة أوردات.`
+        : `View order #${order.orderNumber} details through the Ordrat dashboard.`
+    ),
+  };
+}
 
 async function getOrderById(id: string, lang: string) {
   try {

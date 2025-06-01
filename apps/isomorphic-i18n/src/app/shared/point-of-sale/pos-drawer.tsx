@@ -23,9 +23,10 @@ type PosDrawerProps = {
   freeShppingTarget: number;
   defaultUser: string;
   shopData: any;
+  currencyAbbreviation: string;
 };
 
-export default function POSDrawer({ className, lang, tables, branchOption, allDatatables, languages, branchZones, freeShppingTarget, defaultUser, shopData }: PosDrawerProps) {
+export default function POSDrawer({ className, lang, tables, branchOption, allDatatables, languages, branchZones, freeShppingTarget, defaultUser, shopData,currencyAbbreviation }: PosDrawerProps) {
   const [openDrawer, setOpenDrawer] = useState(false);
   const { totalItems, items, removeItemFromCart, clearItemFromCart, resetCart } = useCart();
   const [defaultData, setDefaultData] = useState<any[]>(allDatatables);
@@ -91,6 +92,7 @@ export default function POSDrawer({ className, lang, tables, branchOption, allDa
           branchZones={branchZones}
           freeShppingTarget={freeShppingTarget}
           shopData={shopData}
+          currencyAbbreviation={currencyAbbreviation}
         />
       </Drawer>
     </>

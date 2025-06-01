@@ -9,9 +9,32 @@ import StickyHeader from "@/layouts/sticky-header";
 import { useTranslation } from "@/app/i18n/client";
 import SearchWidget from "@/app/shared/search/search";
 import Logo from "@/app/components/ui/logo/Logo";
+import { useEffect, useState } from "react";
+import { FaCompress, FaExpand } from "react-icons/fa";
 
 export default function Header({ lang }: { lang?: string }) {
   const { t } = useTranslation(lang!, "common");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    const elem = document.documentElement;
+    if (!document.fullscreenElement) {
+      elem.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
 
   return (
     <StickyHeader className="z-[990] 2xl:py-5 3xl:px-8  4xl:px-10">
@@ -27,7 +50,13 @@ export default function Header({ lang }: { lang?: string }) {
         >
           <Logo small={true} />
         </Link>
-
+    <button
+      onClick={toggleFullscreen}
+      id="fullscreenToggleBtn"
+      className={`quick-btn md:flex hidden items-center gap-2 px-2  me-2 border  py-3 text-sm font-medium text-black rounded-md hover:-translate-y-0.5 transition-transform
+        shadow-sm  `}>
+      {isFullscreen ? <FaCompress className="w-5" /> : <FaExpand className="w-5"  />}
+    </button>
         <SearchWidget t={t} lang={lang!} />
       </div>
 

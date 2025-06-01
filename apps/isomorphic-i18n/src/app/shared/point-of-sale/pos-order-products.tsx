@@ -14,6 +14,7 @@ import SimpleBar from '@ui/simplebar';
 // import { useCart } from '../../../../../isomorphic/src/store/quick-cart/cart.context';
 import { useTranslation } from '@/app/i18n/client';
 import { useEffect } from 'react';
+import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
 
 function parseProductData(productString: string) {
   const dataPairs = productString.split('&&');
@@ -54,11 +55,13 @@ export default function POSOrderProducts({
   orderedItems,
   removeItemFromCart,
   clearItemFromCart,
+  currencyAbbreviation,
 }: {
   className?: string;
   lang?: string;
   itemClassName?: string;
   simpleBarClassName?: string;
+  currencyAbbreviation?: string;
   showControls?: boolean;
   orderedItems: CartItem[];
   removeItemFromCart: (id: number | string) => void;
@@ -124,11 +127,19 @@ export default function POSOrderProducts({
                   <div className="mb-2 text-xs font-medium text-gray-900">
                     {lang =='ar'?
                       <>
-                        {' '}x{' '}{item.quantity}{' '}{toCurrency(item?.salePrice ?? item.price , lang)} 
+                        {' '}x{' '}{item.quantity}{' '}{item?.salePrice ?? item.price}   {currencyAbbreviation === 'ر.س' ? (
+        <Image src={sarIcon} alt="SAR" width={16} height={16} />
+      ) : (
+        <span>{currencyAbbreviation}</span>
+      )}
                       </>
                       :
                       <>
-                        {toCurrency(item?.salePrice ?? item.price , lang)} x{' '}
+                        {item?.salePrice ?? item.price}  {currencyAbbreviation === 'ر.س' ? (
+        <Image src={sarIcon} alt="SAR" width={16} height={16} />
+      ) : (
+        <span>{currencyAbbreviation}</span>
+      )} x{' '}
                         {item.quantity}
                       </>
                     }
@@ -168,7 +179,11 @@ export default function POSOrderProducts({
                 </div>
               </div>
               <div className="flex items-center gap-3 whitespace-nowrap font-medium text-gray-700">
-                {toCurrency((item?.salePrice ?? item.price) * item.quantity , lang)}
+                {(item?.salePrice ?? item.price) * item.quantity }  {currencyAbbreviation === 'ر.س' ? (
+        <Image src={sarIcon} alt="SAR" width={16} height={16} />
+      ) : (
+        <span>{currencyAbbreviation}</span>
+      )}
               </div>
             </div>
           })}

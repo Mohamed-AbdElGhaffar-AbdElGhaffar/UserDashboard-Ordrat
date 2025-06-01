@@ -11,13 +11,15 @@ export async function generateMetadata({ params }: { params: { lang: string } })
   return {
     ...metaObject(
       lang === 'ar'
-        ? 'الإعدادات الإضافية | تخصيص شامل لمتجرك'
-        : 'Additional Settings | Full Customization for Your Store',
+        ? ' تحفيز الشراء | تخصيص شامل لمتجرك'
+        : 'Purchase Motivation | Full Customization for Your Store',
       lang,
       undefined,
       lang === 'ar'
-        ? 'تحكم في الإعدادات الإضافية مثل العملة، اللغة، والمنطقة الزمنية لمتجرك.'
-        : 'Manage additional settings such as currency, language, and store timezone.'
+        ? 'تحكم في  تحفيز الشراء من خلال اظهار الكوبونات ، عمليات الشراء لمتجرك.'
+        : 'Control purchase incentives by displaying coupons and purchases for your store.'
+
+
     ),
   };
 }
