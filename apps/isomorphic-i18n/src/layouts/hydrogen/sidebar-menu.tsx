@@ -10,6 +10,8 @@ import { PiCaretDownBold } from "react-icons/pi";
 import { UrlObject } from "url";
 import Cookies from 'js-cookie'; 
 import { routeRoles } from "@/middleware";
+import axiosClient from "@/app/components/context/api";
+import { useUserContext } from "@/app/components/context/UserContext";
 
 function filterMenuItemsByRoles(menuItems: any[], userRoles: string[]): any[] {
   function hasAccess(path: string | undefined): boolean {
@@ -53,7 +55,27 @@ export function SidebarMenu({ lang }: { lang?: string }) {
   const menuItems = MenuItems({ lang });  
   console.log("menuItems: ",menuItems);
   const [roles, setRoles] = useState<string[]>([]);
+  const [hideStoreProgress, setHideStoreProgress] = useState(false);  
+  const { progressData, productData, tablesData, couponData, setProgressData } = useUserContext();
 
+  const shopId = Cookies.get('shopId');
+  async function fetchProgress() {
+    try {
+      const response = await axiosClient.get('/api/ShopHighPriority/items', {
+        params: { shopId },
+        headers: { 'Accept-Language': lang },
+      });
+
+      const { summary } = response.data;
+      if (summary?.completed === summary?.total) {
+        setHideStoreProgress(true);
+      }else {
+        setHideStoreProgress(false);
+      }
+    } catch (error) {
+      console.error("Error fetching shop progress:", error);
+    }
+  }
   useEffect(() => {
     const rolesCookie = Cookies.get("roles");
     if (rolesCookie) {
@@ -63,7 +85,17 @@ export function SidebarMenu({ lang }: { lang?: string }) {
         console.error("Invalid roles cookie format:", err);
       }
     }
-  }, []);
+  
+    fetchProgress();
+  }, [lang]);
+  
+  useEffect(() => {
+    if (progressData == true || productData == true || tablesData == true || couponData == true) {
+      fetchProgress();
+      setProgressData(false);
+    }
+  }, [progressData, productData, tablesData, couponData]); 
+
   console.log("roles: ",roles);
 
   const filteredMenuItems = filterMenuItemsByRoles(menuItems, roles);
@@ -71,47 +103,49 @@ export function SidebarMenu({ lang }: { lang?: string }) {
 
   return (
     <div className="mt-4 pb-3 3xl:mt-6">
-      <Link
-        href={`/${lang!}/store-progress`}
-        className={cn(
-          'group relative mx-3 my-0.5 flex items-center justify-between rounded-md px-3 py-2 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2',
-          pathname?.startsWith(`/${lang!}/store-progress`)
-            ? 'before:top-2/5 text-redColor before:absolute before:-start-3 before:block before:h-4/5 before:w-1 before:rounded-ee-md before:rounded-se-md before:bg-redColor 2xl:before:-start-5'
-            : 'text-mainTextColor transition-colors duration-200 hover:bg-red-50 hover:text dark:text-gray-700/90'
-        )}
-      >
-        <div className="flex items-center truncate">
-          {/* {item?.icon && (
-            <span
-              className={cn(
-                'me-2 inline-flex h-5 w-5 items-center justify-center rounded-md [&>svg]:h-[20px] [&>svg]:w-[20px]',
-                isActive
-                  ? 'text-redColor'
-                  : 'text-mainTextColor dark:text-gray-500 dark:group-hover:text-gray-700'
-              )}
-            >
-              {item?.icon}
-            </span>
-          )} */}
-          <picture>
-            <source
-              srcSet="https://fonts.gstatic.com/s/e/notoemoji/latest/1f6a8/512.webp"
-              type="image/webp"
-            />
-            <img
-              src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f6a8/512.gif"
-              alt="🚨"
-              width={20}
-              height={20}
-              className="me-2"
-            />
-          </picture>
-          <span className="truncate">{t('side-store-progress')}</span>
-        </div>
-        {/* {item?.badge?.length ? (
-          <StatusBadge status={item?.badge} />
-        ) : null} */}
-      </Link>
+      {!hideStoreProgress && (
+        <Link
+          href={`/${lang!}/store-progress`}
+          className={cn(
+            'group relative mx-3 my-0.5 flex items-center justify-between rounded-md px-3 py-2 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2',
+            pathname?.startsWith(`/${lang!}/store-progress`)
+              ? 'before:top-2/5 text-redColor before:absolute before:-start-3 before:block before:h-4/5 before:w-1 before:rounded-ee-md before:rounded-se-md before:bg-redColor 2xl:before:-start-5'
+              : 'text-mainTextColor transition-colors duration-200 hover:bg-red-50 hover:text dark:text-gray-700/90'
+          )}
+        >
+          <div className="flex items-center truncate">
+            {/* {item?.icon && (
+              <span
+                className={cn(
+                  'me-2 inline-flex h-5 w-5 items-center justify-center rounded-md [&>svg]:h-[20px] [&>svg]:w-[20px]',
+                  isActive
+                    ? 'text-redColor'
+                    : 'text-mainTextColor dark:text-gray-500 dark:group-hover:text-gray-700'
+                )}
+              >
+                {item?.icon}
+              </span>
+            )} */}
+            <picture>
+              <source
+                srcSet="https://fonts.gstatic.com/s/e/notoemoji/latest/1f6a8/512.webp"
+                type="image/webp"
+              />
+              <img
+                src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f6a8/512.gif"
+                alt="🚨"
+                width={20}
+                height={20}
+                className="me-2"
+              />
+            </picture>
+            <span className="truncate">{t('side-store-progress')}</span>
+          </div>
+          {/* {item?.badge?.length ? (
+            <StatusBadge status={item?.badge} />
+          ) : null} */}
+        </Link>
+      )}
        {filteredMenuItems.map((item, index) => {
           const isActive = pathname?.startsWith(item?.href as string);
           const pathnameExistInDropdowns = item?.dropdownItems?.filter((dropdownItem: any) =>

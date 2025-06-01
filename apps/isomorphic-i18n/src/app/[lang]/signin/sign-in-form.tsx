@@ -130,8 +130,16 @@ export default function SignInForm({lang}:{lang?: string;}) {
           path: '/',
         });
         
-        // (optional) Save sellerid
+        // (optional) Save userType
         Cookies.set('userType', response.data.userType, {
+          // expires: 1,
+          secure: true,
+          sameSite: 'Lax',
+          path: '/',
+        });
+        
+        // (optional) Save subdomain
+        Cookies.set('subdomain', response.data.subdomain, {
           // expires: 1,
           secure: true,
           sameSite: 'Lax',

@@ -134,6 +134,7 @@ function DropdownMenu({ lang }: { lang?: string }) {
             Cookies.remove('email');
             Cookies.remove('sellerId');
             Cookies.remove('userType');
+            Cookies.remove('subdomain');
             // signOut({ redirect: false });
             localStorage.clear(); 
             window.location.href = `/${lang}/signin`;

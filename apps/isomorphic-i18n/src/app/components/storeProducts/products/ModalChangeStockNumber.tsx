@@ -51,7 +51,7 @@ export default function ModalChangeStockNumber({ lang = 'en', stocks, productIma
     }),
     onSubmit: async (values) => {
       const formData = new FormData();
-      formData.append('StockNumber', values.stockNumber);
+      formData.append('StockNumber', values.stockNumber || '0');
       if (stock) {
         try {
           setIsSubmitting(true) 

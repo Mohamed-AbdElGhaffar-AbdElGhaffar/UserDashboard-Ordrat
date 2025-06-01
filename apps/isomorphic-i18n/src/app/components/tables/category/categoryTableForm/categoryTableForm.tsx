@@ -59,7 +59,7 @@ export default function CategoryTableForm({
 
   const requiredMessage = lang === 'ar' ? 'مطلوب' : 'is required';
   const [loading, setLoading] = useState(false);
-  const { setCategoriesData } = useUserContext();
+  const { setCategoriesData, setProgressData } = useUserContext();
 
   const mainFormSchema = Yup.object().shape({
     nameEn: Yup.string().required(text.nameEn + ' ' + requiredMessage),
@@ -117,6 +117,7 @@ export default function CategoryTableForm({
 
         toast.success(lang === 'ar' ? 'تم إنشاء القسم بنجاح!' : 'Category created successfully!');
         setCategoriesData(true);
+        setProgressData(true);
         closeModal();
       } catch (error) {
         console.error('Error submitting form:', error);

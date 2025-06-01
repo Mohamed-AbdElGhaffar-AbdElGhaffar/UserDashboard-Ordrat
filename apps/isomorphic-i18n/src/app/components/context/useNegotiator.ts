@@ -72,6 +72,7 @@ export function useNegotiator(orderId?: string) {
       Cookies.remove('email');
       Cookies.remove('sellerId');
       Cookies.remove('userType');
+      Cookies.remove('subdomain');
       localStorage.clear();
           
       window.location.href = '/signin';

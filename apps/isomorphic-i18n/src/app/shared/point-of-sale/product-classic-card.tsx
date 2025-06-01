@@ -12,7 +12,7 @@ import { useCart } from '@/store/quick-cart/cart.context';
 import { toCurrency } from '@utils/to-currency';
 import { useTranslation } from '@/app/i18n/client';
 import sarIcon from '@public/assets/Saudi_Riyal_Symbol.svg.png'
-
+import toast from 'react-hot-toast';
 export type PosProduct = {
   id: string;
   name: string;
@@ -122,6 +122,7 @@ export default function ProductClassicCard({
   const handleOpenModal = () => {
     if(product.variations.length == 0){
       addItemToCart(cartItem, 1);
+      toast.success(lang == 'ar'? `تم اضافة ${productData.nameAr || 'المنتج'} الي السلة` : `${productData.nameEn || 'Product'} added to cart!`);
     }else {
       setIsModalOpen(true);
     }

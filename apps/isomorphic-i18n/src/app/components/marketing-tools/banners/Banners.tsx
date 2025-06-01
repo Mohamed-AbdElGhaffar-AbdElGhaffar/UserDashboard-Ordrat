@@ -12,7 +12,7 @@ import Link from 'next/link';
 
 function Banners({ shopId, lang, data }: { shopId: string; lang: string; data:any; }) {
     const [banners, setBanners] = useState<{ id: string; bannerUrl: string; actionString: string }[]>(data);
-    const { bannersData, setBannersData } = useUserContext();
+    const { bannersData, setBannersData, setProgressData } = useUserContext();
 
     const text = {
         link: lang === 'ar' ? 'الرابط' : 'Link',
@@ -23,8 +23,13 @@ function Banners({ shopId, lang, data }: { shopId: string; lang: string; data:an
     // Fetch banners from API
     const fetchBanners = async () => {
         try {
-            const { data } = await axiosClient.get(`/api/Banner/GetAll/${shopId}`);
-            setBanners(data);
+            const { data: newData } = await axiosClient.get(`/api/Banner/GetAll/${shopId}`);
+            const areEqual =
+            JSON.stringify(newData) === JSON.stringify(data);
+
+            if (!areEqual) {
+                setBanners(newData);
+            }
         } catch (error) {
             toast.error(lang === 'ar' ? 'فشل تحميل البانرات' : 'Failed to load banners');
         }
@@ -36,6 +41,7 @@ function Banners({ shopId, lang, data }: { shopId: string; lang: string; data:an
             await axiosClient.delete(`/api/Banner/Delete/${id}`);
             toast.success(lang === 'ar' ? 'تم الحذف بنجاح' : 'Deleted successfully');
             setBannersData(true);
+            setProgressData(true);
         } catch (error) {
             toast.error(lang === 'ar' ? 'فشل الحذف' : 'Failed to delete');
         }
@@ -51,14 +57,15 @@ function Banners({ shopId, lang, data }: { shopId: string; lang: string; data:an
             });
             toast.success(lang === 'ar' ? 'تم التحديث' : 'Updated successfully');
             setBannersData(true);
+            setProgressData(true);
         } catch (error) {
             toast.error(lang === 'ar' ? 'فشل التحديث' : 'Failed to update');
         }
     };
 
-    // useEffect(() => {
-    //     fetchBanners();
-    // }, []);
+    useEffect(() => {
+        fetchBanners();
+    }, []);
 
     useEffect(() => {
         if (bannersData == true) {

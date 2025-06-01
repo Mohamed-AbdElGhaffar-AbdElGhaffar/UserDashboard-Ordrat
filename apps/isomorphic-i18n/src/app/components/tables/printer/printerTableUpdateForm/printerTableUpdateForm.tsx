@@ -90,6 +90,7 @@ export default function UpdatePrinterForm({
           Cookies.remove('email');
           Cookies.remove('sellerId');
           Cookies.remove('userType');
+          Cookies.remove('subdomain');
           localStorage.clear(); 
           window.location.href = `/${lang}/signin`;
           toast.error(

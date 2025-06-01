@@ -1,14 +1,15 @@
 'use client';
 
+import Link from "next/link";
 import { FaCheck, FaCheckCircle, FaClock, FaExclamation, FaExternalLinkAlt, FaShare } from "react-icons/fa";
+import styles from './TasksPanal.module.css';
 
 interface tasksProps {
-  id: string,
-  titleAr: string,
-  titleEn: string,
-  descAr: string,
-  descEn: string,
+  taskId: string,
+  title: string,
+  description: string,
   completed: boolean,
+  link: string,
 }
 
 interface TasksPanelProps {
@@ -29,12 +30,13 @@ export default function TasksPanel({ lang, tasks }: TasksPanelProps) {
         </div>
       </div>
 
-      <div className="tasks-list grid gap-3">
+      <div className={`${styles.customScroll} tasks-list grid gap-3 max-h-[360px] overflow-y-auto scrollbar-thin scrollbar-thumb-rose-500 scrollbar-track-gray-100 pe-1`}>
         {tasks.map((task) => {
           const isCompleted = task.completed;
           return (
-            <div
-              key={task.id}
+            <Link
+              href={`${task.link}?demo=true`}
+              key={task.taskId}
               className={`task-card flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-all ${
                 isCompleted
                   ? 'bg-emerald-50 border-emerald-500 hover:bg-emerald-100'
@@ -50,10 +52,10 @@ export default function TasksPanel({ lang, tasks }: TasksPanelProps) {
               </div>
               <div className="task-content flex-1">
                 <div className="task-title text-sm font-medium text-slate-800 mb-1">
-                  {lang === 'ar' ? task.titleAr : task.titleEn}
+                  {task.title}
                 </div>
                 <div className="task-desc text-xs text-slate-500">
-                  {lang === 'ar' ? task.descAr : task.descEn}
+                  {task.description}
                 </div>
               </div>
               <div
@@ -64,7 +66,7 @@ export default function TasksPanel({ lang, tasks }: TasksPanelProps) {
                 {isCompleted ? <FaCheckCircle /> : <FaClock />}
                 {isCompleted ? (lang === 'ar' ? 'مكتمل' : 'Completed') : lang === 'ar' ? 'في الانتظار' : 'Pending'}
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

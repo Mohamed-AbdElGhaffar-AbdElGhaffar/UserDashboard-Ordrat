@@ -12,7 +12,7 @@ import { GetCookiesClient } from '../../ui/getCookiesClient/GetCookiesClient';
 function Contact({lang}:{lang:string}) {
     const shopId = GetCookiesClient('shopId') as string;
     const [image, setImage] = useState<File | null>(null);
-    const { setBannersData, setFileData } = useUserContext();
+    const { setBannersData, setFileData, setProgressData } = useUserContext();
     const [loading, setLoading] = useState(false);
 
     const text = {
@@ -32,7 +32,7 @@ function Contact({lang}:{lang:string}) {
         'fileFormat',
         lang === 'ar' ? 'يجب أن يكون ملف صورة' : 'Must be an image file',
         (file) => {
-            return !file || (file instanceof File && ['image/jpeg', 'image/png', 'image/gif'].includes(file.type));
+            return !file || (file instanceof File && file.type.startsWith('image/'));
         }
         ),
     });
@@ -64,6 +64,7 @@ function Contact({lang}:{lang:string}) {
                 setImage(null);
                 setFileData(false);
                 setBannersData(true);
+                setProgressData(true);
                 setLoading(false);
             } catch (error) {
                 console.error('API Error:', error);
@@ -73,7 +74,7 @@ function Contact({lang}:{lang:string}) {
         },
     });
     return (
-    <div className='w-full lg:w-6/12 bg-white rounded-xl'>
+    <div id="contact-step" className='w-full lg:w-6/12 bg-white rounded-xl'>
         <form onSubmit={(e) => {
           e.preventDefault();
           mainFormik.handleSubmit();
