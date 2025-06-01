@@ -25,7 +25,7 @@ export default function CreateUser({lang='en', groupOptions, branchOption}:{lang
   const { closeModal } = useModal();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
-  const { setGroupsPermissions } = useUserContext();
+  const { setGroupsPermissions, setProgressData } = useUserContext();
   const text = {
     title: lang === 'ar' ? 'إضافة مستخدم جديد' : 'Add New User',
     firstName: lang === 'ar' ? 'الاسم الاول' : "First Name",
@@ -112,6 +112,7 @@ export default function CreateUser({lang='en', groupOptions, branchOption}:{lang
         );
         
         setGroupsPermissions(true);
+        setProgressData(true);
         toast.success(lang === 'ar' ? 'تم إنشاء المستخدم بنجاح' : 'User created successfully');
         setLoading(false);
         closeModal();

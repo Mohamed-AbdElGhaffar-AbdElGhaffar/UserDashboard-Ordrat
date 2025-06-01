@@ -110,6 +110,7 @@ export default function CategoryPrinterForm({
           Cookies.remove('email');
           Cookies.remove('sellerId');
           Cookies.remove('userType');
+          Cookies.remove('subdomain');
           localStorage.clear();
           window.location.href = `/${lang}/signin`;
           toast.error(lang === 'ar' ? 'يرجى تسجيل الدخول مرة أخرى.' : 'Please sign in again.');

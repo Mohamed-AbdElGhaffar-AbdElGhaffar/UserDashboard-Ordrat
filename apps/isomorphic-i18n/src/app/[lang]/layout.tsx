@@ -14,6 +14,8 @@ import { languages } from "../i18n/settings";
 import { UserProvider } from "../components/context/UserContext";
 import { GuardProvider } from "../components/context/GuardContext";
 import { QrStyleProvider } from "../components/contsxt1";
+import Head from "next/head";
+import { NextStepProvider } from "nextstepjs";
 
 const NextProgress = dynamic(() => import("@components/next-progress"), {
   ssr: false,
@@ -42,37 +44,45 @@ export default async function RootLayout({
       dir={dir(lang)}
       suppressHydrationWarning
     >
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/nextstepjs@latest/dist/styles.css"
+        />
+      </Head>
       <body
         suppressHydrationWarning
         className={cn(elTajawal.variable ,'font-elTajawal')}
       >
         <QrStyleProvider>
-          <GuardProvider>
-            <UserProvider>
-              <AuthProvider session={session}>
-                <ThemeProvider>
-                  <NextProgress />
-                  {children}
-                  <Toaster
-                    toastOptions={{
-                      style: {
+          <NextStepProvider>
+            <GuardProvider>
+              <UserProvider>
+                <AuthProvider session={session}>
+                  <ThemeProvider>
+                    <NextProgress />
+                    {children}
+                    <Toaster
+                      toastOptions={{
+                        style: {
+                          zIndex: 999999,
+                        },
+                        className: 'toastTop'
+                      }}
+                      containerStyle={{
                         zIndex: 999999,
-                      },
-                      className: 'toastTop'
-                    }}
-                    containerStyle={{
-                      zIndex: 999999,
-                      position: 'fixed',
-                      left: 0,
-                      top:90,
-                    }}
-                  />
-                  <GlobalDrawer lang={lang} />
-                  <GlobalModal />
-                </ThemeProvider>
-              </AuthProvider>
-            </UserProvider>
-          </GuardProvider>
+                        position: 'fixed',
+                        left: 0,
+                        top:90,
+                      }}
+                    />
+                    <GlobalDrawer lang={lang} />
+                    <GlobalModal />
+                  </ThemeProvider>
+                </AuthProvider>
+              </UserProvider>
+            </GuardProvider>
+          </NextStepProvider>
         </QrStyleProvider>
       </body>
     </html>

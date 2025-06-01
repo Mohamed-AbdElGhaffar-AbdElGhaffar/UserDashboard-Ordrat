@@ -16,12 +16,15 @@ import { ContactInfo } from '@/types';
 import { GetCookiesClient } from '../ui/getCookiesClient/GetCookiesClient';
 import RoleExist from '../ui/roleExist/RoleExist';
 import WidgetCard from '@components/cards/widget-card';
+import { useUserContext } from '../context/UserContext';
 function Contact({ lang }: { lang: string }) {
     const shopId = GetCookiesClient('shopId');
     const [isDisabled, setIsDisabled] = useState(true);
     const { t, i18n } = useTranslation(lang!, "basicData");
     const [contact, setContact] = useState<ContactInfo>();
     const [editModeStarted, setEditModeStarted] = useState(false);
+    const { setProgressData } = useUserContext();
+
 
     // const validationSchema = ContactValidation({ lang })
  const handleEnableInputs = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -89,6 +92,7 @@ function Contact({ lang }: { lang: string }) {
                     toast.success(lang === 'ar' ? 'تم تحديث معلومات التواصل بنجاح!' : 'Contact info updated successfully!');
                     fetchContact();
                     setIsDisabled(true);
+                    setProgressData(true);
 
                 } catch (error) {
                     console.error('API Error:', error);
@@ -101,6 +105,7 @@ function Contact({ lang }: { lang: string }) {
                     toast.success(lang === 'ar' ? 'تم إنشاء معلومات التواصل بنجاح!' : 'Contact info created successfully!');
                     fetchContact();
                     setIsDisabled(true);
+                    setProgressData(true);
 
                 } catch (error) {
                     console.error('API Error:', error);

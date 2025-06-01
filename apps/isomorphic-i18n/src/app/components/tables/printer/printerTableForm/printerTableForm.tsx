@@ -89,6 +89,7 @@ export default function PrinterTableForm({
           Cookies.remove('email');
           Cookies.remove('sellerId');
           Cookies.remove('userType');
+          Cookies.remove('subdomain');
           localStorage.clear(); 
           window.location.href = `/${lang}/signin`;
           toast.error(

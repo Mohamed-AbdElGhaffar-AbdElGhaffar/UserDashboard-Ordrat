@@ -108,7 +108,7 @@ export default function UsersTable({ usersData = [], lang, groupOptions, branchO
   const [filters, setFilters] = useState<{ phoneNumber: string }>({
     phoneNumber: '',
   });
-  const { groupsPermissions, setGroupsPermissions } = useUserContext();
+  const { groupsPermissions, setGroupsPermissions, setProgressData } = useUserContext();
   
   
   // Functions to update filters and search, and reset them.
@@ -216,6 +216,7 @@ export default function UsersTable({ usersData = [], lang, groupOptions, branchO
   
       if (response.status === 200 || response.status === 204) {
         setGroupsPermissions(true);
+        setProgressData(true);
         toast.success(lang === 'ar' ? 'تم حذف الموظف بنجاح!' : 'Employee deleted successfully!');
       } else {
         toast.error(lang === 'ar' ? 'حدث خطأ أثناء الحذف' : 'An error occurred while deleting the Employee');

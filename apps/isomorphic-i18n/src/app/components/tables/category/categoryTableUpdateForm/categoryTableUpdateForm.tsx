@@ -63,7 +63,7 @@ export default function UpdateCategoryForm({
   const requiredMessage = lang === 'ar' ? 'مطلوب' : 'is required';
   const [loading, setLoading] = useState(false);
   const [submit, setSubmit] = useState(false);
-  const { setCategoriesData } = useUserContext();
+  const { setCategoriesData, setProgressData } = useUserContext();
 
   const mainFormSchema = Yup.object().shape({
     nameEn: Yup.string().required(text.nameEn + ' ' + requiredMessage),
@@ -126,6 +126,7 @@ export default function UpdateCategoryForm({
   
         toast.success(lang === 'ar' ? 'تم تعديل القسم بنجاح!' : 'Category udated successfully!');
         setCategoriesData(true);
+        setProgressData(true);
         closeModal();
         setSubmit(false);
       } catch (error) {

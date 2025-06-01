@@ -25,7 +25,7 @@ export default function UpdateUser({lang='en', user, groupOptions, branchOption}
   const { closeModal } = useModal();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
-  const { setGroupsPermissions } = useUserContext();
+  const { setGroupsPermissions, setProgressData } = useUserContext();
   
   const text = {
     title: lang === 'ar' ? 'تعديل مستخدم' : 'Update User',
@@ -108,6 +108,7 @@ export default function UpdateUser({lang='en', user, groupOptions, branchOption}
         );
     
         setGroupsPermissions(true);
+        setProgressData(true);
         toast.success(lang === 'ar' ? 'تم تحديث المستخدم بنجاح' : 'User updated successfully');
         closeModal();
         setLoading(false);

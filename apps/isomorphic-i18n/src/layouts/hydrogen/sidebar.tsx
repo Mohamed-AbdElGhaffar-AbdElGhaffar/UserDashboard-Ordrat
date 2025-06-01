@@ -8,6 +8,7 @@ import { SidebarMenu } from "./sidebar-menu";
 import Logo from "@/app/components/ui/logo/Logo";
 import { FaExternalLinkAlt, FaShare } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { GetCookiesClient } from "@/app/components/ui/getCookiesClient/GetCookiesClient";
 
 export default function Sidebar({
   className,
@@ -16,7 +17,8 @@ export default function Sidebar({
   className?: string;
   lang?: string;
 }) {
-  const link = 'https://ordrat.com/'
+  const link = 'https://ordrat.com/';
+  const subdomain = GetCookiesClient('subdomain');
   const text = {
     share: lang === 'ar' ? 'مشاركة' : 'Share',
     error: lang === 'ar' ? 'المشاركة غير مدعومة على هذا المتصفح.' : 'Share not supported on this browser.',
@@ -25,9 +27,9 @@ export default function Sidebar({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: text.share,
-          text: text.share,
-          url: link,
+          // title: text.share,
+          // text: text.share,
+          url: subdomain || link,
         });
       } catch (err) {
         console.error('Error sharing:', err);
@@ -60,7 +62,8 @@ export default function Sidebar({
       <div className="sticky bottom-0 z-40 bg-gray-0/10 dark:bg-gray-100/5 border-t-2 border-gray-300 flex justify-center py-6">
         <div className="header-actions flex gap-3">
           <a
-            href="#"
+            href={subdomain || link}
+            target="_blank"
             id="viewStoreBtn"
             className="quick-btn flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-600 rounded-md hover:bg-rose-700 hover:-translate-y-0.5 transition-transform"
           >
