@@ -35,6 +35,7 @@ import { useUserContext } from '@/app/components/context/UserContext';
 import ModalAssignDriver from '@/app/components/ui/modals/ModalAssignDriver';
 import PrintInvoice from '../../print-invoice';
 import { printOrderReceipt } from '@/app/components/pos/printOrderReceipt ';
+import { undefined } from 'zod';
 
 interface DeliveryOption {
   id: string;
@@ -386,9 +387,9 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
                         email: '',
                         phoneNumber: userData.phoneNumber
                       };
-                      printOrderReceipt(orderPrint, lang, customerInfo, currencyAbbreviation);
+                      printOrderReceipt(orderPrint, lang ,customerInfo, currencyAbbreviation);
                     }else{
-                      printOrderReceipt(orderPrint, lang);
+                      printOrderReceipt(orderPrint, lang ,null as any,currencyAbbreviation);
                     }
                   }}
                 >
