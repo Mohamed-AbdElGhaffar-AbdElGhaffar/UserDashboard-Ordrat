@@ -182,7 +182,7 @@ export default function AddDriver({
 
       formData.append('FirstName', values.fristName);
       formData.append('LastName', values.lastName);
-      formData.append('PhoneNumber', values.phoneNumber);
+      formData.append('PhoneNumber', values.phoneNumber.slice(1));
       formData.append('Email', values.email);
       formData.append('Password', values.password);
       formData.append('BranchId', values.branchId);
