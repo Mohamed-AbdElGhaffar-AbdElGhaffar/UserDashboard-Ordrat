@@ -4,9 +4,11 @@ import cn from '@utils/class-names';
 import { PiPlusBold } from 'react-icons/pi';
 import { useModal } from '@/app/shared/modal-views/use-modal';
 import TablesForm from '../components/tablesPage/TablesForm/TablesForm';
+import { useNextStep } from 'nextstepjs';
 
 type AddButtonProps = {
   className?: string;
+  id?: string;
   buttonLabel?: string;
   lang?: string;
   onSuccess?: () => void;
@@ -15,23 +17,31 @@ type AddButtonProps = {
 
 export default function TableAddButton({
   className,
+  id,
   buttonLabel = 'Add table',
   lang,
   onSuccess,
   languages
 }: React.PropsWithChildren<AddButtonProps>) {
   const { openModal } = useModal();
+  const { setCurrentStep, isNextStepVisible } = useNextStep();
   return (
     <Button
-      onClick={() =>
+      onClick={() =>{
         openModal({
           view: (
             <TablesForm title={lang === 'ar' ? 'إضافة طاولة' : 'Add Table'} lang={lang!} onSuccess={onSuccess} languages={languages}/>
           ),
           customSize: '700px',
         })
-      }
+        if (isNextStepVisible) {
+          setTimeout(() => {
+            setCurrentStep(1);
+          }, 150)
+        }
+      }}
       className={cn('w-auto', className)}
+      id={id}
     >
       <PiPlusBold className="me-1.5 h-[17px] w-[17px]" />
       <span className='block'>{buttonLabel}</span>

@@ -7,14 +7,18 @@ type DeletePopoverProps = {
   title: string;
   description: string;
   onDelete: () => void;
+  onClick?: () => void;
   lang?: string;
+  id?: string;
 };
 
 export default function DeletePopover({
   title,
   description,
   lang,
+  id,
   onDelete,
+  onClick,
 }: DeletePopoverProps) {
   const { t } = useTranslation(lang!, 'table');
   return (
@@ -25,6 +29,12 @@ export default function DeletePopover({
           variant="outline"
           aria-label={'Delete Item'}
           className="cursor-pointer hover:!border-gray-900 hover:text-gray-700"
+          onClick={()=>{
+            if (onClick) {
+              onClick();
+            }
+          }}
+          id={id}
         >
           <TrashIcon className="h-4 w-4" />
         </ActionIcon>

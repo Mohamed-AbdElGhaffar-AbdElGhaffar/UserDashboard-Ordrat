@@ -24,6 +24,7 @@ interface UploadZoneProps {
   files: any[];
   setFiles: (files: ExtendedFile[]) => void;
   className?: string;
+  id?: string;
   error?: string | string[];
   lang?: string;
   multiple?: boolean;
@@ -37,6 +38,7 @@ export default function UploadZone({
   files,
   setFiles, 
   className,
+  id,
   error,
   lang = 'en',
   multiple = false,
@@ -98,7 +100,7 @@ export default function UploadZone({
   });
 
   return (
-    <div className={cn('grid @container', className)}>
+    <div id={id} className={cn('grid @container', className)}>
       {(label || recommendedDimensions) && (
         <div className="mb-1.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
           {label && (

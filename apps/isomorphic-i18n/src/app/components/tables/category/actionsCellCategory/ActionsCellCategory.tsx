@@ -8,6 +8,7 @@ import { useUserContext } from '@/app/components/context/UserContext';
 import axiosClient from '@/app/components/context/api';
 import UpdateCategoryForm from '../categoryTableUpdateForm/categoryTableUpdateForm';
 import RoleExist from '@/app/components/ui/roleExist/RoleExist';
+import { useNextStep } from 'nextstepjs';
 
 interface ActionsCellProps {
   row: { original: { id: string; name: string; }; id: string };
@@ -18,12 +19,16 @@ interface ActionsCellProps {
 const ActionsCellCategory: React.FC<ActionsCellProps> = ({ row, lang, languages }) => {    
   const { openModal } = useModal();
   const { setCategoriesData, setProgressData } = useUserContext();
+  const { closeNextStep, isNextStepVisible } = useNextStep();
 
   const handleOpenModal = () => {
     openModal({
       view: <UpdateCategoryForm title={lang == "en"?"Update Category":'تعديل القسم'} lang={lang} id={row.original.id} onSuccess={()=>setCategoriesData(true)} languages={languages} />,
       customSize: '700px',
     });
+    if(isNextStepVisible){
+      closeNextStep();
+    }
   };
 
   const handleDeleteCategory = async () => {
@@ -58,6 +63,7 @@ const ActionsCellCategory: React.FC<ActionsCellProps> = ({ row, lang, languages 
             variant="outline"
             className="hover:!border-gray-900 hover:text-gray-700"
             onClick={handleOpenModal}
+            id='update-category'
           >
             <PencilIcon className="h-4 w-4" />
           </ActionIcon>
@@ -72,6 +78,12 @@ const ActionsCellCategory: React.FC<ActionsCellProps> = ({ row, lang, languages 
               : `Are you sure you want to delete this ${row.original.name?row.original.name:'Category'}?`
           }
           onDelete={handleDeleteCategory}
+          onClick={()=>{
+            if(isNextStepVisible){
+              closeNextStep();
+            }
+          }}
+          id='delete-category'
         />
       </RoleExist>
     </div>

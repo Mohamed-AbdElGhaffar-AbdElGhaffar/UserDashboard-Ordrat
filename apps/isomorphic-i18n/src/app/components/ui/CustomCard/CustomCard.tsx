@@ -67,7 +67,7 @@ const CustomCard = ({
             className="h-2 rounded-full transition-all"
             style={{
               width: `${progressPercentage}%`,
-              backgroundColor: isLastStep ? 'rgb(16, 185, 129)' : 'rgb(37, 99, 235)',
+              backgroundColor: isLastStep ? 'rgb(16, 185, 129)' : 'rgb(225, 29, 72)',
             }}
           ></div>
         </div>
@@ -87,7 +87,7 @@ const CustomCard = ({
           <button
             onClick={nextStep}
             className={`px-4 py-2 rounded-md font-medium text-white ${
-              isLastStep ? 'bg-emerald-500' : 'bg-blue-600'
+              isLastStep ? 'bg-emerald-500' : 'bg-[#111]'
             }`}
           >
             {isLastStep ? labels.finish : labels.next}
