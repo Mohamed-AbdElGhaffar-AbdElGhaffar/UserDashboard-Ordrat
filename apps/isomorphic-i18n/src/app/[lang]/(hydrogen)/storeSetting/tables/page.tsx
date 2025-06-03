@@ -90,13 +90,6 @@ export default async function Tables({
     'sellerDashboard-tables-create',
   ]);
   return <>
-  <div className='px-4'>
-    <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} >
-      {addTable && (
-        <TableAddButton className="mt-4 w-full @lg:mt-0 @lg:w-auto" buttonLabel={lang === 'ar' ? 'إضافة طاولة' : 'Add Table'} languages={shopData.languages} lang={lang}/>
-      )}
-    </PageHeader>
-    <TablesPage  lang={lang} languages={shopData.languages} tables={tables}/>
-  </div>
+    <TablesPage lang={lang} languages={shopData.languages} tables={tables} pageHeader={pageHeader} />
   </>;
 }

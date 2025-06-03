@@ -72,14 +72,23 @@ export default function SignIn({
         isSocialLoginActive={false}
         pageImage={
           <div className="relative mx-auto w-full">
-            <Image
-              src={lang === "ar" ? signUpBGAr : signUpBG}
+            {/* <Image
+              // src={lang === "ar" ? signUpBGAr : signUpBG}
+              src='https://cdn.ordrat.com/ordrat-dashboard.webp'
               alt="Sign Up Thumbnail"
               width={1000}
               height={550}
               priority
               className="w-full h-auto object-contain rounded-lg"
+            /> */}
+            <img
+              src="https://cdn.ordrat.com/ordrat-dashboard.webp"
+              alt="Sign Up Thumbnail"
+              width="1000"
+              height="550"
+              className="w-full h-auto object-contain rounded-lg"
             />
+
           </div>
         }
       >

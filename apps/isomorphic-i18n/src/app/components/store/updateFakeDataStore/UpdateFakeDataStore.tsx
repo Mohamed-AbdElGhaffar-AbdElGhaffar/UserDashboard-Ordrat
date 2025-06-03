@@ -12,6 +12,7 @@ import CustomInput from '../../ui/customForms/CustomInput';
 import axiosClient from '../../context/api';
 import { useUserContext } from '../../context/UserContext';
 import { GetCookiesClient } from '../../ui/getCookiesClient/GetCookiesClient';
+import { useNextStep } from 'nextstepjs';
 
 type StoresFormProps = {
   title?: string;
@@ -33,6 +34,8 @@ export default function UpdateFakeDataStore({
   const [currentFakeDataId, setCurrentFakeDataId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const shopId = GetCookiesClient('shopId') as string;
+  const { setCurrentStep, closeNextStep, isNextStepVisible } = useNextStep();
+
   const formik = useFormik({
     initialValues: {
       isFakeViewersAvailable: false,
@@ -81,6 +84,9 @@ export default function UpdateFakeDataStore({
         setCouponData(true);
         onSuccess?.();
         closeModal();
+        if (isNextStepVisible) {
+            setCurrentStep(4);
+        }
       } catch (error) {
         setLoading(false)
 
@@ -133,13 +139,20 @@ export default function UpdateFakeDataStore({
       <div className="relative bg-white w-full max-w-3xl p-6 rounded-lg shadow-lg overflow-y-auto max-h-[90vh]">
         <div className="mb-6 flex items-center justify-between">
           <Title as="h3" className="text-lg">{t('updateFake')}</Title>
-          <ActionIcon size="sm" variant="text" onClick={closeModal} className="p-0 text-gray-500 hover:!text-gray-900">
+          <ActionIcon size="sm" variant="text" 
+            onClick={()=>{
+              closeModal();
+              if (isNextStepVisible) {
+                  setCurrentStep(4);
+              }
+            }} className="p-0 text-gray-500 hover:!text-gray-900"
+          >
             <PiXBold className="h-[18px] w-[18px]" />
           </ActionIcon>
         </div>
 
         <form onSubmit={formik.handleSubmit}>
-          <div className="flex flex-col gap-3 mb-6">
+          <div id='enable-sold-number' className="flex flex-col gap-3 mb-6">
             <Switch
               label={t('IsFakeSoldNumberAvailable')}
               labelPlacement={lang === 'ar' ? 'left' : 'right'}
@@ -180,7 +193,7 @@ export default function UpdateFakeDataStore({
           </div>
 
        
-          <div className="flex flex-col gap-3 mb-6">
+          <div id='enable-fake-viewers' className="flex flex-col gap-3 mb-6">
             <Switch
               label={t('IsFakeViewersAvailable')}
               labelPlacement={lang === 'ar' ? 'left' : 'right'}
@@ -213,7 +226,7 @@ export default function UpdateFakeDataStore({
 
           {/* زر الحفظ */}
           <div className="flex justify-end">
-          <Button type='submit'
+            <Button id='update-data' type='submit'
               className={`text-white text-base rounded-lg w-full  py-3   
                             ${loading ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
                         `}>

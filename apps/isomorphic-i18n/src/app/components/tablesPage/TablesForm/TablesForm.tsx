@@ -16,6 +16,7 @@ import available from '@public/assets/tables/available.png';
 import occupied from '@public/assets/tables/occupied.png';
 import reserved from '@public/assets/tables/reserved.png';
 import RadioSelection from '../../ui/radioSelect/radioSelect';
+import { useNextStep } from 'nextstepjs';
 
 type TablesFormProps = {
   title?: string;
@@ -46,6 +47,7 @@ export default function TablesForm({
   const requiredMessage2 = lang === 'ar' ? 'مطلوبة' : 'is required';
   const [isSubmit, setIsSubmit] = useState(false);
   const { setTablesData } = useUserContext();
+  const { setCurrentStep, isNextStepVisible } = useNextStep();
 
   const mainFormSchema = Yup.object().shape({
     descriptionEn: Yup.string().required(text.descriptionEn + ' ' + requiredMessage),
@@ -85,6 +87,13 @@ export default function TablesForm({
         );
         setIsSubmit(false);
         closeModal();
+        if (isNextStepVisible) {
+          if (languages === 0 || languages === 1) {
+            setCurrentStep(4);
+          }else {
+            setCurrentStep(5);
+          }
+        }
         setTablesData(true);
         
       } catch (error: any) {
@@ -147,7 +156,17 @@ export default function TablesForm({
       <div className={`m-auto ps-3 rounded-xl pe-1.5 me-1.5 pb-4 pt-4 IBM-Plex-sans ${styles.customScroll}`}>
         <div className="mb-6 flex items-center justify-between">
           <Title as="h3" className="text-lg IBM-Plex-sans">{title || text.submit}</Title>
-          <ActionIcon size="sm" variant="text" onClick={closeModal} className="p-0 text-gray-500 hover:!text-gray-900">
+          <ActionIcon size="sm" variant="text" 
+            onClick={()=>{
+              closeModal();
+              if (isNextStepVisible) {
+                if (languages === 0 || languages === 1) {
+                  setCurrentStep(4);
+                }else {
+                  setCurrentStep(5);
+                }
+              }
+            }} className="p-0 text-gray-500 hover:!text-gray-900">
             <PiXBold className="h-[18px] w-[18px]" />
           </ActionIcon>
         </div>
@@ -157,12 +176,18 @@ export default function TablesForm({
         }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {languages!=1 &&(
-              <Input label={text.descriptionAr} placeholder={text.descriptionAr} name="descriptionAr" value={mainFormik.values.descriptionAr} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.descriptionAr && mainFormik.errors.descriptionAr ? mainFormik.errors.descriptionAr : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+              <div id='description-ar-table-step'>
+                <Input label={text.descriptionAr} placeholder={text.descriptionAr} name="descriptionAr" value={mainFormik.values.descriptionAr} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.descriptionAr && mainFormik.errors.descriptionAr ? mainFormik.errors.descriptionAr : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+              </div>
             )}
             {languages!=0 &&(
-              <Input label={text.descriptionEn} placeholder={text.descriptionEn} name="descriptionEn" value={mainFormik.values.descriptionEn} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.descriptionEn && mainFormik.errors.descriptionEn ? mainFormik.errors.descriptionEn : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+              <div id='description-en-table-step'>
+                <Input label={text.descriptionEn} placeholder={text.descriptionEn} name="descriptionEn" value={mainFormik.values.descriptionEn} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.descriptionEn && mainFormik.errors.descriptionEn ? mainFormik.errors.descriptionEn : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+              </div>
             )}
-            <Input prefix={text.tableNumberPrefix} type="number" label={text.tableNumber} placeholder={text.tableNumber} name="tableNumber" value={mainFormik.values.tableNumber} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.tableNumber && mainFormik.errors.tableNumber ? mainFormik.errors.tableNumber : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+            <div id='table-number-step'>
+              <Input prefix={text.tableNumberPrefix} type="number" label={text.tableNumber} placeholder={text.tableNumber} name="tableNumber" value={mainFormik.values.tableNumber} onChange={mainFormik.handleChange} onBlur={mainFormik.handleBlur} error={mainFormik.touched.tableNumber && mainFormik.errors.tableNumber ? mainFormik.errors.tableNumber : ''} className="input-placeholder text-[16px]" inputClassName='text-[16px]' />
+            </div>
           </div>
 
           {/* <div className='mt-4'>
@@ -182,7 +207,7 @@ export default function TablesForm({
 
           {/* Submit Button */}
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="submit" isLoading={isSubmit} disabled={isSubmit} className="w-full">
+            <Button id='submit-table' type="submit" isLoading={isSubmit} disabled={isSubmit} className="w-full">
               {text.submit}<PiPlusBold className="ms-1.5 h-[17px] w-[17px]" />
             </Button>
           </div>
