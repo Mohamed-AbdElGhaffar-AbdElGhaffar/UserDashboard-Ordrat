@@ -122,6 +122,7 @@ function calculateTotalDistance(distanceToBranch: string, distanceToUser: string
   const num2 = parseFloat(distanceToUser.replace(/[^\d.]/g, ''));
   return num1 + num2;
 }
+const GUID_EMPTY = "00000000-0000-0000-0000-000000000000";
 export default function OrderView({ lang, initialOrder, currencyAbbreviation, orderPrint, userData, phone, branches, delivery, initialLocationDirection }: { lang: string; initialOrder: Order | null; orderPrint: any; userData: any; phone:string; branches: DeliveryOption[]; delivery: any; currencyAbbreviation: string; initialLocationDirection: any; }) {
   console.log("deliveryInfo: ",delivery);
   
@@ -236,13 +237,13 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
       setCurrentOrderStatus(data?.status); 
 
       setOrder(data);
-      if (data?.type === 2 && (data.status === 3 || data.status === 4)) {
+      if (data?.type === 2 && (data.status === 2 || data.status === 3 || data.status === 4) && data.deliveryId != GUID_EMPTY || null) {
         const delivery = await fetchDeliveryById(data.deliveryId);
         setDeliveryInfoState(delivery);
       } else {
         setDeliveryInfoState(null);
       }
-      if (data?.type === 2 && (data.status === 3)) {
+      if (data?.type === 2 && (data.status === 2 || data.status === 3)&& data.deliveryId != GUID_EMPTY || null) {
         const fetchLocDir = await fetchLocationDirection(id as string, lang);
         setLocationDirection(fetchLocDir);
       } else {
@@ -263,7 +264,7 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
   }, [orderDetailsStatus]);
   useEffect(() => {
     const interval = setInterval(async () => {
-      if (order?.type === 2 && order.status === 3) {
+      if (order?.type === 2 && (order.status === 2 || order.status === 3)&& order.deliveryId != GUID_EMPTY || null) {
         const fetchLocDir = await fetchLocationDirection(id as string, lang);
         setLocationDirection(fetchLocDir);
       } else {
@@ -500,7 +501,7 @@ export default function OrderView({ lang, initialOrder, currencyAbbreviation, or
               ))}
             </div>
           </div>
-          {deliveryInfo && (currentOrderStatus == 3 || currentOrderStatus == 4) && (
+          {deliveryInfo && (currentOrderStatus == 2 || currentOrderStatus == 3 || currentOrderStatus == 4) && (
             <div className="">
               <Title
                 as="h3"

@@ -127,7 +127,7 @@ async function fetchOrderLocationDirection(lang: string, orderId?: string) {
     }
   }
 }
-
+const GUID_EMPTY = "00000000-0000-0000-0000-000000000000";
 export default async function OrderId({
   params: { lang, id },
 }: {
@@ -166,10 +166,10 @@ export default async function OrderId({
     value: lang == 'ar'? branch.nameAr.toLowerCase().replace(/\s+/g, '-') : branch.nameEn.toLowerCase().replace(/\s+/g, '-'),
     icon: ''
   }));
-  const deliveryInfo = order.type === 2 && (order.status === 3 || order.status === 4)
+  const deliveryInfo = order.type === 2 && (order.status === 2 || order.status === 3 || order.status === 4) && order.deliveryId != GUID_EMPTY || null
     ? await fetchDeliveryById(order.deliveryId)
     : null;
-  const LocationDirection = order.type === 2 && order.status === 3
+  const LocationDirection = order.type === 2 && (order.status === 2 || order.status === 3) && order.deliveryId != GUID_EMPTY || null
     ? await fetchOrderLocationDirection(lang ,order.id)
     : null;
 
