@@ -139,7 +139,7 @@ type ChooseDeliveryFormProps = {
   initialLocationDirection: any;
 };
 const GUID_EMPTY = "00000000-0000-0000-0000-000000000000";
-export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviation,branches, orderId, pageHeader, initialDeliveryInfo, initialOrder, initialLocationDirection }: ChooseDeliveryFormProps) {
+export default function ChooseBranchsDelivery({ lang = 'en', initialCurrencyAbbreviation,branches, orderId, pageHeader, initialDeliveryInfo, initialOrder, initialLocationDirection }: ChooseDeliveryFormProps) {
   const { closeModal } = useModal();
   const accessToken = GetCookiesClient('accessToken');
   const shopId = GetCookiesClient('shopId');
@@ -155,7 +155,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
     cancelBroadcastOrder,
     acceptDeliveryOffer,
     rejectDeliveryOffer,
-  } = useNegotiator(orderId, false);
+  } = useNegotiator(orderId, true);
   // console.log("broadcastStatus: ",broadcastStatus);
   // console.log("isOrderBroadcasted: ",isOrderBroadcasted);
   console.log("offers: ",offers);
