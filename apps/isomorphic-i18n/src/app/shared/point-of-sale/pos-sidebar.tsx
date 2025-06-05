@@ -97,7 +97,6 @@ type PosSidebarProps = {
   defaultUser: string;
   shopData: any;
   currencyAbbreviation: string;
-  shopGateways: any[];
 }; 
 
 function PostSidebar({
@@ -115,7 +114,6 @@ function PostSidebar({
   defaultUser,
   shopData,
   currencyAbbreviation,
-  shopGateways,
 }: PosSidebarProps) {
   const { shipping, setShipping, posTableOrderId, setPOSTableOrderId, 
     updateMainBranch, setUpdateMainBranch, setTablesData,
@@ -168,7 +166,6 @@ function PostSidebar({
               lang={lang!} 
               currencyAbbreviation={shopData.currencyAbbreviation}
               branchOption={branchOption}
-              shopGateways={shopGateways}
             />
           ),
           customSize: '700px',
@@ -188,7 +185,6 @@ function PostSidebar({
               freeShppingTarget={freeShppingTarget}
               shopData={shopData}
               currencyAbbreviation={shopData.currencyAbbreviation}
-              shopGateways={shopGateways}
             />
           ),
           customSize: '700px',
