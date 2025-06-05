@@ -23,6 +23,8 @@ const NextProgress = dynamic(() => import("@components/next-progress"), {
 export const metadata = {
   title: siteConfig.title,
   description: siteConfig.description,
+  manifest: '/manifest.json',
+
 };
 
 export async function generateStaticParams() {
@@ -43,6 +45,10 @@ export default async function RootLayout({
       dir={dir(lang)}
       suppressHydrationWarning
     >
+      <head>
+<link rel="manifest" href="/manifest.json" />
+
+        </head>
       <body
         suppressHydrationWarning
         className={cn(elTajawal.variable ,'font-elTajawal')}

@@ -23,6 +23,7 @@ export const config = {
     "/file/:path*",
     "/file-manager",
     "/invoice/:path*",
+    "/manifest.json",
     "/forms/profile-settings/:path*",
     "/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js).*)",
   ],
@@ -64,6 +65,7 @@ export const routeRoles: Record<string, string[]> = {
   "/term/privacy": [ "/sellerDashboard/term/privacy", "sellerDashboard-term-privacy", "لوحة-تحكم-التاجر-الشروط-والاحكام-سياسة-الخصوصية", ],
   "/term/refund": [ "/sellerDashboard/term/refund", "sellerDashboard-term-refund", "لوحة-تحكم-التاجر-الشروط-والاحكام-سياسة-الاسترداد", ],
   "/abandonedOrders": [ "/sellerDashboard/abandonedOrders", "sellerDashboard-abandonedOrders", "لوحة-تحكم-التاجر-الطلبات المتروكة", ],
+  "/manifest.json": [ "/manifest.json", "manifest.json" ],
 };
 export const routeRolesInCludes: Record<string, string[]> = {
   "/delivery/details": [ "GetDeliverById" ],
@@ -107,7 +109,7 @@ export async function middleware(req: any) {
 
   const refreshToken = req.cookies.get("refreshToken")?.value;
 
-  if (!refreshToken && !pathname.includes("/signin") && !pathname.includes("/auth/forgot-password")&& !pathname.includes("/auth/otp")&& !pathname.includes("/auth/restart-password")) {
+  if (!refreshToken && !pathname.includes("/signin") && !pathname.includes("/auth/forgot-password")&& !pathname.includes("/auth/otp")&& !pathname.includes("/auth/restart-password") && !pathname.includes("/manifest.json")) {
     return NextResponse.redirect(new URL(`/${lang}/signin`, req.url));
   }
 

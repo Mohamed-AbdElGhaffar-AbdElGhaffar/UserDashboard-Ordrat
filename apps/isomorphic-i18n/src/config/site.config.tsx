@@ -15,6 +15,7 @@ export const siteConfig = {
   logo: ``,
   logoAr: ``,
   icon: ``,
+  manifest: ``,
   mode: MODE.LIGHT,
   layout: LAYOUT_OPTIONS.HYDROGEN,
   // TODO: favicon
@@ -31,6 +32,7 @@ export const metaObject = (
   return {
     title: title ? `${title}` : siteConfig.title,
     description,
+    manifest: "/manifest.json",
     openGraph: openGraph ?? {
       title: title ? `${title} ` : title,
       description,
