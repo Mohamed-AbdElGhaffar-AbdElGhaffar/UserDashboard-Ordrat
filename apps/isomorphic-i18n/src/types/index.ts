@@ -1,6 +1,46 @@
 import type { CouponType } from "@/config/enums";
 import { StaticImageData } from "next/image";
 
+export interface PaymentGateway {
+  id: string;
+  name: string;
+  description?: string;
+  imageURL: string;
+}
+
+export interface ShopPaymentGateway {
+  id: string;
+  shopId: string;
+  gatewayId: string;
+  isEnabled: boolean;
+  priority: number;
+  gatewayName: string;
+  gatewayDescription: string;
+  gatewayUrl: string;
+  gatewayConfigValues: GatewayConfigValue[];
+}
+
+export interface GatewayConfigField {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  buttonType: 'Radio' | 'Dropdown' | 'Checkbox' | 'Input' | 'PhoneNumber' | 'Email' | 'DatePick' | 'Image' ;
+  priority: number;
+  isRequired: boolean;
+  options?: ConfigOption[];
+}
+
+export interface ConfigOption {
+  id: string;
+  name: string;
+}
+
+export interface GatewayConfigValue {
+  gatewayConfigFieldId: string;
+  value?: string;
+  selectedOptionId?: string;
+}
+
 export interface Coupon {
   id: string;
   name: string;

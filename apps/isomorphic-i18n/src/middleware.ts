@@ -35,6 +35,7 @@ const cookieName = "i18next";
 
 export const routeRoles: Record<string, string[]> = {
   "/affiliate": [ "/sellerDashboard/affiliate", "sellerDashboard-affiliate", "لوحة-تحكم-التاجر-الشركاء", ],
+  "/storeSetting/payment-gateways": [ "/sellerDashboard/payment-gateways", "sellerDashboard-payment-gateways", "لوحة-تحكم-التاجر-بوابات-الدفع", ],
   "/printer": [ "/sellerDashboard/printer", "sellerDashboard-printer", "لوحة-تحكم-التاجر-الطابعة", ],
   "/storeSetting/branches": [ "/sellerDashboard/branches", "sellerDashboard-branches", "لوحة-تحكم-التاجر-الفروع", ],
   "/marketingtools/coupon": [ "/sellerDashboard/coupon", "sellerDashboard-coupon", "لوحة-تحكم-التاجر-قسيمة", ],

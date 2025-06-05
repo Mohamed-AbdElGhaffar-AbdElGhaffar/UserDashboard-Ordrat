@@ -7,6 +7,7 @@ import FloatingCartButton from '@/app/shared/floating-cart-button';
 import POSDrawerView from '@/app/shared/point-of-sale/pos-drawer-view';
 import { useUserContext } from '@/app/components/context/UserContext';
 import axiosClient from '@/app/components/context/api';
+import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookiesClient';
 // import { useCart } from '../../../../../isomorphic/src/store/quick-cart/cart.context';
 const Drawer = dynamic(() => import('rizzui').then((module) => module.Drawer), {
   ssr: false,
@@ -30,13 +31,32 @@ export default function POSDrawer({ className, lang, tables, branchOption, allDa
   const [openDrawer, setOpenDrawer] = useState(false);
   const { totalItems, items, removeItemFromCart, clearItemFromCart, resetCart } = useCart();
   const [defaultData, setDefaultData] = useState<any[]>(allDatatables);
+  const [shopGateways, setShopGateways] = useState<any[]>([]);
   const { posTableOrderId, setPOSTableOrderId, tablesData, setTablesData, mainBranch } = useUserContext();
+  const shopId = GetCookiesClient('shopId') as string;
+
+  const fetchShopPaymentGatewayData = async () => {
+    try {
+      const response = await axiosClient.get(`/api/ShopPaymentGateway/GetByShopId/${shopId}`, {
+        headers: {
+          'Accept-Language': lang,
+        },
+      });
+      console.log("ShopPaymentGateway: ",response.data);
+      
+      setShopGateways(response.data);
+    } catch (error) {
+      console.error('Error loading shop gateways:', error);
+      setShopGateways([]);
+    }
+  };
   useEffect(() => {
     const localPOSTableOrderId = localStorage.getItem('posTableOrderId');
     const posTableOrderIdLocal = localPOSTableOrderId ? JSON.parse(localPOSTableOrderId) : null;
     if (posTableOrderId != posTableOrderIdLocal) {
       setPOSTableOrderId(posTableOrderIdLocal);
     }
+    fetchShopPaymentGatewayData();
   }, [lang]);
   const fetchTablesData = async () => {
     try {
@@ -93,6 +113,7 @@ export default function POSDrawer({ className, lang, tables, branchOption, allDa
           freeShppingTarget={freeShppingTarget}
           shopData={shopData}
           currencyAbbreviation={currencyAbbreviation}
+          shopGateways={shopGateways}
         />
       </Drawer>
     </>

@@ -36,6 +36,11 @@ const PageLinks = ({ lang }: { lang: string }) => {
       badge: ''
     },
     {
+      name: t(`side-payment-gateways`),
+      href: `/storeSetting/payment-gateways`,
+      badge: ''
+    },
+    {
       name: t(`side-tables`),
       href: `/storeSetting/tables`,
       badge: ''

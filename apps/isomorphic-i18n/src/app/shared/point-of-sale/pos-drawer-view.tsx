@@ -100,6 +100,7 @@ type POSOrderTypes = {
   defaultUser: string;
   shopData: any;
   currencyAbbreviation: string;
+  shopGateways: any[];
 };
 
 export default function POSDrawerView({
@@ -119,7 +120,8 @@ export default function POSDrawerView({
   freeShppingTarget,
   defaultUser,
   shopData,
-  currencyAbbreviation
+  currencyAbbreviation,
+  shopGateways,
 }: POSOrderTypes) {
   const { shipping, setShipping, posTableOrderId, setPOSTableOrderId,
     updateMainBranch, setUpdateMainBranch, setTablesData,
@@ -170,7 +172,7 @@ export default function POSDrawerView({
               title={lang === 'ar' ? "الكاشير" : "POS"}
               lang={lang!}
               currencyAbbreviation={shopData.currencyAbbreviation}
-
+              shopGateways={shopGateways}
               branchOption={branchOption}
             />
           ),
@@ -191,7 +193,7 @@ export default function POSDrawerView({
               freeShppingTarget={freeShppingTarget}
               shopData={shopData}
               currencyAbbreviation={shopData.currencyAbbreviation}
-
+              shopGateways={shopGateways}
             />
           ),
           customSize: '700px',

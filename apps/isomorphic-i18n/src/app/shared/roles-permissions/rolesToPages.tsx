@@ -77,6 +77,10 @@ export function generatePagesFromRoles(roles: string[], lang: string = 'en') {
       label: { en: 'Control Search Engine Optimization', ar: 'التحكم في محركات البحث' },
     },
     {
+      permissions: ['sellerDashboard-payment-gateways'],
+      label: { en: 'Payment Gateways', ar: 'بوابات الدفع' },
+    },
+    {
       permissions: ['sellerDashboard-marketingtools-whatsapp'],
       label: { en: 'Control WhatsApp', ar: 'التحكم في الواتساب' },
     },
@@ -269,6 +273,12 @@ export function generatePagesFromRoles(roles: string[], lang: string = 'en') {
       nameEn: 'Seo', 
       nameAr: 'تحسين محركات البحث', 
       permissions: ['ShopGetById', 'UpdateShop', 'sellerDashboard-storeSetting-seo'] 
+    },
+    { 
+      key: 'sellerDashboard-payment-gateways', 
+      nameEn: 'Payment Gateways', 
+      nameAr: 'بوابات الدفع', 
+      permissions: ['sellerDashboard-payment-gateways'] 
     },
     { 
       key: 'sellerDashboard-marketingtools-whatsapp', 

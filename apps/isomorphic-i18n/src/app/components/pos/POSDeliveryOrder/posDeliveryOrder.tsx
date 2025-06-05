@@ -28,6 +28,7 @@ import { printOrderReceipt } from '../printOrderReceipt ';
 import 'react-datepicker/dist/react-datepicker.css';
 import { RadioGroup as Radio, AdvancedRadio } from 'rizzui';
 import { PiCheckCircleFill } from 'react-icons/pi';
+import { useRouter } from 'next/navigation';
 
 function parseProductData(productString: string) {
   const dataPairs = productString.split('&&');
@@ -104,6 +105,7 @@ type POSDeliveryOrderProps = {
   freeShppingTarget: number;
   shopData: any;
   currencyAbbreviation: string;
+  shopGateways: any[];
 };
 
 export default function POSDeliveryOrder({
@@ -115,6 +117,7 @@ export default function POSDeliveryOrder({
   items,
   freeShppingTarget,
   shopData,
+  shopGateways,
   currencyAbbreviation
 
 }: POSDeliveryOrderProps) {
@@ -137,6 +140,7 @@ export default function POSDeliveryOrder({
     office: lang === 'ar' ? "المكتب" : 'Office',
     
     wrongPhone: lang === 'ar' ? 'رقم الهاتف غير صالح' : 'Invalid phone number',
+    paymentMethod: lang === 'ar' ? 'الرجاء اختيار وسيلة الدفع' : 'Please select a payment method',
 
     submit: lang === 'ar' ? 'انشاء' : 'Create',
     return: lang === 'ar' ? 'رجوع' : 'Return',
@@ -190,6 +194,8 @@ export default function POSDeliveryOrder({
   const [searchName, setSearchName] = useState('');
   const [searchPhone, setSearchPhone] = useState('');
   const [loadingCustomers, setLoadingCustomers] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const router = useRouter();
 
   const [userAddressData, setUserAddressData] = useState<any>(null);
   const [isFetchingAddress, setIsFetchingAddress] = useState(false);
@@ -210,12 +216,17 @@ export default function POSDeliveryOrder({
   const thirdFormik = useFormik({
     initialValues: {
       selectedAddress: '',
+      paymentMethod: '',
     },
     validationSchema: () => {
       let schema = Yup.object({
         selectedAddress: Yup.string().required(secondText.addressIsRequired),
       });
-  
+      if (shopGateways.filter(gateway => gateway.isEnabled).length != 0 && shopGateways.filter(gateway => gateway.isEnabled).length != 1) {
+        schema = schema.shape({
+          paymentMethod: Yup.string().required(text.paymentMethod),
+        });
+      }
       return schema;
     },
     onSubmit: async (values) => {
@@ -223,6 +234,8 @@ export default function POSDeliveryOrder({
       setLoading(true);
       const accessToken = GetCookiesClient('accessToken') as string;
       const decodedToken = decodeJWT(accessToken);
+      const selectedGateway = shopGateways.find((g) => g.id === values.paymentMethod);
+      const paymentMethod = selectedGateway?.paymentMethod;
       console.log("decodedToken: ",decodedToken);
       if (selectedCustomer) {
         try {
@@ -230,9 +243,14 @@ export default function POSDeliveryOrder({
           const addressId = values.selectedAddress;
           const service =
             shopData?.applyServiceOnDineInOnly ? 0 : shopData?.service;
+          
           try {
             const formData = new FormData();
-            formData.append('paymentmethod', '0');
+            if (shopGateways.filter(gateway => gateway.isEnabled).length == 1) {
+              formData.append('paymentmethod', shopGateways[0]?.paymentMethod);
+            }else{
+              formData.append('paymentmethod',  paymentMethod?.toString() || '0');
+            }
             formData.append('TotalPrice', "0");
             formData.append('ShippingFees', shippingFees? shippingFees.toString() : '0');
             formData.append('TotalVat', shopData.vat? shopData.vat.toString() : "0");
@@ -295,6 +313,8 @@ export default function POSDeliveryOrder({
             const response = await axiosClient.post(`/api/Order/Create/${shopId}`, formData);
       
             if (response.status === 200) {
+              const payUrl = response.data.payUrl;
+              router.push(payUrl)
               const orderId = response.data.id;
               const orderNumber = response.data.orderNumber;
       
@@ -479,8 +499,28 @@ export default function POSDeliveryOrder({
 			floor: '',
 			street: '',
 			additionalDirections: undefined,
+			paymentMethod: '',
     },
-    validationSchema: mainFormSchema,
+    validationSchema: () => {
+      let schema = Yup.object({
+        firstName: Yup.string().required(text.firstName + ' ' + requiredMessage),
+        lastName: Yup.string().required(text.lastName + ' ' + requiredMessage),
+        phoneNumber: Yup.string().required(`${text.phoneNumber} ${requiredMessage}`).matches(/^20(1[0-2,5][0-9]{8})$/, text.wrongPhone),
+        lat: Yup.number().required(text.location + ' ' + requiredMessage),
+        lng: Yup.number().required(text.location + ' ' + requiredMessage),
+        type: Yup.string().required(text.type + ' ' + requiredMessage),
+        aptNo: Yup.number().required(text.aptNo + ' ' + requiredMessage),
+        floor: Yup.string().required(text.floor + ' ' + requiredMessage),
+        street: Yup.string().required(text.street + ' ' + requiredMessage),
+        additionalDirections: Yup.string().optional(),
+      });
+      if (shopGateways.filter(gateway => gateway.isEnabled).length != 0 && shopGateways.filter(gateway => gateway.isEnabled).length != 1) {
+        schema = schema.shape({
+          paymentMethod: Yup.string().required(text.paymentMethod),
+        });
+      }
+      return schema;
+    },
     onSubmit: async (values) => {
       setIsSubmit(true);
       const accessToken = GetCookiesClient('accessToken') as string;
@@ -519,9 +559,17 @@ export default function POSDeliveryOrder({
         
           const service =
             shopData?.applyServiceOnDineInOnly ? 0 : shopData?.service;
+          
+          
+          const selectedGateway = shopGateways.find((g) => g.id === values.paymentMethod);
+          const paymentMethod = selectedGateway?.paymentMethod;
           try {
             const formData = new FormData();
-            formData.append('paymentmethod', '0');
+            if (shopGateways.filter(gateway => gateway.isEnabled).length == 1) {
+              formData.append('paymentmethod', shopGateways[0]?.paymentMethod);
+            }else{
+              formData.append('paymentmethod',  paymentMethod?.toString() || '0');
+            }
             formData.append('TotalPrice', "0");
             formData.append('ShippingFees', shippingFees.toString());
             formData.append('TotalVat', shopData.vat? shopData.vat.toString() : "0");
@@ -584,6 +632,8 @@ export default function POSDeliveryOrder({
             const response = await axiosClient.post(`/api/Order/Create/${shopId}`, formData);
       
             if (response.status === 200) {
+              const payUrl = response.data.payUrl;
+              router.push(payUrl)
               const orderId = response.data.id;
               const orderNumber = response.data.orderNumber;
       
@@ -765,6 +815,46 @@ export default function POSDeliveryOrder({
                   />
                 </div>
               </div>
+              {(shopGateways.filter(gateway => gateway.isEnabled).length != 1 && shopGateways.filter(gateway => gateway.isEnabled).length != 0 ) && (
+                <div>
+                  <span className="font-bold text-sm leading-[28px] text-black">{lang == 'ar'? 'اختر وسيلة الدفع:' : 'Select Payment Method:'}</span>
+                  <div className="col-span-full grid grid-cols-2 xs:grid-cols-3 md:grid-cols-4 gap-4 my-2">
+                    {shopGateways.filter(gateway => gateway.isEnabled).map((gateway: any) => {
+                      const isSelected = selectedId === gateway.id;
+
+                      return (
+                        <div
+                          key={gateway.id}
+                          onClick={() => {
+                            setSelectedId(gateway.id);
+                            mainFormik.setFieldValue('paymentMethod', gateway.id);
+                          }}
+                          className={`cursor-pointer p-2 rounded-xl border transition-all duration-200
+                            ${isSelected ? 'border-primary shadow-md' : 'border-gray-200 hover:shadow-sm'}
+                          `}
+                        >
+                          <div className="flex flex-col items-center justify-center space-y-2 h-[80px]">
+                            <div className="w-14 h-12 flex items-center justify-center">
+                              <img
+                                src={gateway.gatewayUrl}
+                                alt={gateway.gatewayName}
+                                width='80'
+                                height='80'
+                                className="object-contain w-full h-full"
+                              />
+                            </div>
+                            <span className="text-sm font-semibold text-center truncate w-full">
+                              {gateway.gatewayName}
+                            </span>
+                          </div>
+                        </div>
+
+                      );
+                    })}
+                  </div>
+                  {mainFormik.errors.paymentMethod as string && <p className="text-red-500 text-sm mt-1 mb-2">{mainFormik.errors.paymentMethod as string}</p>}
+                </div>
+              )}
             </div>
 
             {/* Submit Button */}
@@ -826,6 +916,46 @@ export default function POSDeliveryOrder({
                               {`${Number(shopData.service).toFixed(2)} ${secondText.currency}`}
                             </span>
                           </h3>
+                        )}
+                        {(shopGateways.filter(gateway => gateway.isEnabled).length != 1 && shopGateways.filter(gateway => gateway.isEnabled).length != 0 ) && (
+                          <>
+                            <span className="font-bold text-sm leading-[28px] text-black">{lang == 'ar'? 'اختر وسيلة الدفع:' : 'Select Payment Method:'}</span>
+                            <div className="col-span-full grid grid-cols-2 xs:grid-cols-3 md:grid-cols-4 gap-4 my-2">
+                              {shopGateways.filter(gateway => gateway.isEnabled).map((gateway: any) => {
+                                const isSelected = selectedId === gateway.id;
+
+                                return (
+                                  <div
+                                    key={gateway.id}
+                                    onClick={() => {
+                                      setSelectedId(gateway.id);
+                                      thirdFormik.setFieldValue('paymentMethod', gateway.id);
+                                    }}
+                                    className={`cursor-pointer p-2 rounded-xl border transition-all duration-200
+                                      ${isSelected ? 'border-primary shadow-md' : 'border-gray-200 hover:shadow-sm'}
+                                    `}
+                                  >
+                                    <div className="flex flex-col items-center justify-center space-y-2 h-[80px]">
+                                      <div className="w-14 h-12 flex items-center justify-center">
+                                        <img
+                                          src={gateway.gatewayUrl}
+                                          alt={gateway.gatewayName}
+                                          width='80'
+                                          height='80'
+                                          className="object-contain w-full h-full"
+                                        />
+                                      </div>
+                                      <span className="text-sm font-semibold text-center truncate w-full">
+                                        {gateway.gatewayName}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                );
+                              })}
+                            </div>
+                            {thirdFormik.errors.paymentMethod as string && <p className="text-red-500 text-sm mt-1 mb-2">{thirdFormik.errors.paymentMethod as string}</p>}
+                          </>
                         )}
                       </div>
                       <div>
