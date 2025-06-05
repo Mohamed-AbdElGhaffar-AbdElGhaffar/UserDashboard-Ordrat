@@ -124,7 +124,6 @@ export default function Seo({ lang }: { lang?: string }) {
                 }) => {
                     return (
                         <>
-
                             <div className="mx-auto  grid w-full max-w-screen-4xl gap-7 @2xl:gap-9 @3xl:gap-11">
                                 <div title={lang === 'ar' ? 'تحسين محركات البحث' : 'Seo'} className='space-y-4 border border-muted bg-gray-0 p-5 dark:bg-gray-50 lg:p-7 rounded-lg'>
                                     <div className="flex justify-between ">

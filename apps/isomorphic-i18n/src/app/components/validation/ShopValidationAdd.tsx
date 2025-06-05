@@ -7,14 +7,10 @@ function ShopValidationAdd({ lang }: { lang: string }) {
     const { t, i18n } = useTranslation(lang!, "validation");
 
     return Yup.object({
-        titleAr: Yup.string().required(t('req')),
-        titleEn: Yup.string().required(t('req')),
-        metaDescriptionAr: Yup.string()
-            .required(t('req')),
-        metaDescriptionEn: Yup.string()
-            .required(t('req')),
-
-
+        titleAr: Yup.string(),
+        titleEn: Yup.string(),
+        metaDescriptionAr: Yup.string(),
+        metaDescriptionEn: Yup.string(),
     })
 }
 
