@@ -1704,9 +1704,9 @@ html[dir=rtl] .rizzui-checkbox-icon{
 .rtl{
   direction: rtl;
 }
-/* html[dir=ltr] * {
+html[dir=ltr] * {
   font-family: inter,sans-serif !important;
-} */
+}
 
 .ltr{
   direction: ltr !important;
