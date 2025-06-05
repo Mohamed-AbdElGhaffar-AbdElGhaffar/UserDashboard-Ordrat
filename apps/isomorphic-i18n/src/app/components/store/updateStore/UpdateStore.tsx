@@ -71,7 +71,7 @@ export default function StoresForm({
   const [loading, setLoading] = useState(true);
   const { fileData } = useUserContext();
   const { t } = useTranslation(lang!, "shop");
-  const { couponData, setCouponData } = useUserContext();
+  const { couponData, setCouponData, setProgressData } = useUserContext();
   const validationSchema = ShopValidation({ lang })
   const [currencies, setCurrencies] = useState<{ value: string; label: string }[]>([]);
 
@@ -171,6 +171,7 @@ export default function StoresForm({
         if (response) {
           closeModal();
           setCouponData(true);
+          setProgressData(true);
           toast.success(lang === 'ar' ? 'تم تعديل المتجر بنجاح!' : 'Shop Updated successfully!');
           //   setUpdateStores(true);
         } else {

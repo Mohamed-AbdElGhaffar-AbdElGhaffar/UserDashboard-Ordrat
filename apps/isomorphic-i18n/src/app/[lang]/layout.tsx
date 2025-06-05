@@ -15,6 +15,9 @@ import { UserProvider } from "../components/context/UserContext";
 import { GuardProvider } from "../components/context/GuardContext";
 import { QrStyleProvider } from "../components/contsxt1";
 import ResponsiveToaster from "../components/ResponsiveToaster";
+import Head from "next/head";
+import { NextStepProvider } from "nextstepjs";
+
 
 const NextProgress = dynamic(() => import("@components/next-progress"), {
   ssr: false,
@@ -46,28 +49,35 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-<link rel="manifest" href="/manifest.json" />
-
-        </head>
+        <link rel="manifest" href="/manifest.json" />
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/nextstepjs@latest/dist/styles.css"
+        />
+      </head>
       <body
         suppressHydrationWarning
         className={cn(elTajawal.variable ,'font-elTajawal')}
       >
         <QrStyleProvider>
-          <GuardProvider>
-            <UserProvider>
-              <AuthProvider session={session}>
-                <ThemeProvider>
-                  <NextProgress />
-                  {children}
-                  <ResponsiveToaster />
 
-                  <GlobalDrawer lang={lang} />
-                  <GlobalModal />
-                </ThemeProvider>
-              </AuthProvider>
-            </UserProvider>
-          </GuardProvider>
+          <NextStepProvider>
+            <GuardProvider>
+              <UserProvider>
+                <AuthProvider session={session}>
+                  <ThemeProvider>
+                    <NextProgress />
+                    {children}
+                     <ResponsiveToaster />
+
+                    <GlobalDrawer lang={lang} />
+                    <GlobalModal />
+                  </ThemeProvider>
+                </AuthProvider>
+              </UserProvider>
+            </GuardProvider>
+          </NextStepProvider>
+
         </QrStyleProvider>
       </body>
     </html>

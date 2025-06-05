@@ -1754,4 +1754,11 @@ html[dir=rtl] .rizzui-checkbox-icon{
 .rizzui-input-field{
   font-size: 16px !important;
 }
-
+.rizzui-modal-root{
+  z-index: 996 !important;
+}
+/* @media (min-width: 1280px) {
+  [dir='rtl'] [data-name='nextstep-pointer'] {
+    transform: translateX(0%) translateY(30%) !important;
+  }
+} */

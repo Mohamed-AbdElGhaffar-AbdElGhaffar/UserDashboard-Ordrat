@@ -113,7 +113,7 @@ export const defaultColumns = (lang: string, languages: number) => {
       size: 160,
       header: lang === 'ar' ? 'الحالة' : 'Status',
       cell: ({ row }) => (
-        <div className='flex items-center gap-2'>
+        <div id='change-status-category' className='flex items-center gap-2'>
           <Text className="font-lexend text-sm font-normal text-gray-900 dark:text-gray-700">
             {row.original.status}
           </Text>
@@ -122,7 +122,6 @@ export const defaultColumns = (lang: string, languages: number) => {
               lang={lang}
             />
           )}
-
         </div>
       ),
     }),

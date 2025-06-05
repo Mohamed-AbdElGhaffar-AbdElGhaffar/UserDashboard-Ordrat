@@ -27,7 +27,7 @@ import { useTranslation } from "@/app/i18n/client";
 import { getShop } from "@/app/lib/api/shop";
 import { ShopInfo } from "@/types";
 import { useUserContext } from "@/app/components/context/UserContext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import UpdateStoreButton from '@/app/components/store/UpdateStoreButton'
 import WidgetCard from "@components/cards/widget-card";
 import CustomInput from "@/app/components/ui/customForms/CustomInput";
@@ -38,6 +38,12 @@ import UpdateFakeDataStoreButton from "../store/UpdateFakeDataStoreButton";
 import { getFakeData } from "@/app/lib/api/fakeData";
 import RoleExist from "../ui/roleExist/RoleExist";
 import { GetCookiesClient } from "../ui/getCookiesClient/GetCookiesClient";
+import { NextStep, Tour, useNextStep } from "nextstepjs";
+import { getFakeSteps } from "../ui/steps/steps";
+import { useSearchParams } from "next/navigation";
+import CustomCard from "../ui/CustomCard/CustomCard";
+import { useModal } from "@/app/shared/modal-views/use-modal";
+import UpdateFakeDataStore from "../store/updateFakeDataStore/UpdateFakeDataStore";
 const QuillEditor = dynamic(() => import("@ui/quill-editor"), {
     ssr: false,
 });
@@ -48,6 +54,24 @@ export default function FakeData({ lang }: { lang?: string }) {
     const [data, setData] = useState<any>();
     const { couponData, setCouponData, } = useUserContext();
     const shopId = GetCookiesClient('shopId');
+    const searchParams = useSearchParams();
+    const { startNextStep, currentStep, setCurrentStep, closeNextStep, isNextStepVisible } = useNextStep();
+    const { closeModal, openModal } = useModal();
+    
+    
+    const steps: Tour[] = useMemo(() => {
+        const stepsWithIcons = getFakeSteps(lang!).map((tour) => ({
+            ...tour,
+            steps: tour.steps.map((step) => ({
+                ...step,
+                pointerPadding: 10,
+                pointerRadius: 8,
+            })),
+        }));
+
+        return stepsWithIcons;
+    }, [lang, data]);
+
     useEffect(() => {
         setLoading(true);
         const fetchData = async () => {
@@ -72,10 +96,43 @@ export default function FakeData({ lang }: { lang?: string }) {
         }
     }, [lang, couponData]);
 
+    useEffect(() => {
+        if (searchParams.get('demo') === 'true') {
+        setTimeout(() => {
+            startNextStep('fakeTour');
+        }, 300);
+        }
+    }, [searchParams, startNextStep]);
+    
+    useEffect(() => {
+        const overlay = document.querySelector('[data-name="nextstep-overlay"]');
+        if (overlay) {
+        overlay.setAttribute('lang', 'en');
+        overlay.setAttribute('dir', 'ltr');
+        }
+    
+        const observer = new MutationObserver(() => {
+        const updatedOverlay = document.querySelector('[data-name="nextstep-overlay"]');
+        if (updatedOverlay) {
+            updatedOverlay.setAttribute('lang', 'en');
+            updatedOverlay.setAttribute('dir', 'ltr');
+        }
+        });
+    
+        observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        });
+    
+        return () => observer.disconnect();
+    }, []);
 
     const onSubmit: SubmitHandler<ProfileFormTypes> = (data) => {
         toast.success(<Text as="b">{t('shopupdate')}</Text>);
         console.log("Profile settings data ->", data);
+        if (isNextStepVisible) {
+            setCurrentStep(4);
+        }
     };
 
     const options = [
@@ -84,7 +141,69 @@ export default function FakeData({ lang }: { lang?: string }) {
     ]
 
     return (
-        <>
+        <NextStep
+            steps={steps} 
+            cardComponent={(props) => 
+                <CustomCard
+                    {...props} 
+                    nextStep={()=>{
+                        if (currentStep == 0) {
+                            openModal({
+                                view: (
+                                <UpdateFakeDataStore
+                                    // id=
+                                    title={lang == "en" ? "Update" : 'تعديل'} 
+                                    modalBtnLabel={lang == "en" ? "Update" : 'تعديل'} 
+                                    onSuccess={() => {
+                                        console.log('true');
+                                    }}
+                                    lang={lang!}
+                                />
+                                ),
+                                customSize: '480px',
+                            })
+                            setTimeout(() => {
+                                setCurrentStep(1);
+                            }, 150)
+                        }else if(currentStep == 3 ){
+                            closeModal()
+                            setCurrentStep(4);
+                        }else if(currentStep == 4 ){
+                            closeNextStep();
+                        }else {
+                        setCurrentStep(currentStep + 1);
+                        }
+                    }} 
+                    prevStep={()=>{
+                        if(currentStep == 1 ){
+                            setCurrentStep(0);
+                            closeModal();
+                        }else if(currentStep == 4){
+                           openModal({
+                                view: (
+                                <UpdateFakeDataStore
+                                    // id=
+                                    title={lang == "en" ? "Update" : 'تعديل'} 
+                                    modalBtnLabel={lang == "en" ? "Update" : 'تعديل'} 
+                                    onSuccess={() => {
+                                        console.log('true');
+                                    }}
+                                    lang={lang!}
+                                />
+                                ),
+                                customSize: '480px',
+                            })
+                            setTimeout(() => {
+                                setCurrentStep(3);
+                            }, 150)
+                        }else {
+                            setCurrentStep(currentStep - 1);
+                        }
+                    }}
+                    lang={lang!} 
+                />
+            }
+        >
             <Form<ProfileFormTypes>
                 validationSchema={profileFormSchema}
                 onSubmit={onSubmit}
@@ -103,7 +222,6 @@ export default function FakeData({ lang }: { lang?: string }) {
                 }) => {
                     return (
                         <>
-
                             <div className="mx-auto  grid w-full max-w-screen-4xl gap-7 @2xl:gap-9 @3xl:gap-11">
                                 <div title={t('fakeData')} className='space-y-4 border border-muted bg-gray-0 p-5 dark:bg-gray-50 lg:p-7 rounded-lg'>
                                     <div className="flex justify-between ">
@@ -116,98 +234,99 @@ export default function FakeData({ lang }: { lang?: string }) {
                                         </RoleExist>
                                     </div>
 
-                                    <div className="mb-3 sm:flex items-center gap-2">
-                                        <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-                                            {t('IsFakeViewersAvailable')} :
-                                        </label>
-                                        <div className={`${data?.isFakeViewersAvailable ? "bg-[#B9F9CF]" : "bg-[#fc9090]"
-                                            } flex items-center gap-2 w-fit py-1 px-3 rounded-full`}>
-                                            <span
-                                                className={`w-1.5 h-1.5 rounded-full ${data?.isFakeViewersAvailable ? "bg-green-500" : "bg-red-500"
-                                                    }`}
-                                            />
-                                            <span className="text-sm font-medium">
-                                                {data?.isFakeViewersAvailable ? t("active") : t("deactive")}
-                                            </span>
+                                    <div id="view-fake-data">
+                                        <div className="mb-3 sm:flex items-center gap-2">
+                                            <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                                                {t('IsFakeViewersAvailable')} :
+                                            </label>
+                                            <div className={`${data?.isFakeViewersAvailable ? "bg-[#B9F9CF]" : "bg-[#fc9090]"
+                                                } flex items-center gap-2 w-fit py-1 px-3 rounded-full`}>
+                                                <span
+                                                    className={`w-1.5 h-1.5 rounded-full ${data?.isFakeViewersAvailable ? "bg-green-500" : "bg-red-500"
+                                                        }`}
+                                                />
+                                                <span className="text-sm font-medium">
+                                                    {data?.isFakeViewersAvailable ? t("active") : t("deactive")}
+                                                </span>
+                                            </div>
                                         </div>
+
+                                        <div className="sm:flex justify-between gap-10 my-5">
+                                            <div className="sm:w-1/2">
+                                                <CustomInput
+                                                    label={t('MinimumFakeViewers')}
+                                                    placeholder={t('MinimumFakeViewers')}
+                                                    id="MinimumFakeViewers"
+                                                    name="MinimumFakeViewers"
+                                                    readOnly
+                                                    value={data?.minimumFakeViewers}
+                                                    className=""
+                                                />
+                                            </div>
+                                            <div className="sm:w-1/2 sm:mt-0 mt-3">
+                                                <CustomInput
+                                                    label={t('MaximumFakeViewers')}
+                                                    placeholder={t('MaximumFakeViewers')}
+                                                    id="MaximumFakeViewers"
+                                                    name="MaximumFakeViewers"
+                                                    readOnly
+                                                    value={data?.maximumFakeViewers}
+                                                    className=""
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-3 sm:flex items-center gap-2">
+                                            <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                                                {t('IsFakeSoldNumberAvailable')} :
+                                            </label>
+                                            <div className={`${data?.isFakeSoldNumberAvailable ? "bg-[#B9F9CF]" : "bg-[#fc9090]"
+                                                } flex items-center gap-2 w-fit py-1 px-3 rounded-full`}>
+                                                <span
+                                                    className={`w-1.5 h-1.5 rounded-full ${data?.isFakeSoldNumberAvailable ? "bg-green-500" : "bg-red-500"
+                                                        }`}
+                                                />
+                                                <span className="text-sm font-medium">
+                                                    {data?.isFakeSoldNumberAvailable ? t("active") : t("deactive")}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="sm:flex justify-between gap-10 my-5">
+
+                                            <div className="sm:w-1/2 sm:mt-0 mt-3">
+                                                <CustomInput
+                                                    label={t('MinimumFakeSoldNumber')}
+                                                    placeholder={t('MinimumFakeSoldNumber')}
+                                                    id="MinimumFakeSoldNumber"
+                                                    name="MinimumFakeSoldNumber"
+                                                    readOnly
+                                                    value={data?.minimumFakeSoldNumber}
+                                                    className=""
+                                                />
+                                            </div>
+                                            <div className="sm:w-1/2 sm:mt-0 mt-3">
+                                                <CustomInput
+                                                    label={t('MaximumFakeSoldNumber')}
+                                                    placeholder={t('MaximumFakeSoldNumber')}
+                                                    id="MaximumFakeSoldNumber"
+                                                    name="MaximumFakeSoldNumber"
+                                                    readOnly
+                                                    value={data?.maximumFakeSoldNumber}
+                                                    className=""
+                                                />
+                                            </div>
+                                        </div>
+                                        <CustomInput
+                                            label={t('LastSoldNumberInHours')}
+                                            placeholder={t('LastSoldNumberInHours')}
+                                            id="LastSoldNumberInHours"
+                                            name="LastSoldNumberInHours"
+                                            readOnly
+                                            value={data?.lastSoldNumberInHours}
+                                            className=""
+                                        />
                                     </div>
-
-                                    <div className="sm:flex justify-between gap-10 my-5">
-                                        <div className="sm:w-1/2">
-                                            <CustomInput
-                                                label={t('MinimumFakeViewers')}
-                                                placeholder={t('MinimumFakeViewers')}
-                                                id="MinimumFakeViewers"
-                                                name="MinimumFakeViewers"
-                                                readOnly
-                                                value={data?.minimumFakeViewers}
-                                                className=""
-                                            />
-                                        </div>
-                                        <div className="sm:w-1/2 sm:mt-0 mt-3">
-                                            <CustomInput
-                                                label={t('MaximumFakeViewers')}
-                                                placeholder={t('MaximumFakeViewers')}
-                                                id="MaximumFakeViewers"
-                                                name="MaximumFakeViewers"
-                                                readOnly
-                                                value={data?.maximumFakeViewers}
-                                                className=""
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="mb-3 sm:flex items-center gap-2">
-                                        <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-                                            {t('IsFakeSoldNumberAvailable')} :
-                                        </label>
-                                        <div className={`${data?.isFakeSoldNumberAvailable ? "bg-[#B9F9CF]" : "bg-[#fc9090]"
-                                            } flex items-center gap-2 w-fit py-1 px-3 rounded-full`}>
-                                            <span
-                                                className={`w-1.5 h-1.5 rounded-full ${data?.isFakeSoldNumberAvailable ? "bg-green-500" : "bg-red-500"
-                                                    }`}
-                                            />
-                                            <span className="text-sm font-medium">
-                                                {data?.isFakeSoldNumberAvailable ? t("active") : t("deactive")}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="sm:flex justify-between gap-10 my-5">
-
-                                        <div className="sm:w-1/2 sm:mt-0 mt-3">
-                                            <CustomInput
-                                                label={t('MinimumFakeSoldNumber')}
-                                                placeholder={t('MinimumFakeSoldNumber')}
-                                                id="MinimumFakeSoldNumber"
-                                                name="MinimumFakeSoldNumber"
-                                                readOnly
-                                                value={data?.minimumFakeSoldNumber}
-                                                className=""
-                                            />
-                                        </div>
-                                        <div className="sm:w-1/2 sm:mt-0 mt-3">
-                                            <CustomInput
-                                                label={t('MaximumFakeSoldNumber')}
-                                                placeholder={t('MaximumFakeSoldNumber')}
-                                                id="MaximumFakeSoldNumber"
-                                                name="MaximumFakeSoldNumber"
-                                                readOnly
-                                                value={data?.maximumFakeSoldNumber}
-                                                className=""
-                                            />
-                                        </div>
-                                    </div>
-                                    <CustomInput
-                                        label={t('LastSoldNumberInHours')}
-                                        placeholder={t('LastSoldNumberInHours')}
-                                        id="LastSoldNumberInHours"
-                                        name="LastSoldNumberInHours"
-                                        readOnly
-                                        value={data?.lastSoldNumberInHours}
-                                        className=""
-                                    />
-
                                 </div>
                             </div>
                             {/* <div className="mx-auto  mt-3 grid w-full max-w-screen-4xl gap-7 @2xl:gap-9 @3xl:gap-11">
@@ -240,7 +359,7 @@ export default function FakeData({ lang }: { lang?: string }) {
                     );
                 }}
             </Form>
-        </>
+        </NextStep>
     );
 }
 

@@ -52,7 +52,7 @@ export default function ModalCategoryActive({
     activeRequst: lang === 'ar' ? 'إلغاء تفعيل القسم' : 'Deactivate Category',
     activate : lang === 'ar' ? 'تفعيل' : 'Activate',
   };
-  const { categoriesData, setCategoriesData } = useUserContext();
+  const { categoriesData, setCategoriesData, setProgressData } = useUserContext();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userStatus, setUserStatus] = useState<string>(status); 
@@ -70,6 +70,7 @@ export default function ModalCategoryActive({
       if (response.status === 200) {
         toast.success(lang === 'ar' ? 'تم تفعيل القسم' : 'Category activated successfully');
         setCategoriesData(true);
+        setProgressData(true);
         closeModal();
       } else {
         toast.error(lang === 'ar' ? 'حدث خطأ أثناء العملية' : 'Failed to activate request');
@@ -95,6 +96,7 @@ export default function ModalCategoryActive({
       if (response.status === 200) {
         toast.success(lang === 'ar' ? 'لقد اصبح القسم غير نشط' : 'You have become an inactive category.');
         setCategoriesData(true);
+        setProgressData(true);
         closeModal();
       } else {
         toast.error(lang === 'ar' ? 'حدث خطأ أثناء العملية' : 'Failed to decline request');

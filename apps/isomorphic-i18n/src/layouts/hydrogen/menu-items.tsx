@@ -34,6 +34,40 @@ const MenuItems = ({ lang }: { lang?: string; }, p0?: { lang: any; }) => {
       icon: <ImStatsDots />,
     },
     {
+      name: 'side-storeSetting',
+      href: '/',
+      icon: <PiFoldersDuotone />,
+      dropdownItems: [
+        {
+          name: t(`side-mainData`),
+          href: `/${lang!}/storeSetting/basicData`,
+          badge: ''
+        },
+        {
+          name: 'side-branches',
+          href: `/${lang!}/storeSetting/branches`,
+          icon: <PiStorefront />,
+        },
+        {
+          name: 'side-tables',
+          href: `/${lang!}/storeSetting/tables`,
+          icon: <MdRestaurant />,
+        },
+        {
+          name: t(`side-contactInfo`),
+          href: `/${lang!}/storeSetting/contact-info`,
+          badge: ''
+        },
+        {
+          name: t(`side-qr-code`),
+          href: `/${lang!}/storeSetting/qr-code`,
+          badge: ''
+        },
+
+
+      ]
+    },
+    {
       name: 'side-orders',
       href: `/${lang!}/orders`,
       icon: <PiTruckDuotone />,
@@ -143,40 +177,6 @@ const MenuItems = ({ lang }: { lang?: string; }, p0?: { lang: any; }) => {
       name: t(`side-myPlan`),
       href: `/${lang!}/plans/myPlan`,
       icon: <MdPriceChange />,
-    },
-    {
-      name: 'side-storeSetting',
-      href: '/',
-      icon: <PiFoldersDuotone />,
-      dropdownItems: [
-        {
-          name: t(`side-mainData`),
-          href: `/${lang!}/storeSetting/basicData`,
-          badge: ''
-        },
-        {
-          name: 'side-branches',
-          href: `/${lang!}/storeSetting/branches`,
-          icon: <PiStorefront />,
-        },
-        {
-          name: 'side-tables',
-          href: `/${lang!}/storeSetting/tables`,
-          icon: <MdRestaurant />,
-        },
-        {
-          name: t(`side-contactInfo`),
-          href: `/${lang!}/storeSetting/contact-info`,
-          badge: ''
-        },
-        {
-          name: t(`side-qr-code`),
-          href: `/${lang!}/storeSetting/qr-code`,
-          badge: ''
-        },
-
-
-      ]
     },
     {
       name: 'side-printer',

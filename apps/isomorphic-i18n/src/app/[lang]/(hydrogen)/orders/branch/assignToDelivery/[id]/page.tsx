@@ -10,6 +10,7 @@ import { API_BASE_URL } from '@/config/base-url';
 import ChooseDelivery from '@/app/components/delivery/chooseDelivery/ChooseDelivery';
 import NotFound from '@/app/not-found';
 import { fetchShopData } from '@/app/api/shop';
+import ChooseBranchsDelivery from '@/app/components/delivery/chooseBranchsDelivery/chooseBranchsDelivery';
 
 export const metadata = {
   ...metaObject('FAQ Details'),
@@ -94,7 +95,7 @@ async function fetchOrderLocationDirection(lang: string, orderId?: string) {
     }
   }
 }
-
+const GUID_EMPTY = "00000000-0000-0000-0000-000000000000";
 export default async function AssignOrderToDelivery({
   params: { lang, id },
 }: {
@@ -124,10 +125,10 @@ export default async function AssignOrderToDelivery({
     ],
   };
   
-  const deliveryInfo = order.type === 2 && (order.status === 3 || order.status === 4)
+  const deliveryInfo = order.type === 2 && (order.status === 2 || order.status === 3 || order.status === 4) && order.deliveryId != GUID_EMPTY || null
     ? await fetchDeliveryById(order.deliveryId)
     : null;
-  const LocationDirection = order.type === 2 && order.status === 3
+  const LocationDirection = order.type === 2 && (order.status === 2 || order.status === 3) && order.deliveryId != GUID_EMPTY || null
     ? await fetchOrderLocationDirection(lang ,order.id)
     : null;
   return (
@@ -144,7 +145,7 @@ export default async function AssignOrderToDelivery({
               </p>
             </div>
           :
-          <ChooseDelivery 
+          <ChooseBranchsDelivery 
             lang={lang} 
             branches={branches} 
             orderId={id} 

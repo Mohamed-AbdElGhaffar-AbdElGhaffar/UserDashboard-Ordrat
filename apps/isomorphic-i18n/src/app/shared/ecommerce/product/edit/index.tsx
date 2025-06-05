@@ -456,9 +456,9 @@ export default function EditProduct({
           },
         }
       );
-      if (cookiesBranches.length == 1) {
+      if (cookiesBranches.length == 1 && values.HasStock == true) {
         const stockFormData = new FormData();
-        stockFormData.append('StockNumber', values.StockNumber);
+        stockFormData.append('StockNumber', values.StockNumber || '0');
         try {
           const responseStock = await axiosClient.put(`api/Stock/UpdateProductStock/${cookiesBranches[0].id}/${product.id}`, stockFormData);
           

@@ -22,6 +22,34 @@ const PageLinks = ({ lang }: { lang: string }) => {
       name: t('side-statistics'),
       href: `/statistics`,
     },
+    {
+      name: t('side-storeSetting'),
+    },
+    {
+      name: t(`side-mainData`),
+      href: `/storeSetting/basicData`,
+      badge: ''
+    },
+    {
+      name: t(`side-branches`),
+      href: `/storeSetting/branches`,
+      badge: ''
+    },
+    {
+      name: t(`side-tables`),
+      href: `/storeSetting/tables`,
+      badge: ''
+    },
+    {
+      name: t(`side-contactInfo`),
+      href: `/storeSetting/contactInfo`,
+      badge: ''
+    },
+    {
+      name: t(`side-qr-code`),
+      href: `/storeSetting/qr-code`,
+      badge: ''
+    },
 
     //
     {
@@ -164,35 +192,6 @@ const PageLinks = ({ lang }: { lang: string }) => {
     //   href: `/delivery`,
     //   icon: <PiTruckDuotone />,
     // },
-
-    {
-      name: t('side-storeSetting'),
-    },
-    {
-      name: t(`side-mainData`),
-      href: `/storeSetting/basicData`,
-      badge: ''
-    },
-    {
-      name: t(`side-branches`),
-      href: `/storeSetting/branches`,
-      badge: ''
-    },
-    {
-      name: t(`side-tables`),
-      href: `/storeSetting/tables`,
-      badge: ''
-    },
-    {
-      name: t(`side-contactInfo`),
-      href: `/storeSetting/contactInfo`,
-      badge: ''
-    },
-    {
-      name: t(`side-qr-code`),
-      href: `/storeSetting/qr-code`,
-      badge: ''
-    },
     {
       name: t('side-printer'),
     },

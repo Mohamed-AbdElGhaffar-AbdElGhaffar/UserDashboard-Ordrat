@@ -3,6 +3,7 @@ import { ActionIcon, Tooltip } from 'rizzui';
 import { useModal } from '@/app/shared/modal-views/use-modal';
 import ExchangeIcon from '@components/icons/exchange';
 import ModalCategoryActive from '@/app/components/ui/modals/ModalCategoryActive';
+import { useNextStep } from 'nextstepjs';
 
 interface ActionsCellProps {
   row: { original: any; id: string };
@@ -18,7 +19,8 @@ const ActionsCellActive: React.FC<ActionsCellProps> = ({ row, lang,initialPhone,
     console.log("row: ",row);
 
   const { openModal } = useModal();
- 
+  const { closeNextStep, isNextStepVisible } = useNextStep();
+
   const handleOpenModal = () => {
     openModal({
       view: <ModalCategoryActive 
@@ -28,6 +30,9 @@ const ActionsCellActive: React.FC<ActionsCellProps> = ({ row, lang,initialPhone,
       />,
       customSize: '480px',
     });
+    if(isNextStepVisible){
+      closeNextStep();
+    }
   };
   return (
     <div className="flex items-center justify-end gap-3 pe-3">

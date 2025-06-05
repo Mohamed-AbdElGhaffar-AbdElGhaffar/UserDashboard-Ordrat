@@ -77,8 +77,8 @@ export default function ModalAssignDriver({ orderId, lang = 'en', status, branch
               <p className="text-2xl text-center mb-2 font-bold">{text.title}</p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 {[
-                  { value: 'branch', title: lang === 'ar' ? 'الفرع' : 'Branch', imageURL: branch },
-                  { value: 'ordrat', title: lang === 'ar' ? 'اوردرات' : 'Ordrat', imageURL: logo },
+                  { value: 'branch', title: lang === 'ar' ? 'الفرع' : 'Branch', imageURL: branch, link: `/${lang}/orders/branch/assignToDelivery/${orderId}` },
+                  { value: 'ordrat', title: lang === 'ar' ? 'اوردرات' : 'Ordrat', imageURL: logo, link: `/${lang}/orders/ordrat/assignToDelivery/${orderId}` },
                 ].map((option) => (
                   <label key={option.value} className="cursor-pointer">
                     <input
@@ -92,7 +92,7 @@ export default function ModalAssignDriver({ orderId, lang = 'en', status, branch
                       }}
                       className="hidden"
                     />
-                    <Link href={`/${lang}/orders/assignToDelivery/${orderId}`} className={`w-[160px] h-[130px] flex flex-col justify-center items-center rounded-[5px] border-2 transition-all duration-200 ${
+                    <Link href={option.link} className={`w-[160px] h-[130px] flex flex-col justify-center items-center rounded-[5px] border-2 transition-all duration-200 ${
                       formik.values.deliveryMethod === option.value ? 'bg-[#E8E8E8] border-[#e11d48]' : 'bg-[#E8E8E8] border-transparent'
                     }`}>
                       <Image

@@ -70,7 +70,8 @@ export const routeRoles: Record<string, string[]> = {
 export const routeRolesInCludes: Record<string, string[]> = {
   "/delivery/details": [ "GetDeliverById" ],
   "/orders/": [ "OrderDetails" ],
-  "/orders/assignToDelivery/": [ "AssignOrderToDelivery" ],
+  "/orders/branch/assignToDelivery/": [ "AssignOrderToDelivery" ],
+  "/orders/ordrat/assignToDelivery/": [ "AssignOrderToDelivery" ],
   "/storeProducts/products/update": [ "/sellerDashboard/storeProducts/products/update", "sellerDashboard-storeProducts-products-update", "لوحة-تحكم-التاجر-منتجات-المتجر-المنتجات-تعديل", ],
 };
 

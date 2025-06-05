@@ -28,7 +28,7 @@ interface DeliveryUnresponsive {
   message: string;
 }
 
-export function useNegotiator(orderId?: string) {
+export function useNegotiator(orderId?: string, branch?: boolean) {
   const [accessToken, setAccessToken] = useState(GetCookiesClient('accessToken'));
   const [offers, setOffers] = useState<DeliveryOffer[]>([]);
   const [broadcastStatus, setBroadcastStatus] = useState<BroadcastStatus>({});
@@ -72,6 +72,7 @@ export function useNegotiator(orderId?: string) {
       Cookies.remove('email');
       Cookies.remove('sellerId');
       Cookies.remove('userType');
+      Cookies.remove('subdomain');
       localStorage.clear();
           
       window.location.href = '/signin';
@@ -115,8 +116,10 @@ export function useNegotiator(orderId?: string) {
     });
 
     connection.on('DeliveryCanceledOffer', (response) => {
-      // console.warn('🚫 DeliveryCanceledOffer (●●) --->', response);
-      // setOffers((prev) => prev.filter((o) => o.deliveryId !== response.deliveryId));
+      console.warn('🚫 DeliveryCanceledOffer (●●) --->', response);
+      if(response.orderId == orderId){
+        setOffers((prev) => prev.filter((o) => o.deliveryId !== response.deliveryId));
+      }
       // Optional: notify or log message
       console.log("🚫 DeliveryCanceledOffer (●'◡'●) ---> ", response);
     });
@@ -181,7 +184,8 @@ export function useNegotiator(orderId?: string) {
   const broadcastOrder = async () => {
     if (!orderId) return;
     console.log('📢 Sending BroadcastOrder...');
-    await tryInvoke('BroadcastOrder', orderId, 1);
+    console.log('📢 BroadcastOrder number = ',branch? 0 : 1);
+    await tryInvoke('BroadcastOrder', orderId, branch? 0 : 1);
     await checkIfBroadcasted();
   };
 

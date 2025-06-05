@@ -8,6 +8,7 @@ import { useUserContext } from '@/app/components/context/UserContext';
 import axiosClient from '@/app/components/context/api';
 import RoleExist from '@/app/components/ui/roleExist/RoleExist';
 import UpdateTablesForm from '../UpdateTablesForm/UpdateTablesForm';
+import { useNextStep } from 'nextstepjs';
 
 interface ActionsCellProps {
   data: any;
@@ -18,12 +19,16 @@ interface ActionsCellProps {
 const ActionsCellTables: React.FC<ActionsCellProps> = ({ data, lang, languages }) => {    
   const { openModal } = useModal();
   const { setTablesData, setPOSTableOrderId } = useUserContext();
+  const { startNextStep, currentStep, setCurrentStep, closeNextStep, isNextStepVisible } = useNextStep();
 
   const handleUpdateModal = () => {
     openModal({
       view: <UpdateTablesForm title={lang == "ar"?'تعديل الطاولة' : 'Update Table'} lang={lang} initData={data} languages={languages}/>,
       customSize: '700px',
     });
+    if (isNextStepVisible) {
+      closeNextStep();
+    }
   };
 
   const handleDeleteTable = async () => {
@@ -59,6 +64,7 @@ const ActionsCellTables: React.FC<ActionsCellProps> = ({ data, lang, languages }
             variant="outline"
             className="hover:!border-gray-900 hover:text-gray-700"
             onClick={handleUpdateModal}
+            id='update-table'
           >
             <PencilIcon className="h-4 w-4" />
           </ActionIcon>
@@ -73,6 +79,20 @@ const ActionsCellTables: React.FC<ActionsCellProps> = ({ data, lang, languages }
               : `Are you sure you want to delete this Table ?`
           }
           onDelete={handleDeleteTable}
+          onClick={()=>{
+            if (isNextStepVisible) {
+              if (languages === 0 || languages === 1) {
+                if (currentStep == 6) {
+                  closeNextStep();
+                }
+              }else {
+                if (currentStep == 7) {
+                  closeNextStep();
+                }
+              }
+            }
+          }}
+          id='delete-table'
         />
       </RoleExist>
     </div>

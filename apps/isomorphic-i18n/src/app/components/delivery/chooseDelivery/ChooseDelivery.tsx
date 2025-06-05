@@ -138,7 +138,7 @@ type ChooseDeliveryFormProps = {
   initialOrder: any;
   initialLocationDirection: any;
 };
-
+const GUID_EMPTY = "00000000-0000-0000-0000-000000000000";
 export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviation,branches, orderId, pageHeader, initialDeliveryInfo, initialOrder, initialLocationDirection }: ChooseDeliveryFormProps) {
   const { closeModal } = useModal();
   const accessToken = GetCookiesClient('accessToken');
@@ -155,7 +155,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
     cancelBroadcastOrder,
     acceptDeliveryOffer,
     rejectDeliveryOffer,
-  } = useNegotiator(orderId);
+  } = useNegotiator(orderId, false);
   // console.log("broadcastStatus: ",broadcastStatus);
   // console.log("isOrderBroadcasted: ",isOrderBroadcasted);
   console.log("offers: ",offers);
@@ -255,7 +255,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
     if (fetchedOrder) {
       setOrder(fetchedOrder);
       setCurrencyAbbreviation(shopData?.currencyAbbreviation);
-      if (fetchedOrder?.type === 2 && (fetchedOrder.status === 3 || fetchedOrder.status === 4)) {
+      if (fetchedOrder?.type === 2 && (fetchedOrder.status === 2 || fetchedOrder.status === 3 || fetchedOrder.status === 4) && fetchedOrder.deliveryId != GUID_EMPTY || null) {
         const info = await fetchDeliveryById(fetchedOrder.deliveryId);
         console.log("info: ",info);
         
@@ -263,7 +263,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
       }else{
         setDeliveryInfo(null);
       }
-      if (fetchedOrder?.type === 2 && (fetchedOrder.status === 3)) {
+      if (fetchedOrder?.type === 2 && (fetchedOrder.status === 2 || fetchedOrder.status === 3)&& fetchedOrder.deliveryId != GUID_EMPTY || null) {
         const fetchLocDir = await fetchLocationDirection(orderId, lang);
         setLocationDirection(fetchLocDir);
       }
@@ -290,7 +290,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
   }, [page, maxPage, selectedBranch, offers, isOrderBroadcasted]);
   useEffect(() => {
     const interval = setInterval(async () => {
-      if (order?.type === 2 && order.status === 3) {
+      if (order?.type === 2 && (order.status === 2 || order.status === 3)&& order.deliveryId != GUID_EMPTY || null) {
         const fetchLocDir = await fetchLocationDirection(orderId, lang);
         setLocationDirection(fetchLocDir);
       } else {
@@ -379,7 +379,7 @@ export default function ChooseDelivery({ lang = 'en', initialCurrencyAbbreviatio
                       <span className="font-medium text-gray-700">{text.shippingFees}:</span>
                     </div>
                     <span className="font-bold text-green-600 text-md flex gap-2">
-                      {(order.status === 3 || order.status === 4)? order.finalShippingFees : order.shippingFees} {currencyAbbreviation === "ر.س" ? (<Image src={sarIcon} alt="SAR" width={16} height={16} />) : (<span>{currencyAbbreviation}</span>)}
+                      {(order.status === 2 || order.status === 3 || order.status === 4)? order.finalShippingFees : order.shippingFees} {currencyAbbreviation === "ر.س" ? (<Image src={sarIcon} alt="SAR" width={16} height={16} />) : (<span>{currencyAbbreviation}</span>)}
                     </span>
                   </div>
                 </div>                
