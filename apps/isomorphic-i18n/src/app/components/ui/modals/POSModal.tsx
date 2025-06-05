@@ -540,24 +540,25 @@ function POSModal({
                             className="bg-white rounded-full p-2 absolute top-3 start-2 hover:cursor-pointer"
                             size={36}
                           />
-                          {prodId?.isDiscountActive &&
-                          <p
-                          className="bg-white rounded-xl py-2 px-3 absolute top-3 font-semibold end-2 hover:cursor-pointer"
-                          
-                          >
-                              {lang==='ar'?'خصم':'save'}{" "}
+                          {prodId?.isDiscountActive && (
+                            <p className="bg-white rounded-xl py-2 px-3 flex gap-1 items-center absolute top-3 font-semibold end-2 hover:cursor-pointer">
+                              {lang === 'ar' ? 'خصم' : 'Save'}{" "}
+                              
+                              {prodId.discountType === 0 ? (
+                                <span>{prodId.discount} %</span>
+                              ) : (
+                                <span className="flex items-center gap-1">
+                                  {prodId.discount}
+                                  {currencyAbbreviation === 'ر.س' ? (
+                                    <Image src={sarIcon} alt="SAR" width={12} height={12} />
+                                  ) : (
+                                    <span>{currencyAbbreviation}</span>
+                                  )}
+                                </span>
+                              )}
+                            </p>
+                          )}
 
-                            {prodId.discountType ===0 ?
-                           ` ${prodId.discount} %`
-                           :
-                            `${prodId.discount} ${currencyAbbreviation === 'ر.س' ? (
-                              <Image src={sarIcon} alt="SAR" width={12} height={12} />
-                            ) : (
-                              <span>{currencyAbbreviation}</span>
-                            )}`
-                          }
-                          </p>
-                          }
                         </div>
                         <div className="px-4 pt-2 flex flex-col">
                           <div className="flex items-center gap-2">
