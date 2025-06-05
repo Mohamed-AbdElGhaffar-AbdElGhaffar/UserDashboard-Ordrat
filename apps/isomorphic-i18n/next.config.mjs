@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
-
+import nextPwa from 'next-pwa'
+const withPWA = nextPwa({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: false, 
+})
 const nextConfig = {
   images: {
     domains: [
@@ -58,4 +64,4 @@ const nextConfig = {
   transpilePackages: ["@isomorphic/core"],
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
