@@ -48,7 +48,6 @@ type POSOrderFormProps = {
   clearItemFromCart: (id: number | string) => void;
   items: Item[];
   branchOption: any[];
-  shopGateways: any[];
 };
 
 // const customers = [
@@ -134,9 +133,26 @@ export default function POSOrderForm({
   clearItemFromCart,
   items,
   branchOption,
-  shopGateways,
   currencyAbbreviation
 }: POSOrderFormProps) {
+  const shopGateways = [
+    {
+      id: "1",
+      gatewayName: lang == 'ar'? "فيزا" : "Visa",
+      gatewayDescription: lang == 'ar'? "وسيلة دفع ب كارت فيزا" : "Visa Payment Method",
+      gatewayUrl: "https://isomorphic-furyroad.s3.amazonaws.com/public/payment/master.webp",
+      isEnabled: true,
+      paymentMethod: '1',
+    },
+    {
+      id: "2",
+      gatewayName: lang == 'ar'? "الدفع عند الاستلام" : "Cash",
+      gatewayDescription: lang == 'ar'? "الدفع عند الاستلام" : "Cash on Delivery",
+      gatewayUrl: "https://cdn.ordrat.com/1aba7b65-b6f6-403f-8f8b-0ab4dae108fd_converted.webp",
+      isEnabled: true,
+      paymentMethod: '0',
+    }
+  ];
   const shopId = GetCookiesClient('shopId');
   const userType = GetCookiesClient('userType');
   const { closeModal } = useModal();
@@ -351,8 +367,6 @@ export default function POSOrderForm({
         const response = await axiosClient.post(`/api/Order/Create/${shopId}`, formData);
   
         if (response.status === 200) {
-          const payUrl = response.data.payUrl;
-          router.push(payUrl)
           const orderId = response.data.id;
           const orderNumber = response.data.orderNumber;
   
