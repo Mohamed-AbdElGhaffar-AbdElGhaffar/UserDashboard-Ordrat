@@ -49,6 +49,11 @@ const MenuItems = ({ lang }: { lang?: string; }, p0?: { lang: any; }) => {
           icon: <PiStorefront />,
         },
         {
+          name: 'side-payment-gateways',
+          href: `/${lang!}/storeSetting/payment-gateways`,
+          icon: <MdRestaurant />,
+        },
+        {
           name: 'side-tables',
           href: `/${lang!}/storeSetting/tables`,
           icon: <MdRestaurant />,

@@ -47,6 +47,8 @@ type UserContextType = {
   setUpdateMainBranch: React.Dispatch<React.SetStateAction<boolean>>;
   progressData: boolean;
   setProgressData: React.Dispatch<React.SetStateAction<boolean>>;
+  paymentGateway: boolean;
+  setPaymentGateway: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -75,6 +77,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children  }) =
   const [updateMainBranch, setUpdateMainBranch] = useState<boolean>(false);
   const [progressData, setProgressData] = useState<boolean>(false);
 
+  const [paymentGateway, setPaymentGateway] = useState<boolean>(false);
+
   
   return (
     <UserContext.Provider value={{
@@ -99,6 +103,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children  }) =
       mainBranch, setMainBranch,
       updateMainBranch, setUpdateMainBranch,
       progressData, setProgressData,
+      paymentGateway, setPaymentGateway,
     }}>
       {children}
     </UserContext.Provider>

@@ -8,19 +8,39 @@ import cn from '@utils/class-names';
 import { useUserContext } from '@/app/components/context/UserContext';
 import { useEffect, useState } from 'react';
 import axiosClient from '@/app/components/context/api';
+import { GetCookiesClient } from '@/app/components/ui/getCookiesClient/GetCookiesClient';
 // import { useCart } from '../../../../../isomorphic/src/store/quick-cart/cart.context';
 
 export default function POSPageView({ lang = 'en', filterOptions, tables, branchOption, allDatatables, languages, branchZones, freeShppingTarget, currencyAbbreviation, defaultUser, shopData }:{ lang: string; filterOptions: { id: string; name: string; value: string; icon: any; }[]; 
   tables: { value: string; label: string }[]; branchOption: any[]; allDatatables: any[]; languages: number; branchZones: { id:string; lat: number; lng: number; zoonRadius: number }[]; freeShppingTarget: number; currencyAbbreviation: string; defaultUser: string; shopData: any;}) {
   const { items, removeItemFromCart, clearItemFromCart, addItemToCart } = useCart();
   const [defaultData, setDefaultData] = useState<any[]>(allDatatables);
+  const [shopGateways, setShopGateways] = useState<any[]>([]);
   const { posTableOrderId, setPOSTableOrderId, tablesData, setTablesData, mainBranch } = useUserContext();
+  const shopId = GetCookiesClient('shopId') as string;
+  
+  const fetchShopPaymentGatewayData = async () => {
+    try {
+      const response = await axiosClient.get(`/api/ShopPaymentGateway/GetByShopId/${shopId}`, {
+        headers: {
+          'Accept-Language': lang,
+        },
+      });
+      console.log("ShopPaymentGateway: ",response.data);
+      
+      setShopGateways(response.data);
+    } catch (error) {
+      console.error('Error loading shop gateways:', error);
+      setShopGateways([]);
+    }
+  };
   useEffect(() => {
     const localPOSTableOrderId = localStorage.getItem('posTableOrderId');
     const posTableOrderIdLocal = localPOSTableOrderId ? JSON.parse(localPOSTableOrderId) : null;
     if (posTableOrderId != posTableOrderIdLocal) {
       setPOSTableOrderId(posTableOrderIdLocal);
     }
+    fetchShopPaymentGatewayData();
   }, [lang]);
   const fetchTablesData = async () => {
     try {
@@ -100,6 +120,7 @@ export default function POSPageView({ lang = 'en', filterOptions, tables, branch
             freeShppingTarget={freeShppingTarget}
             shopData={shopData}
             currencyAbbreviation={currencyAbbreviation}
+            shopGateways={shopGateways}
           />
         </aside>
       {/* )} */}

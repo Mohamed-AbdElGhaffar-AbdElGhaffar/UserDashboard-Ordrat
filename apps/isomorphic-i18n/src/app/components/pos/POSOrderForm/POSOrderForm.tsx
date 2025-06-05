@@ -21,6 +21,7 @@ import { GetCookiesClient } from '../../ui/getCookiesClient/GetCookiesClient';
 // import { useCart } from '@/store/quick-cart/cart.context';
 import { CartItem as Item } from '@/types';
 import { printOrderReceipt } from '../printOrderReceipt ';
+import { useRouter } from 'next/navigation';
 
 const fetchOrderDetails = async (orderId: string, lang: string): Promise<any | null> => {
   try {
@@ -47,6 +48,7 @@ type POSOrderFormProps = {
   clearItemFromCart: (id: number | string) => void;
   items: Item[];
   branchOption: any[];
+  shopGateways: any[];
 };
 
 // const customers = [
@@ -132,6 +134,7 @@ export default function POSOrderForm({
   clearItemFromCart,
   items,
   branchOption,
+  shopGateways,
   currencyAbbreviation
 }: POSOrderFormProps) {
   const shopId = GetCookiesClient('shopId');
@@ -156,7 +159,8 @@ export default function POSOrderForm({
   const [searchPhone, setSearchPhone] = useState('');
   const [filteredCustomers, setFilteredCustomers] = useState(customers);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
-
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const router = useRouter();
   const text = {
     addNewCustomer: lang === 'ar' ? 'اضافة عميل جديد' : 'Add New Customer',
     addCustomer: lang === 'ar' ? 'اضافة عميل' : 'Add Customer',
@@ -176,6 +180,7 @@ export default function POSOrderForm({
     tablePlaceLable: lang === 'ar' ? 'رقم التربيزة:' : 'Table Number:',
     selectIsRequired: lang === 'ar' ? 'الرجاء اختيار العميل' : 'Please select a customer',
     tablePlaceIsRequired: lang === 'ar' ? 'الرجاء تحديد رقم التربيزة' : 'Please select a table number',
+    paymentMethod: lang === 'ar' ? 'الرجاء اختيار وسيلة الدفع' : 'Please select a payment method',
   };
   console.log("shipping: ",shipping);
 
@@ -229,6 +234,7 @@ export default function POSOrderForm({
     initialValues: {
       selectedCustomer: '',
       tableNumber: '',
+      paymentMethod: '',
       // branchId: '',
     },
     validationSchema: () => {
@@ -240,6 +246,11 @@ export default function POSOrderForm({
       if (shipping === 'delivery') {
         schema = schema.shape({
           tableNumber: Yup.string().required(text.tablePlaceIsRequired),
+        });
+      }
+      if (shopGateways.filter(gateway => gateway.isEnabled).length != 0 && shopGateways.filter(gateway => gateway.isEnabled).length != 1) {
+        schema = schema.shape({
+          paymentMethod: Yup.string().required(text.paymentMethod),
         });
       }
   
@@ -258,9 +269,15 @@ export default function POSOrderForm({
       const storedBranch = localStorage.getItem('mainBranch');
       const accessToken = GetCookiesClient('accessToken') as string;
       const decodedToken = decodeJWT(accessToken);
+      const selectedGateway = shopGateways.find((g) => g.id === selectedId);
+      const paymentMethod = selectedGateway?.paymentMethod;
       try {
         const formData = new FormData();
-        formData.append('paymentmethod', '0');
+        if (shopGateways.filter(gateway => gateway.isEnabled).length == 1) {
+          formData.append('paymentmethod', shopGateways[0]?.paymentMethod);
+        }else{
+          formData.append('paymentmethod',  paymentMethod?.toString() || '0');
+        }
         formData.append('TotalPrice', "0");
         formData.append('ShippingFees', "0");
         formData.append('TotalVat', "0");
@@ -334,6 +351,8 @@ export default function POSOrderForm({
         const response = await axiosClient.post(`/api/Order/Create/${shopId}`, formData);
   
         if (response.status === 200) {
+          const payUrl = response.data.payUrl;
+          router.push(payUrl)
           const orderId = response.data.id;
           const orderNumber = response.data.orderNumber;
   
@@ -445,7 +464,7 @@ export default function POSOrderForm({
             e.preventDefault();
             mainFormik.handleSubmit();
           }}>
-            {(selectedCustomer || shipping == 'delivery') && (
+            {(selectedCustomer || shipping == 'delivery' || (shopGateways.filter(gateway => gateway.isEnabled).length != 0 && shopGateways.filter(gateway => gateway.isEnabled).length != 1)) && (
               <div className='grid grid-cols-2 border-b border-black mb-4 gap-x-4'>
                 {selectedCustomer && (
                   <>
@@ -479,18 +498,46 @@ export default function POSOrderForm({
                     inPortal={false}
                   />
                 )}
-                {/* <Select
-                  options={branchOption}
-                  value={branchOption?.find((option: any) => option.value === mainFormik.values.branchId)}
-                  onChange={(value) => mainFormik.setFieldValue('branchId', value)}
-                  label={text.branchLable}
-                  placeholder={text.placeholderBranch}
-                  className="mb-4"
-                  labelClassName='font-bold text-sm leading-[28px] text-black'
-                  error={mainFormik.errors.branchId as string}
-                  getOptionValue={(option) => option.value}
-                  inPortal={false}
-                /> */}
+                {(shopGateways.filter(gateway => gateway.isEnabled).length != 1 && shopGateways.filter(gateway => gateway.isEnabled).length != 0 ) && (
+                  <>
+                    <span className="font-bold text-sm leading-[28px] text-black">{lang == 'ar'? 'اختر وسيلة الدفع:' : 'Select Payment Method:'}</span>
+                    <div className="col-span-full grid grid-cols-2 xs:grid-cols-3 md:grid-cols-4 gap-4 my-2">
+                      {shopGateways.filter(gateway => gateway.isEnabled).map((gateway: any) => {
+                        const isSelected = selectedId === gateway.id;
+
+                        return (
+                          <div
+                            key={gateway.id}
+                            onClick={() => {
+                              setSelectedId(gateway.id);
+                              mainFormik.setFieldValue('paymentMethod', gateway.id);
+                            }}
+                            className={`cursor-pointer p-2 rounded-xl border transition-all duration-200
+                              ${isSelected ? 'border-primary shadow-md' : 'border-gray-200 hover:shadow-sm'}
+                            `}
+                          >
+                            <div className="flex flex-col items-center justify-center space-y-2 h-[80px]">
+                              <div className="w-14 h-12 flex items-center justify-center">
+                                <img
+                                  src={gateway.gatewayUrl}
+                                  alt={gateway.gatewayName}
+                                  width='80'
+                                  height='80'
+                                  className="object-contain w-full h-full"
+                                />
+                              </div>
+                              <span className="text-sm font-semibold text-center truncate w-full">
+                                {gateway.gatewayName}
+                              </span>
+                            </div>
+                          </div>
+
+                        );
+                      })}
+                    </div>
+                    {mainFormik.errors.paymentMethod as string && <p className="text-red-500 text-sm mt-1 mb-2">{mainFormik.errors.paymentMethod as string}</p>}
+                  </>
+                )}
               </div>
             )}
             {/* Search Inputs */}
@@ -513,7 +560,7 @@ export default function POSOrderForm({
                 }}
               />
             </div>
-
+           
             {/* Customer List with Radio Selection */}
             <div 
               className={`overflow-auto ${customers.length > 9 ? `max-h-56 ps-1 ${mainFormik.errors.selectedCustomer && mainFormik.touched.selectedCustomer ? 'mb-0':'mb-4'}` : ''}`}

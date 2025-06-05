@@ -32,7 +32,7 @@ export default function UpdateLocationPicker({
 }: UpdateLocationPickerProps) {
   const text = {
     searchPlaceholder: lang === 'ar' ? 'ابحث عن الموقع' : 'Search location',
-    enterRadius: lang === 'ar' ? 'أدخل نصف القطر بالأمتار' : 'Enter radius in meters',
+    enterRadius: lang === 'ar' ? 'أدخل نطاق التغطية بالأمتار' : 'Enter Coverage Zone in meters',
     locationButton: lang === 'ar' ? 'موقعي' : 'My Location',
     errorLoadingMap: lang === 'ar' ? 'حدث خطأ أثناء تحميل الخريطة' : 'Error loading map',
     loadingMap: lang === 'ar' ? 'جاري تحميل الخريطة...' : 'Loading map...',

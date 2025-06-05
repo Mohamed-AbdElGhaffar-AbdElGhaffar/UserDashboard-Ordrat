@@ -1,0 +1,196 @@
+.customScroll {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.customScroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.customScroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.customScroll::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.customScroll::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Firefox scrollbar styling */
+.customScroll {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Field animations */
+.fieldCard {
+  transition: all 0.3s ease;
+}
+
+.fieldCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+}
+
+/* Switch customization */
+.customSwitch {
+  transition: all 0.3s ease;
+}
+
+.customSwitch:checked {
+  background-color: #ef4444;
+}
+
+/* Input focus states */
+.configInput:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Radio button styling */
+.radioOption {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.radioOption:hover {
+  border-color: #fca5a5 !important;
+  background-color: #fef2f2 !important;
+}
+
+.radioOption.selected {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+}
+
+/* Select dropdown styling */
+.configSelect {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Loading skeleton styling */
+.skeletonContainer {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .customScroll {
+    max-height: 70vh;
+  }
+  
+  .fieldCard {
+    padding: 1rem;
+  }
+}
+
+/* RTL support */
+[dir="rtl"] .configSelect {
+  background-position: left 0.5rem center;
+  padding-left: 2.5rem;
+  padding-right: 0.75rem;
+}
+
+[dir="rtl"] .radioOption {
+  text-align: right;
+}
+
+/* Error state styling */
+.fieldError {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+}
+
+.errorMessage {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.errorMessage::before {
+  content: "⚠️";
+  font-size: 0.75rem;
+}
+
+/* Success state */
+.fieldSuccess {
+  border-color: #10b981 !important;
+  background-color: #f0fdf4 !important;
+}
+
+/* Priority field styling */
+.priorityField {
+  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+  border: 2px solid #fca5a5;
+}
+
+.priorityField:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Status toggle styling */
+.statusToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.statusToggle:hover {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+/* Icon styling */
+.fieldIcon {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* Button styling */
+.submitButton {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  transition: all 0.3s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.cancelButton {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  transition: all 0.3s ease;
+}
+
+.cancelButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(107, 114, 128, 0.4);
+}
